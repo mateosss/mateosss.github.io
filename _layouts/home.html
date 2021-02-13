@@ -1,0 +1,30 @@
+---
+---
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+  </head>
+  <body>
+    <main>
+    <article class="latex">
+      <h1>{{ page.title }}</h1>
+      <div class="latex-header">
+        {% if page.author %} <h2 class="author">{{ page.author }}</h2> {% endif %}
+        {% if page.date %} <h2 class="date">{{ page.date }}</h2> {% endif %}
+      </div>
+      {% if page.abstract %}
+      <div class="latex-abstract">
+        <h2>Abstract</h2>
+        <p>{{ page.abstract }}</p>
+      </div>
+      {% endif %}
+      {{ content }}
+    </article>
+    </main>
+  </body>
+  <footer class="footer">
+  </footer>
+</html>

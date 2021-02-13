@@ -1,0 +1,150 @@
+/*
+  Originally inspired from https://github.com/Hammie217/LatexJekyll
+  NOTE: Commented background-color's are there for debugging, do not remove.
+*/
+
+/* Globals */
+:root {
+  /* Paragraph */
+  --p-width: 58vw;
+  --p-max-width: 72ch;
+  --abstract-width: 88%;
+
+  /* Font sizes */
+  --fs-h1: 40px;
+  --fs-h2-name: 27px;
+  --fs-h2-date: 27px;
+  --fs-h2-abstract: 25px;
+  --fs-h2: 33px;
+  --fs-p: 23px;
+  --fs-p-abstract: 21px;
+
+}
+
+/* Style resets */
+h1, h2, body {
+  margin: 0;
+	/* padding: 0; */
+	/* border: 0; */
+	/* outline: 0; */
+	font-weight: inherit;
+	/* font-style: inherit; */
+	/* font-size: 100%; */
+	/* font-family: inherit; */
+	/* vertical-align: baseline; */
+}
+
+/* Fonts */
+
+@font-face {
+  font-family: "CM Serif";
+  src: url(../fonts/cmunrm.woff);
+}
+@font-face {
+  font-family: "CM Serif Bold";
+  src: url(../fonts/cmunbx.woff);
+}
+
+body {
+  font-family: "CM Serif";
+  font-size: var(--fs-p);
+}
+
+/* Screensize specifics */
+
+@media only screen and (max-width: 320px) { :root {
+  /* background-color: deepskyblue; */
+  --p-width: 100vw
+}}
+
+@media only screen and (min-width: 321px) and (max-width: 480px) { :root {
+  /* background-color: fuchsia; */
+  --p-width: 100vw
+}}
+@media only screen and (min-width: 481px) and (max-width: 768px) { :root {
+  /* background-color: gold; */
+  --p-width: 80vw;
+}}
+@media only screen and (min-width: 769px) and (max-width: 1024px) { :root {
+  /* background-color: greenyellow; */
+  --p-width: 80vw;
+}}
+@media only screen and (min-width: 1025px) and (max-width: 1200px) {:root {
+  /* background-color: darkviolet; */
+  --p-width: 72vw;
+}}
+
+.latex {
+  width: var(--p-width);
+  padding-left: calc((100vw - min(var(--p-width), var(--p-max-width))) / 2);
+  max-width: var(--p-max-width);
+}
+
+.latex > h1 {
+  font-family: "CM Serif";
+  font-size: var(--fs-h1);
+  padding-top: 10vh;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.latex > .latex-header > h2.author{
+  font-family: "CM Serif";
+  font-size: var(--fs-h2-name);
+  text-align: center;
+  margin-bottom: 13px;
+}
+.latex > .latex-header > h2.date{
+  font-family: "CM Serif";
+  font-size: var(--fs-h2-date);
+  text-align: center;
+  margin-top: 13px;
+  margin-bottom: 45px;
+}
+
+.latex > h2 {
+  font-family: "CM Serif Bold";
+  font-size: var(--fs-h2);
+  text-align: Left;
+  margin-top: 13px;
+  margin-bottom: 20px;
+}
+
+.latex > p {
+  font-family: "CM Serif";
+  font-size: var(--fs-p);
+  text-align: Left;
+  margin-top: 13px;
+  margin-bottom: 45px;
+  line-height: 125%;
+}
+
+/* Abstract section */
+
+.latex-abstract{
+  width: var(--abstract-width);
+  padding-left: calc((100% - var(--abstract-width)) / 2);
+  padding-bottom: 15px;
+}
+
+.latex-abstract > h2{
+  font-family: "CM Serif Bold";
+  font-weight: bold;
+  font-size: var(--fs-h2-abstract);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.latex-abstract > p {
+  margin-top: 10px;
+  font-family: "CM Serif";
+  font-size: var(--fs-p-abstract);
+  text-align: justify;
+  text-indent: 20px;
+}
+
+.footer{
+  height: 30vh;
+  width: 100%;
+  /* background-color: darkslategrey; */
+}
