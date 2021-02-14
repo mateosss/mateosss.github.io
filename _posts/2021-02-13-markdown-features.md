@@ -181,20 +181,27 @@ watend
 
 ---
 
-Standard link =  <http://ghost.org>
+Standard link =  <http://ghost.org>\\
 [Custom Text Link](http://ghost.org)
 
 ---
 
 ![Image](https://raw.githubusercontent.com/mateosss/nnet/main/docs/res/network-diagram.svg)
+
+*Figure: The network diagram*
+
 ![Image](https://raw.githubusercontent.com/mateosss/nnet/main/docs/res/class_losses_hitrate_en.svg)
-![Image](https://raw.githubusercontent.com/mateosss/nnet/main/docs/res/auto_losses_en.svg)
+
+In that one it is just two.
+
+![Image](https://raw.githubusercontent.com/mateosss/nnet/main/docs/res/auto_losses_en.svg){:style="width: 60%"}
+![Birds](https://www.bing.com/th?id=OHR.BluebirdsEastern_ROW6178802062_1920x1080.jpg&rf=LaDigue_1920x1080.jpg)
 
 ---
 
 Table
 
-| Left-Aligned  | Center Aligned  | Right Aligned |
+| **Left-Aligned**  | **Center Aligned**  | **Right Aligned** |
 | :------------ |:---------------:| -----:|
 | col 3 is      | some wordy text | $1600 |
 | col 2 is      | centered        |   $12 |

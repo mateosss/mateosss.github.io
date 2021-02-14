@@ -27,9 +27,15 @@
   --c-hl: #E91E63; /* highlight */
   --c-cm: #2196F3; /* complement */
 
+  /* Border radius */
+  --br: 5px;
+
+  /* Box shadow */
+  --bs: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+
 }
 
-html {
+html { /* Set globals like rem size and font */
   font-family: "CM Serif";
   font-size: var(--fs-p);
   background-color: var(--c-bg);
@@ -37,7 +43,7 @@ html {
 }
 
 /* Style resets */
-h1, h2, body, p {
+h1, h2, body, p, th {
   margin: 0;
 	/* padding: 0; */
 	/* border: 0; */
@@ -59,14 +65,13 @@ h1, h2, body, p {
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--c-hl);
-  border-radius: 5px;
+  border-radius: var(--br);
 }
 
 * {
   scrollbar-color: var(--c-hl) transparent;
   scrollbar-width: thin;
 }
-
 
 /* Fonts */
 
@@ -85,6 +90,30 @@ h1, h2, body, p {
   src: url(../fonts/firacode.woff2);
 }
 
+/* Links animation */
+
+a {
+  text-decoration: none;
+  position: relative;
+}
+
+a:hover:before {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+a:before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--c-hl);
+  visibility: hidden;
+  transform: scaleX(0);
+  transition: all .2s cubic-bezier(1,.25,0,.75) 0s;
+}
 
 /* Screensize specifics */
 
@@ -185,11 +214,11 @@ h1, h2, body, p {
 }
 
 .latex pre.highlight { /* Code block */
-  box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+  box-shadow: var(--bs);
   font-size: var(--fs-mono);
   padding: 1rem;
   margin: 0 0 1rem 0;
-  border-radius: 5px;
+  border-radius: var(--br);
   overflow-x: auto;
 }
 
@@ -200,10 +229,10 @@ h1, h2, body, p {
 /* Code block with line numbers used with {% highlight python linenos %} */
 
 .latex > figure.highlight {
-  box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+  box-shadow: var(--bs);
   font-size: var(--fs-mono);
   margin: 0 0 1rem 0;
-  border-radius: 5px;
+  border-radius: var(--br);
   overflow-x: auto;
 }
 
@@ -225,7 +254,28 @@ h1, h2, body, p {
   opacity: 0.5;
 }
 
+.latex img { /* Images */
+  width: 100%;
+  display: block;
+  margin: auto;
+  border-radius: var(--br);
+  margin: 0 auto 1rem auto;
+}
 
+/* Tables */
+
+.latex > table {
+  margin: auto;
+  border-collapse: collapse;
+}
+.latex > table td, .latex > table th {
+  border: 2px black solid;
+  padding: 0.5rem;
+}
+
+.latex > table th {
+  padding: 1rem;
+}
 
 /* Abstract section */
 
