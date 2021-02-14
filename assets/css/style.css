@@ -11,18 +11,19 @@
   --abstract-width: 88%;
 
   /* Font sizes, 1rem == --fs-p */
-  --fs-h1: 40px;
-  --fs-h2-name: 27px;
-  --fs-h2-date: 27px;
-  --fs-h2-abstract: 25px;
-  --fs-h2: 33px;
-  --fs-p: 23px;
-  --fs-p-abstract: 21px;
+  /* Proportions taken from the Jekyll Latex theme */
+  --fs-p: 23px; /* Base unit, 1rem */
+  --fs-h1: 1.739rem; /* 40/23 */
+  --fs-h2-name: 1.174rem; /* 27/23 */
+  --fs-h2-date: 1.174rem;
+  --fs-h2-abstract: 1.087rem; /* 25/23 */
+  --fs-h2: 1.435rem; /* 33/23 */
+  --fs-p-abstract: 0.913rem; /* 21/23 */
   --fs-mono: 0.7rem; /* Mono font w.r.t. main font size */
 
   /* Colors */
-  --c-bg-1: #ECEFF1;
   --c-bg: white; /* background */
+  --c-bg-1: #ECEFF1;
   --c-fg: black; /* foreground */
   --c-hl: #E91E63; /* highlight */
   --c-cm: #2196F3; /* complement */
@@ -35,6 +36,30 @@
 
 }
 
+/* Screensize specifics */
+
+@media only screen and (max-width: 320px) { :root {
+  /* background-color: deepskyblue; */
+  --p-width: 96vw;
+}}
+
+@media only screen and (min-width: 321px) and (max-width: 480px) { :root {
+  /* background-color: fuchsia; */
+  --p-width: 88vw;
+}}
+@media only screen and (min-width: 481px) and (max-width: 768px) { :root {
+  /* background-color: gold; */
+  --p-width: 88vw;
+}}
+@media only screen and (min-width: 769px) and (max-width: 1024px) { :root {
+  /* background-color: greenyellow; */
+  --p-width: 88vw;
+}}
+@media only screen and (min-width: 1025px) and (max-width: 1200px) { :root {
+  /* background-color: darkviolet; */
+  --p-width: 72vw;
+}}
+
 html { /* Set globals like rem size and font */
   font-family: "CM Serif";
   font-size: var(--fs-p);
@@ -42,8 +67,7 @@ html { /* Set globals like rem size and font */
   color: var(--c-fg);
 }
 
-/* Style resets */
-h1, h2, body, p, th {
+h1, h2, body, p, th { /* Style resets */
   margin: 0;
 	/* padding: 0; */
 	/* border: 0; */
@@ -115,29 +139,7 @@ a:before {
   transition: all .2s cubic-bezier(1,.25,0,.75) 0s;
 }
 
-/* Screensize specifics */
-
-@media only screen and (max-width: 320px) { :root {
-  /* background-color: deepskyblue; */
-  --p-width: 100vw
-}}
-
-@media only screen and (min-width: 321px) and (max-width: 480px) { :root {
-  /* background-color: fuchsia; */
-  --p-width: 100vw
-}}
-@media only screen and (min-width: 481px) and (max-width: 768px) { :root {
-  /* background-color: gold; */
-  --p-width: 80vw;
-}}
-@media only screen and (min-width: 769px) and (max-width: 1024px) { :root {
-  /* background-color: greenyellow; */
-  --p-width: 80vw;
-}}
-@media only screen and (min-width: 1025px) and (max-width: 1200px) { :root {
-  /* background-color: darkviolet; */
-  --p-width: 72vw;
-}}
+/* Latex rules */
 
 .latex {
   width: var(--p-width);
@@ -146,7 +148,7 @@ a:before {
 }
 
 
-.latex > h1 {
+.latex > h1 { /* H1 headers */
   font-family: "CM Serif";
   font-size: var(--fs-h1);
   text-align: center;
@@ -154,13 +156,13 @@ a:before {
   margin-bottom: 1rem;
 }
 
-.latex > .latex-header > h2.author{
+.latex > .latex-header > h2.author{ /* Author header */
   font-family: "CM Serif";
   font-size: var(--fs-h2-name);
   text-align: center;
   margin-bottom: 0.5rem;
 }
-.latex > .latex-header > h2.date{
+.latex > .latex-header > h2.date{ /* Date header */
   font-family: "CM Serif";
   font-size: var(--fs-h2-date);
   text-align: center;
@@ -168,7 +170,7 @@ a:before {
   margin-bottom: 2rem;
 }
 
-.latex > h2 {
+.latex > h2 { /* H2 header */
   font-family: "CM Serif Bold";
   font-size: var(--fs-h2);
   text-align: Left;
@@ -176,11 +178,11 @@ a:before {
   margin-bottom: 1rem;
 }
 
-.latex > h3 {
+.latex > h3 { /* H3 header */
   margin-top: 2rem;
 }
 
-.latex > p {
+.latex > p { /* Paragrah */
   font-family: "CM Serif";
   font-size: var(--fs-p);
   text-align: Left;
@@ -189,14 +191,14 @@ a:before {
   margin-bottom: 1rem;
 }
 
-.latex > blockquote {
+.latex > blockquote { /* Quote */
   background-color: var(--c-bg-1);
   font-style: italic;
   padding: 1rem;
   border-radius: 2px;
 }
 
-.latex > hr {
+.latex > hr { /* Horizontal line */
   border-color: var(--c-fg);
 }
 
@@ -222,7 +224,7 @@ a:before {
   overflow-x: auto;
 }
 
-.latex pre {
+.latex pre { /* Inline code */
   line-height: 1.55; /* Magic number height that I like particularly for this font */
 }
 

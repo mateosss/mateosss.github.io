@@ -2,10 +2,11 @@
 
 Stuff that this blog does not have (yet):
 
+- Optimized lighthouse score and minifications
 - Full markdown styling
 - Home/about/404 pages
 - Dark mode
-- Favicon
+- Favicon and theme metatag
 - Good usage of metatags (e.g. theme) and schema.org
 - Good code highlighting: use fira code, see prism or some highlighter for jekyll
 - CSS for print media for nicer pdfs
