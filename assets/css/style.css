@@ -10,7 +10,7 @@
   --p-max-width: 72ch;
   --abstract-width: 88%;
 
-  /* Font sizes */
+  /* Font sizes, 1rem == --fs-p */
   --fs-h1: 40px;
   --fs-h2-name: 27px;
   --fs-h2-date: 27px;
@@ -18,7 +18,22 @@
   --fs-h2: 33px;
   --fs-p: 23px;
   --fs-p-abstract: 21px;
+  --fs-mono: 0.7rem; /* Mono font w.r.t. main font size */
 
+  /* Colors */
+  --c-bg-1: #ECEFF1;
+  --c-bg: white; /* background */
+  --c-fg: black; /* foreground */
+  --c-hl: #E91E63; /* highlight */
+  --c-cm: #2196F3; /* complement */
+
+}
+
+html {
+  font-family: "CM Serif";
+  font-size: var(--fs-p);
+  background-color: var(--c-bg);
+  color: var(--c-fg);
 }
 
 /* Style resets */
@@ -34,21 +49,42 @@ h1, h2, body, p {
 	/* vertical-align: baseline; */
 }
 
+/* Scrollbars */
+
+*::-webkit-scrollbar {
+  background-color: transparent;
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--c-hl);
+  border-radius: 5px;
+}
+
+* {
+  scrollbar-color: var(--c-hl) transparent;
+  scrollbar-width: thin;
+}
+
+
 /* Fonts */
 
 @font-face {
   font-family: "CM Serif";
   src: url(../fonts/cmunrm.woff);
 }
+
 @font-face {
   font-family: "CM Serif Bold";
   src: url(../fonts/cmunbx.woff);
 }
 
-html {
-  font-family: "CM Serif";
-  font-size: var(--fs-p);
+@font-face {
+  font-family: "FiraCode";
+  src: url(../fonts/firacode.woff2);
 }
+
 
 /* Screensize specifics */
 
@@ -125,11 +161,71 @@ html {
 }
 
 .latex > blockquote {
-  background-color: #ECEFF1;
+  background-color: var(--c-bg-1);
   font-style: italic;
   padding: 1rem;
   border-radius: 2px;
 }
+
+.latex > hr {
+  border-color: var(--c-fg);
+}
+
+.latex a { /* Links */
+  color: var(--c-hl);
+  text-decoration: none;
+}
+
+.latex > p > code { /* Inline code */
+  font-family: FiraCode;
+  font-size: var(--fs-mono);
+  background-color: var(--c-bg-1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 2px;
+}
+
+.latex pre.highlight { /* Code block */
+  box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+  font-size: var(--fs-mono);
+  padding: 1rem;
+  margin: 0 0 1rem 0;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.latex pre {
+  line-height: 1.55; /* Magic number height that I like particularly for this font */
+}
+
+/* Code block with line numbers used with {% highlight python linenos %} */
+
+.latex > figure.highlight {
+  box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+  font-size: var(--fs-mono);
+  margin: 0 0 1rem 0;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.latex div.highlighter-rouge div.highlight {
+  background-color: inherit;
+}
+
+.latex > figure.highlight > pre {
+  margin: 0;
+}
+
+.latex table.rouge-table pre {
+  padding: 1rem 0.25rem;
+  margin: 0;
+}
+
+.latex table.rouge-table pre.lineno {
+  padding: calc(var(--fs-mono) / 2);
+  opacity: 0.5;
+}
+
+
 
 /* Abstract section */
 
