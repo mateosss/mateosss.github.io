@@ -8,6 +8,7 @@ Stuff that this blog does not have (yet):
 - Favicon
 - Good usage of metatags (e.g. theme) and schema.org
 - Good code highlighting: use fira code, see prism or some highlighter for jekyll
+- CSS for print media for nicer pdfs
 - Latex support: see Katex
 - RSS/Atom feed: see jekyll-atom
 - Comments: see https://utteranc.es/ or directly use the [github

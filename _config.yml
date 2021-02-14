@@ -1,2 +1,4 @@
 title: Mateo de Mayo
 email: mateodemayo@gmail.com
+plugins:
+  - jekyll-target-blank
