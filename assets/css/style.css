@@ -146,33 +146,28 @@ a:before {
 /* Header */
 
 header.mm-header {
-  --padding: 2rem;
-  /* background-color: deepskyblue; */
-  height: 1rem;
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: center;
-  padding: var(--padding);
   justify-content: space-between;
   user-select: none;
+  padding: 1rem;
+  line-height: 2;
 }
 
-header.mm-header > a {
+header.mm-header > .mm-header-title {
   font-family: "CM Serif Bold";
   font-size: 1.25rem;
   font-weight: bold;
+  flex-grow: 1;
 }
 
-header.mm-header > span {
-  /* background-color: forestgreen; */
+header.mm-header > .mm-header-links {
+  flex-grow: 1;
+  text-align: right;
 }
 
-header.mm-header > div {
-  /* background-color: hotpink; */
-}
-
-header.mm-header > div > span {
-  /* background-color: hotpink; */
+header.mm-header > .mm-header-links > span {
   padding: 0 1rem;
 }
 
@@ -182,6 +177,12 @@ header.mm-header a {
   color: var(--c-fg)
 }
 
+@media only screen and (max-width: 768px) {
+  header.mm-header > .mm-header-title,
+  header.mm-header > .mm-header-links {
+    text-align: center;
+  }
+}
 
 /* Latex rules */
 
