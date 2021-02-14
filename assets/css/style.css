@@ -269,7 +269,7 @@ a:before {
   border-collapse: collapse;
 }
 .latex > table td, .latex > table th {
-  border: 2px black solid;
+  border: 2px var(--c-fg) solid;
   padding: 0.5rem;
 }
 
