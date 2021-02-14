@@ -8,7 +8,7 @@ abstract: >
   page we show that it is indeed feasible, and not only that but it is a
   nice way of making a blog style sheet.
 # image:
-excerpt: A lorem-ipsum style post to see text flow.
+excerpt: A lorem-ipsum filled post to showcase text flow.
 # tags:
 # category
 ---

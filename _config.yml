@@ -16,6 +16,6 @@ themes:
     fg: white
     bg: black
     bg-1: "#263238"
-    hl: "#E91E63"
-    cm: "#2196F3"
+    hl: "#2196F3"
+    cm: "#E91E63"
 default-theme: light # Must be a valid one from themes
