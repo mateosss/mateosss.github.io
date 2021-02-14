@@ -3,38 +3,6 @@
   NOTE: Commented background-color's are there for debugging, do not remove.
 */
 
-/* Globals */
-:root {
-  /* Paragraph */
-  --p-width: 58vw;
-  --p-max-width: 72ch;
-  --abstract-width: 88%;
-
-  /* Font sizes, 1rem == --fs-p */
-  /* Proportions taken from the Jekyll Latex theme */
-  --fs-p: 23px; /* Base unit, 1rem */
-  --fs-h1: 1.739rem; /* 40/23 */
-  --fs-h2-subtitle: 1.174rem; /* 27/23 */
-  --fs-h2-abstract: 1.087rem; /* 25/23 */
-  --fs-h2: 1.435rem; /* 33/23 */
-  --fs-p-abstract: 0.913rem; /* 21/23 */
-  --fs-mono: 0.7rem; /* Mono font w.r.t. main font size */
-
-  /* Colors */
-  --c-bg: white; /* background */
-  --c-bg-1: #ECEFF1;
-  --c-fg: black; /* foreground */
-  --c-hl: #E91E63; /* highlight */
-  --c-cm: #2196F3; /* complement */
-
-  /* Border radius */
-  --br: 5px;
-
-  /* Box shadow */
-  --bs: rgba(0, 0, 0, 0.55) 0px 5px 17px;
-
-}
-
 /* Screensize specifics */
 
 @media only screen and (max-width: 320px) { :root {
@@ -66,7 +34,7 @@ html { /* Set globals like rem size and font */
   color: var(--c-fg);
 
   transition-property: background-color, color;
-  transition-duration: 0.2s, 1s;
+  transition-duration: 0.2s, 0.6s;
   transition-delay: 0;
   transition-timing-function: cubic-bezier(1,.25,0,.75);
 }

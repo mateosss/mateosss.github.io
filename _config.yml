@@ -2,3 +2,20 @@ title: Mateo de Mayo
 email: mateodemayo@gmail.com
 plugins:
   - jekyll-target-blank
+
+themes:
+  light:
+    _display_name: "Light" # starting with underscore won't be sent to css
+    fg: black
+    bg: white
+    bg-1: "#ECEFF1"
+    hl: "#E91E63"
+    cm: "#2196F3"
+  dark:
+    _display_name: "Dark"
+    fg: white
+    bg: black
+    bg-1: "#263238"
+    hl: "#E91E63"
+    cm: "#2196F3"
+default-theme: light # Must be a valid one from themes

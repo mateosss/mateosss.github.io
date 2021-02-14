@@ -1,0 +1,37 @@
+---
+---
+
+/* Globals */
+:root {
+  /* Paragraph */
+  --p-width: 58vw;
+  --p-max-width: 72ch;
+  --abstract-width: 88%;
+
+  /* Font sizes, 1rem == --fs-p */
+  /* Proportions taken from the Jekyll Latex theme */
+  --fs-p: 23px; /* Base unit, 1rem */
+  --fs-h1: 1.739rem; /* 40/23 */
+  --fs-h2-subtitle: 1.174rem; /* 27/23 */
+  --fs-h2-abstract: 1.087rem; /* 25/23 */
+  --fs-h2: 1.435rem; /* 33/23 */
+  --fs-p-abstract: 0.913rem; /* 21/23 */
+  --fs-mono: 0.7rem; /* Mono font w.r.t. main font size */
+
+  /* Startup Colors */
+  /* This properties exists, but I'm initializing them from javascript
+     for a better user experience */
+  /* {% assign theme = site.themes[site.default-theme] %} */
+  /* --c-bg: {{ theme.bg }}; /* background */
+  /* --c-bg-1: {{ theme.bg-1 }};
+  /* --c-fg: {{ theme.fg }}; /* foreground */
+  /* --c-hl: {{ theme.hl }}; /* highlight */
+  /* --c-cm: {{ theme.cm }}; /* complement */
+
+  /* Border radius */
+  --br: 5px;
+
+  /* Box shadow */
+  --bs: rgba(0, 0, 0, 0.55) 0px 5px 17px;
+
+}
