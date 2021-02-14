@@ -14,8 +14,7 @@
   /* Proportions taken from the Jekyll Latex theme */
   --fs-p: 23px; /* Base unit, 1rem */
   --fs-h1: 1.739rem; /* 40/23 */
-  --fs-h2-name: 1.174rem; /* 27/23 */
-  --fs-h2-date: 1.174rem;
+  --fs-h2-subtitle: 1.174rem; /* 27/23 */
   --fs-h2-abstract: 1.087rem; /* 25/23 */
   --fs-h2: 1.435rem; /* 33/23 */
   --fs-p-abstract: 0.913rem; /* 21/23 */
@@ -65,6 +64,11 @@ html { /* Set globals like rem size and font */
   font-size: var(--fs-p);
   background-color: var(--c-bg);
   color: var(--c-fg);
+
+  transition-property: background-color, color;
+  transition-duration: 0.2s, 1s;
+  transition-delay: 0;
+  transition-timing-function: cubic-bezier(1,.25,0,.75);
 }
 
 h1, h2, body, p, th { /* Style resets */
@@ -123,7 +127,7 @@ a {
 
 a:hover:before {
   visibility: visible;
-  transform: scaleX(1);
+  transform: scaleX(1.1);
 }
 
 a:before {
@@ -139,12 +143,53 @@ a:before {
   transition: all .2s cubic-bezier(1,.25,0,.75) 0s;
 }
 
+/* Header */
+
+header.mm-header {
+  --padding: 2rem;
+  /* background-color: deepskyblue; */
+  height: 1rem;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: var(--padding);
+  justify-content: space-between;
+  user-select: none;
+}
+
+header.mm-header > a {
+  font-family: "CM Serif Bold";
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+header.mm-header > span {
+  /* background-color: forestgreen; */
+}
+
+header.mm-header > div {
+  /* background-color: hotpink; */
+}
+
+header.mm-header > div > span {
+  /* background-color: hotpink; */
+  padding: 0 1rem;
+}
+
+header.mm-header a {
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--c-fg)
+}
+
+
 /* Latex rules */
 
 .latex {
   width: var(--p-width);
   padding-left: calc((100vw - min(var(--p-width), var(--p-max-width))) / 2);
   max-width: var(--p-max-width);
+  margin-top: 4rem;
 }
 
 
@@ -152,22 +197,18 @@ a:before {
   font-family: "CM Serif";
   font-size: var(--fs-h1);
   text-align: center;
-  padding-top: 10vh;
   margin-bottom: 1rem;
 }
 
-.latex > .latex-header > h2.author{ /* Author header */
-  font-family: "CM Serif";
-  font-size: var(--fs-h2-name);
-  text-align: center;
-  margin-bottom: 0.5rem;
+.latex > .latex-header {
+  margin-bottom: 2rem;
 }
-.latex > .latex-header > h2.date{ /* Date header */
+
+.latex > .latex-header > h2.author, .latex > .latex-header > h2.date, .latex > .latex-header > h2.subtitle{ /* Cover headers */
   font-family: "CM Serif";
-  font-size: var(--fs-h2-date);
+  font-size: var(--fs-h2-subtitle);
   text-align: center;
   margin-top: 0.5rem;
-  margin-bottom: 2rem;
 }
 
 .latex > h2 { /* H2 header */

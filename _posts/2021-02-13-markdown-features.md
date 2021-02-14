@@ -3,6 +3,7 @@ layout: home
 title:  "Markdown Features"
 date:   2021-02-13 21:54 -0300
 permalink: /markdown-features
+excerpt: A test of my blog styling.
 ---
 
 # Heading 1
