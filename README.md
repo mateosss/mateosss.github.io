@@ -1,8 +1,12 @@
 <mateosss.github.io>
 
-Features that this blog does not have (yet):
+Stuff that this blog does not have (yet):
 
 - Full markdown styling
+- Home/about/404 pages
+- Dark mode
+- Favicon
+- Good usage of metatags (e.g. theme) and schema.org
 - Good code highlighting: use fira code, see prism or some highlighter for jekyll
 - Latex support: see Katex
 - RSS/Atom feed: see jekyll-atom

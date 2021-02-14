@@ -22,7 +22,7 @@
 }
 
 /* Style resets */
-h1, h2, body {
+h1, h2, body, p {
   margin: 0;
 	/* padding: 0; */
 	/* border: 0; */
@@ -45,7 +45,7 @@ h1, h2, body {
   src: url(../fonts/cmunbx.woff);
 }
 
-body {
+html {
   font-family: "CM Serif";
   font-size: var(--fs-p);
 }
@@ -69,7 +69,7 @@ body {
   /* background-color: greenyellow; */
   --p-width: 80vw;
 }}
-@media only screen and (min-width: 1025px) and (max-width: 1200px) {:root {
+@media only screen and (min-width: 1025px) and (max-width: 1200px) { :root {
   /* background-color: darkviolet; */
   --p-width: 72vw;
 }}
@@ -80,43 +80,55 @@ body {
   max-width: var(--p-max-width);
 }
 
+
 .latex > h1 {
   font-family: "CM Serif";
   font-size: var(--fs-h1);
-  padding-top: 10vh;
   text-align: center;
-  margin-bottom: 20px;
+  padding-top: 10vh;
+  margin-bottom: 1rem;
 }
 
 .latex > .latex-header > h2.author{
   font-family: "CM Serif";
   font-size: var(--fs-h2-name);
   text-align: center;
-  margin-bottom: 13px;
+  margin-bottom: 0.5rem;
 }
 .latex > .latex-header > h2.date{
   font-family: "CM Serif";
   font-size: var(--fs-h2-date);
   text-align: center;
-  margin-top: 13px;
-  margin-bottom: 45px;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .latex > h2 {
   font-family: "CM Serif Bold";
   font-size: var(--fs-h2);
   text-align: Left;
-  margin-top: 13px;
-  margin-bottom: 20px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.latex > h3 {
+  margin-top: 2rem;
 }
 
 .latex > p {
   font-family: "CM Serif";
   font-size: var(--fs-p);
   text-align: Left;
-  margin-top: 13px;
-  margin-bottom: 45px;
-  line-height: 125%;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.latex > blockquote {
+  background-color: #ECEFF1;
+  font-style: italic;
+  padding: 1rem;
+  border-radius: 2px;
 }
 
 /* Abstract section */
@@ -124,7 +136,6 @@ body {
 .latex-abstract{
   width: var(--abstract-width);
   padding-left: calc((100% - var(--abstract-width)) / 2);
-  padding-bottom: 15px;
 }
 
 .latex-abstract > h2{
@@ -132,15 +143,16 @@ body {
   font-weight: bold;
   font-size: var(--fs-h2-abstract);
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
 }
 
 .latex-abstract > p {
-  margin-top: 10px;
   font-family: "CM Serif";
   font-size: var(--fs-p-abstract);
   text-align: justify;
-  text-indent: 20px;
+  text-indent: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .footer{
