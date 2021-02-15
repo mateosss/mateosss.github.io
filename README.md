@@ -19,3 +19,8 @@ List of things that this blog should have:
   [jekyll-feed](https://jekyllrb.com/docs/step-by-step/10-deployment/)
 - [ ] Comments: see https://utteranc.es/ or directly use the [github
   api](https://api.github.com/repos/aristath/aristath.github.com/issues/5/comments?per_page=3)
+
+# Run
+
+Requirements: <https://jekyllrb.com/docs/installation/>
+Run: `bundle exec jekyll serve --host 0.0.0.0`

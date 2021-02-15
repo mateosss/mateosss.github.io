@@ -95,7 +95,7 @@ a {
 
 a:hover:before {
   visibility: visible;
-  transform: scaleX(1.1);
+  transform: scaleX(1);
 }
 
 a:before {
@@ -217,7 +217,7 @@ header.mm-header a {
   text-decoration: none;
 }
 
-.latex > p > code { /* Inline code */
+.latex > p > code, .latex > p > a > code { /* Inline code */
   font-family: FiraCode;
   font-size: var(--fs-mono);
   background-color: var(--c-bg-1);
