@@ -30,6 +30,7 @@
 
   /* Border radius */
   --br: 5px;
+  --br-small: 2px;
 
   /* Box shadow */
   --bs: rgba(0, 0, 0, 0.55) 0px 5px 17px;

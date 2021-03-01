@@ -201,11 +201,29 @@ header.mm-header a {
   margin-bottom: 1rem;
 }
 
+/* Unordered Lists */
+
+.latex ul li {
+  padding: 0 0 1rem 0;
+}
+
+.latex ul li:last-child {
+  padding: 0 0 0.5rem 0;
+}
+
+.latex.home ul li {
+  padding: 0;
+}
+
+.latex.home ul li:last-child {
+  padding: 0;
+}
+
 .latex > blockquote { /* Quote */
   background-color: var(--c-bg-1);
   font-style: italic;
   padding: 1rem;
-  border-radius: 2px;
+  border-radius: var(--br-small);
 }
 
 .latex > hr { /* Horizontal line */
@@ -216,13 +234,17 @@ header.mm-header a {
   color: var(--c-hl);
   text-decoration: none;
 }
-
-.latex > p > code, .latex > p > a > code { /* Inline code */
+.latex > p > code,
+.latex > p > a > code,
+.latex > p > em > code,
+.latex > p > em > strong > code,
+.latex > p > strong > code,
+.latex > ul code { /* Inline code */
   font-family: FiraCode;
   font-size: var(--fs-mono);
   background-color: var(--c-bg-1);
   padding: 0.125rem 0.25rem;
-  border-radius: 2px;
+  border-radius: var(--br-small);
 }
 
 .latex pre.highlight { /* Code block */
@@ -287,6 +309,25 @@ header.mm-header a {
 
 .latex > table th {
   padding: 1rem;
+}
+
+/* Youtube Videos */
+
+.latex .youtube-video {
+  /* text-align: center; */
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  margin-bottom: 1.5rem;
+  height: 0;
+}
+
+.latex .youtube-video > iframe {
+  border-radius: var(--br);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Abstract section */
