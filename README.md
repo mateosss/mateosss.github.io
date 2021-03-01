@@ -4,13 +4,13 @@ List of things that this blog should have:
 
 - [ ] Optimized lighthouse score and minifications
 - [x] Full markdown styling
-- [ ] Home/about/404 pages
-- [ ] Dark mode
-- [ ] Favicon and theme metatag
+- [x] Home/about/404 pages
+- [x] Dark mode
+- [x] Favicon and theme metatag
 - [ ] Good usage of metatags: see jekyll-seo-tag,
   [jekyll-sitemap](https://jekyllrb.com/docs/step-by-step/10-deployment/) and
   schema.org
-- [ ] Good code highlighting: use fira code, see prism or some highlighter for
+- [x] Good code highlighting: use fira code, see prism or some highlighter for
   jekyll
 - [ ] Better vertical rythm based on https://nowodzinski.pl/syncope/
 - [ ] CSS for print media for nicer pdfs
