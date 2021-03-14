@@ -1,7 +1,9 @@
 title: Mateo de Mayo
 email: mateodemayo@gmail.com
-plugins:
-  - jekyll-target-blank
+
+# Not all plugins work with github pages, see https://docs.github.com/en/github/working-with-github-pages/about-github-pages-and-jekyll#plugins and https://pages.github.com/versions/
+# plugins:
+  # - jekyll-target-blank
 
 themes:
   light:
