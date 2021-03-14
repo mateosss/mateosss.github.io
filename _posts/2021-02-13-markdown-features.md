@@ -2,7 +2,7 @@
 layout: home
 title:  "Markdown Features"
 date:   2021-02-13 21:54 -0300
-excerpt: A test of the blog styles in markdown components.
+brief: A test of the blog styles in markdown components.
 ---
 
 # Heading 1
