@@ -1,4 +1,5 @@
 ---
+hidden: true
 layout: post
 title: The Title of This Blog
 author: Mateo de Mayo

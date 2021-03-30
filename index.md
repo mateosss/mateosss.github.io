@@ -7,7 +7,9 @@ subtitle: Diving into VR and OpenXR
 ## Blog Posts
 
 {% for post in site.posts %}
+{% unless post.hidden %}
 - [{{ post.title }}]({{ post.url }}){:target="_self"}: {{ post.brief }}
+{% endunless %}
 {% endfor %}
 
 <!-- <ul>
