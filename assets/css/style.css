@@ -239,6 +239,7 @@ header.mm-header a {
 .latex > p > em > code,
 .latex > p > em > strong > code,
 .latex > p > strong > code,
+.latex > ol code,
 .latex > ul code { /* Inline code */
   font-family: FiraCode;
   font-size: var(--fs-mono);
