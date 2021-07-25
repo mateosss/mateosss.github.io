@@ -1,7 +1,7 @@
 ---
 layout: home
-title: Mateo de Mayo
-subtitle: Diving into VR and OpenXR
+title: Stumbling Across Solutions
+subtitle: Yet another developer blog.
 ---
 
 ## Blog Posts
