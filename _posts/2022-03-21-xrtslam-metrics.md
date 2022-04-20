@@ -315,8 +315,9 @@ Systems:
 
 ### Final note
 
-As a final note, I want to link to my [next blogpost](/slam-metric-issues) that
-discuss an important issue I found thanks to all the tools developed here.
+As a final note, I want to link to my [next blogpost](/blog/slam-metric-issues) that
+discusses why ORB-SLAM3 metrics reported in the tables above are so bad and an
+important issue I found thanks to all the tools developed here.
 
 ## Footnotes
 
