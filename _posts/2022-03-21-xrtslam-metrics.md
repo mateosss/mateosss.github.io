@@ -2,7 +2,7 @@
 layout: post
 title: Tracking Metrics for Monado
 author: Mateo de Mayo
-date: 2021-03-21 13:10:00 -0300
+date: 2022-03-21 13:10:00 -0300
 abstract: >
   This post presents what is now possible after a couple of updates that allow
   Monado to analyze SLAM trackers and datasets in batch to assess their performance

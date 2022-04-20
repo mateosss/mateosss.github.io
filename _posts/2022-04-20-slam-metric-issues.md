@@ -2,7 +2,7 @@
 layout: post
 title: Issues with SLAM metrics
 author: Mateo de Mayo
-date: 2021-03-21 13:10:00 -0300
+date: 2022-04-20 13:10:00 -0300
 abstract: >
   "When a measure becomes a target, it ceases to be a good measure"—
   Does SLAM research suffer from Goodhart's law?
