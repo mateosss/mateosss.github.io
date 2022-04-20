@@ -1,7 +1,7 @@
 ---
 layout: home
 title: Stumbling Across Solutions
-subtitle: Yet another developer blog.
+subtitle: Mostly visual-inertial tracking for Monado.
 ---
 
 ## Blog Posts
