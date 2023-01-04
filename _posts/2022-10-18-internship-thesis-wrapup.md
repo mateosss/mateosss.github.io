@@ -6,7 +6,7 @@ date: 2022-10-18 21:50:00 -0300
 abstract: >
   After FossXR it is a good time as any other to sit down and summarize some of
   the SLAM/VIO-related milestones achieved this year.
-brief: Wrapping up some important chapters
+brief: Wrapping up some important chapters.
 ---
 
 ## Key moments

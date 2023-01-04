@@ -10,7 +10,7 @@ abstract: >
   improving and how good it is working. It is also a good opportunity to present
   tables that compare the different integrated systems and give you an idea of
   how well things are working with each fork.
-brief: Tools for evaluating performance of SLAM
+brief: Tools for evaluating performance of SLAM.
 ---
 
 When working with tracking systems it can happen that you wake up one day, and
