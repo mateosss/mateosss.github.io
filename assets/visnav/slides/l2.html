@@ -1,0 +1,1179 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2 id="lecture-2-camera-models-and-optimization">Lecture 2: Camera
+Models and Optimization</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+<!-- Slide number: 2 -->
+</section>
+<section id="camera-models" class="slide level1">
+<h1>Camera Models</h1>
+<!-- Slide number: 3 -->
+</section>
+<section id="image-formation-13" class="slide level1">
+<h1>Image Formation 1/3</h1>
+<p><img data-src="res/l2/image_579623.png" style="width:100.0%" /></p>
+<!-- Slide number: 4 -->
+</section>
+<section id="image-formation-23" class="slide level1">
+<h1>Image Formation 2/3</h1>
+<p><img data-src="res/l2/image_733978.png" style="width:100.0%" /></p>
+<!-- Slide number: 5 -->
+</section>
+<section id="image-formation-33" class="slide level1">
+<h1>Image Formation 3/3</h1>
+<p><img data-src="res/l2/image_956940.png" style="width:100.0%" /></p>
+<!-- Slide number: 6 -->
+</section>
+<section id="camera-obscura" class="slide level1">
+<h1>Camera Obscura</h1>
+<figure>
+<img data-src="res/l2/image_156151.jpg" style="width:100.0%"
+alt="First published picture of camera obscura in Gemma Frisius’ 1545 book De Radio Astronomica et Geometrica" />
+<figcaption aria-hidden="true">First published picture of camera obscura
+in Gemma Frisius’ 1545 book De Radio Astronomica et
+Geometrica</figcaption>
+</figure>
+<!-- Slide number: 7 -->
+</section>
+<section id="pinhole-camera-model" class="slide level1">
+<h1>Pinhole Camera Model</h1>
+<div class="columns">
+<div class="column" style="width:30%;">
+<ul>
+<li>Camera coordinate frame attached to the center of (0,0) pixel.
+<ul>
+<li>X - horizontal axis</li>
+<li>Y - vertical axis downwards</li>
+<li>Z - forward</li>
+</ul></li>
+</ul>
+<p>Intrinsic parameters:</p>
+<p><span class="math display">\[\textbf{i} = [f_x, f_y, c_x,
+c_y]^T\]</span></p>
+<p>Projection:</p>
+<p><span class="math display">\[\pi(\textbf{x}, \textbf{i}) =
+\begin{bmatrix} f_x \frac{x}{z} \\ f_y \frac{y}{z} \end{bmatrix} +
+\begin{bmatrix} c_x \\ c_y \end{bmatrix}\]</span></p>
+<p>Unprojection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi^{-1}(\textbf{u}, \textbf{i}) &amp;= \frac{1}{\sqrt{m_x^2 + m_y^2 +
+1}} \begin{bmatrix} m_x \\ m_y \\ 1 \end{bmatrix} \\
+m_x &amp;= \frac{u - c_x}{f_x} \quad
+m_y = \frac{v - c_y}{f_y}
+\end{aligned}
+\]</span></p>
+</div><div class="column" style="width:70%;">
+<p><img data-src="res/l2/image_135554.png" style="width:65.0%"
+alt="Untitled.png" /> <img data-src="res/l2/image_232223.png"
+style="width:65.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 8 -->
+</section>
+<section id="distortion-models" class="slide level1">
+<h1>Distortion Models</h1>
+<p><img data-src="res/l2/image_801748.png" style="width:80.0%" /></p>
+<p><img data-src="res/l2/image_735823.png" style="width:60.0%" /></p>
+<p>Useful Link: <a
+href="https://web.stanford.edu/class/cs231a/course_notes/01-camera-models.pdf"
+class="uri">https://web.stanford.edu/class/cs231a/course_notes/01-camera-models.pdf</a></p>
+<!-- Slide number: 9 -->
+</section>
+<section id="large-fov-and-navigation" class="slide level1">
+<h1>Large FOV and Navigation</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/l2/image_144203.png" style="width:100.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l2/image_641755.png" style="width:100.0%" /></p>
+</div>
+</div>
+<p>Z. Zhang, H. Rebecq, C. Forster, D. Scaramuzza “<strong>Benefit of
+Large Field-of-View Cameras for Visual Odometry</strong>” IEEE
+International Conference on Robotics and Automation (ICRA), Stockholm,
+2016.</p>
+<!-- Slide number: 10 -->
+</section>
+<section id="distortion" class="slide level1">
+<h1>Distortion</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l2/image_516881.png" style="width:80.0%"
+alt="Pinhole-Undistorted" />
+<figcaption aria-hidden="true">Pinhole-Undistorted</figcaption>
+</figure>
+<ul>
+<li>Pinhole
+<ul>
+<li>Fast projection and unprojection</li>
+<li>Not sutiable for &gt; 180 deg</li>
+<li>Bad numeric properties &gt; 120 deg</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l2/image_292062.png" style="width:80.0%"
+alt="Original Image" />
+<figcaption aria-hidden="true">Original Image</figcaption>
+</figure>
+<ul>
+<li>More complex model
+<ul>
+<li>Working with “raw” image</li>
+<li>No issues with large FOV</li>
+<li>Possible to optimize intrinsics online</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<!-- Slide number: 11 -->
+</section>
+<section id="extended-unified-camera-model" class="slide level1">
+<h1>(Extended) Unified Camera Model</h1>
+<div class="columns">
+<div class="column" style="width:35%;">
+<p>Intrinsic parameters:</p>
+<p><span class="math display">\[\textbf{i} = [f_x, f_y, c_x, c_y,
+\alpha, \beta]^T\]</span></p>
+<p>Projection:</p>
+<p><span class="math display">\[\pi(\textbf{x}, \textbf{i}) =
+\begin{bmatrix} f_x \frac{x}{\alpha d + (1-\alpha)z} \\ f_y
+\frac{y}{\alpha d + (1-\alpha)z} \end{bmatrix} + \begin{bmatrix} c_x \\
+c_y \end{bmatrix}\]</span></p>
+<p><span class="math display">\[d = \sqrt{\beta(x^2 + y^2) +
+z^2}\]</span></p>
+<p>Unprojection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi^{-1}(\textbf{u}, \textbf{i}) &amp;= \frac{1}{\sqrt{m_x^2 + m_y^2 +
+m_z^2}} \begin{bmatrix} m_x \\ m_y \\ m_z \end{bmatrix} \\
+m_x &amp;= \frac{u - c_x}{f_x} \quad
+m_y = \frac{v - c_y}{f_y} \\
+r^2 &amp;= m_x^2 + m_y^2 \\
+m_z &amp;= \frac{1 - \beta \alpha^2 r^2}{\alpha \sqrt{1 - (2\alpha -
+1)\beta r^2} + (1-\alpha)}
+\end{aligned}
+\]</span></p>
+</div><div class="column" style="width:65%;">
+<p><img data-src="res/l2/image_412621.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 12 -->
+</section>
+<section id="kannala-brandt-camera-model" class="slide level1">
+<h1>Kannala-Brandt Camera Model</h1>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p>Intrinsic parameters:</p>
+<p><span class="math display">\[\textbf{i} = [f_x, f_y, c_x, c_y, k_1,
+k_2, k_3, k_4]^T\]</span></p>
+<p>Projection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi(\textbf{x}, \textbf{i}) &amp;= \begin{bmatrix} f_x d(\theta)
+\frac{x}{r} \\ f_y d(\theta) \frac{y}{r} \end{bmatrix} + \begin{bmatrix}
+c_x \\ c_y \end{bmatrix}\\
+r &amp;= \sqrt{x^2 + y^2} \\
+\theta &amp;= atan2(r, z) \\
+d(\theta) &amp;= \theta + k_1 \theta^3 + k_2 \theta^5 + k_3 \theta^7 +
+k_4 \theta^9
+\end{aligned}
+\]</span></p>
+<p>Unprojection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi^{-1}(\textbf{u}, \textbf{i}) &amp;= \begin{bmatrix} sin(\theta^*)
+\frac{m_x}{r_u} \\ sin(\theta^*) \frac{m_y}{r_u} \\ cos(\theta^*)
+\end{bmatrix} \quad
+m_x = \frac{u - c_x}{f_x} \quad
+m_y = \frac{v - c_y}{f_y} \\
+r_u &amp;= \sqrt{m_x^2 + m_y^2} \\
+\theta^* &amp;= d^{-1}(r_u) \text{ (find root of the polynomial)}
+\end{aligned}
+\]</span></p>
+</div><div class="column" style="width:60%;">
+<p><img data-src="res/l2/image_140854.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 13 -->
+</section>
+<section id="double-sphere-camera-model" class="slide level1">
+<h1>Double Sphere Camera Model</h1>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p>Intrinsic parameters:</p>
+<p><span class="math display">\[\textbf{i} = [f_x, f_y, c_x, c_y, \xi,
+\alpha]^T\]</span></p>
+<p>Projection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi(\textbf{x}, \textbf{i}) &amp;= \begin{bmatrix} f_x \frac{x}{\alpha
+d_2 + (1-\alpha)(\xi d_1 + z)} \\ f_y \frac{y}{\alpha d_2 +
+(1-\alpha)(\xi d_1 + z)} \end{bmatrix} + \begin{bmatrix} c_x \\ c_y
+\end{bmatrix}\\
+d_1 &amp;= \sqrt{x^2 + y^2 + z^2} \\
+d_2 &amp;= \sqrt{x^2 + y^2 + (\xi d_1 + z)^2}
+\end{aligned}
+\]</span></p>
+<p>Unprojection:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi^{-1}(\textbf{u}, \textbf{i}) &amp;= \frac{m_z \xi + \sqrt{m_z^2 +
+(1-\xi^2)r^2}}{m_z^2 + r^2} \begin{bmatrix} m_x \\ m_y \\ m_z
+\end{bmatrix} - \begin{bmatrix} 0 \\ 0 \\ \xi \end{bmatrix} \quad
+m_x = \frac{u - c_x}{f_x} \quad
+m_y = \frac{v - c_y}{f_y} \\
+r^2 &amp;= m_x^2 + m_y^2 \\
+m_z &amp;= \frac{1 - \alpha^2 r^2}{\alpha \sqrt{1 - (2\alpha - 1)r^2} +
+(1-\alpha)}
+\end{aligned}
+\]</span></p>
+</div><div class="column" style="width:40%;">
+<figure>
+<img data-src="res/l2/image_714214.png" style="width:100.0%"
+alt="The Double Sphere Camera Model (V. Usenko, N. Demmel and D. Cremers), In Proc. of the Int. Conference on 3D Vision (3DV), 2018. arXiv:1807.08957" />
+<figcaption aria-hidden="true">The Double Sphere Camera Model (V.
+Usenko, N. Demmel and D. Cremers), In Proc. of the Int. Conference on 3D
+Vision (3DV), 2018. <a
+href="https://arxiv.org/abs/1807.08957">arXiv:1807.08957</a></figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 14 -->
+</section>
+<section id="camera-models-code" class="slide level1">
+<h1>Camera Models Code</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Scalar<span class="op">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PinholeCamera <span class="op">:</span> <span class="kw">public</span> AbstractCamera<span class="op">&lt;</span>Scalar<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  …</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span>Scalar<span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">1</span><span class="op">&gt;</span> Vec2<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span>Scalar<span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">1</span><span class="op">&gt;</span> Vec3<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span>Scalar<span class="op">,</span> N<span class="op">,</span> <span class="dv">1</span><span class="op">&gt;</span> VecN<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  PinholeCamera<span class="op">()</span> <span class="op">{</span> param<span class="op">.</span>setZero<span class="op">();</span> <span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  PinholeCamera<span class="op">(</span><span class="at">const</span> VecN<span class="op">&amp;</span> p<span class="op">)</span> <span class="op">{</span> param <span class="op">=</span> p<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  …</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> Vec2 project<span class="op">(</span><span class="at">const</span> Vec3<span class="op">&amp;</span> p<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> fx <span class="op">=</span> param<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> fy <span class="op">=</span> param<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> cx <span class="op">=</span> param<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> cy <span class="op">=</span> param<span class="op">[</span><span class="dv">3</span><span class="op">];</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> x <span class="op">=</span> p<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> y <span class="op">=</span> p<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> z <span class="op">=</span> p<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    Vec2 res <span class="op">=</span> <span class="op">...;</span> <span class="co">// </span><span class="al">TODO</span><span class="co"> SHEET 2: implement camera model</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res<span class="op">;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> Vec3 unproject<span class="op">(</span><span class="at">const</span> Vec2<span class="op">&amp;</span> p<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> fx <span class="op">=</span> param<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> fy <span class="op">=</span> param<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> cx <span class="op">=</span> param<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Scalar<span class="op">&amp;</span> cy <span class="op">=</span> param<span class="op">[</span><span class="dv">3</span><span class="op">];</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    Vec3 res <span class="op">=</span> <span class="op">...;</span> <span class="co">// </span><span class="al">TODO</span><span class="co"> SHEET 2: implement camera model</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res<span class="op">;</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  …</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  EIGEN_MAKE_ALIGNED_OPERATOR_NEW</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a> <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  VecN param<span class="op">;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+</div><div class="column" style="width:50%;">
+<div class="vfill">
+
+</div>
+<ul>
+<li>Avoid using <code>std::pow()</code> function to maintain the
+precision. For example, if you need to compute <span
+class="math inline">\(x^2\)</span> use multiplication:
+<code>x * x</code>.</li>
+<li>If your compiler complains about <code>Jet</code> types try changing
+the constants in projection and unprojection functions to
+<code>Scalar(&lt;constant&gt;)</code>. For example,
+<code>Scalar(1)</code> instead of <code>1</code>.</li>
+<li>You can use <a
+href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton’s
+method</a> for finding roots to compute a root of the polynomial given a
+good initialization. Usually 3-5 iterations should be enough for the
+optimization to converge.</li>
+<li>You can use <a
+href="https://en.wikipedia.org/wiki/Horner%27s_method">Horner’s
+method</a> to efficiently compute polynomials.</li>
+</ul>
+</div>
+</div>
+<!-- Slide number: 15 -->
+</section>
+<section id="optimization" class="slide level1">
+<h1>Optimization</h1>
+<!-- Slide number: 16 -->
+</section>
+<section id="maximum-a-posteriori-estimation" class="slide level1">
+<h1>Maximum a Posteriori Estimation</h1>
+<p>Given a set of parameters <span class="math inline">\(x = \{x_1,
+\ldots, x_n\}\)</span> and a set of observations that depend on the
+parameters <span class="math inline">\(z = \{z_1, \ldots, z_m\}\)</span>
+we want estimate the value of <span class="math inline">\(x\)</span>
+that is most likely to result in these observations:</p>
+<p><span class="math display">\[x^* = \arg \max_x P(x|z)\]</span></p>
+<p>This estimate of the parameters <span
+class="math inline">\(x^*\)</span> is called the Maximum a posteriori
+(MAP) estimation.</p>
+<p>We can rewrite the probability using the Bayes’ Rule:</p>
+<p><span class="math display">\[P(x|z) =
+\frac{P(z|x)P(x)}{P(z)}\]</span></p>
+<p>i.e., <code>posteriori = likelihood * prior / evidence</code></p>
+<p>We can drop the denominator, because it does not depend on <span
+class="math inline">\(x\)</span>.</p>
+<p><span class="math display">\[x^* = \arg \max_x
+P(z|x)P(x)\]</span></p>
+<p>i.e., <strong><em>“Which state it is most likely to produce such
+measurements?”</em></strong></p>
+<!-- Slide number: 17 -->
+</section>
+<section id="from-map-to-least-squares-14" class="slide level1">
+<h1>From MAP to Least Squares 1/4</h1>
+<ul>
+<li><p>From MAP to least squares problem</p></li>
+<li><p>If we assume that the measurements are independent the joint PDF
+can be factorized:</p></li>
+</ul>
+<p><span class="math display">\[P(z|x) = \prod_{k=1}^m
+P(z_k|x)\]</span></p>
+<ul>
+<li><p>Let’s consider a single observation: <span
+class="math inline">\(z_k = h(x) + v_k\)</span></p>
+<ul>
+<li>Affected by Gaussian noise: <span class="math inline">\(v_k \sim
+\mathcal{N}(0, Q_k)\)</span></li>
+</ul></li>
+<li><p>The observation model gives us a conditional PDF:</p></li>
+</ul>
+<p><span class="math display">\[P(z_k|x) = \mathcal{N(h(x),
+Q_k)}\]</span></p>
+<p>How do we estimate <span class="math inline">\(x\)</span>?</p>
+<!-- Slide number: 18 -->
+</section>
+<section id="from-map-to-least-squares-24" class="slide level1">
+<h1>From MAP to Least Squares 2/4</h1>
+<ul>
+<li>Gaussian Distribution (matrix form)</li>
+</ul>
+<p><span class="math display">\[P(x) = \frac{1}{(2\pi)^{p/2}
+|\Sigma|^{1/2}} \exp\left(-\frac{1}{2}(x-\mu)^T \Sigma^{-1}
+(x-\mu)\right)\]</span></p>
+<ul>
+<li>Take negative logarithm from both sides:</li>
+</ul>
+<p><span class="math display">\[-\ln P(x) = \frac{1}{2}\ln((2\pi)^p
+|\Sigma|) + \frac{1}{2}(x-\mu)^T \Sigma^{-1} (x-\mu)\]</span></p>
+<ul>
+<li>Maximum of <span class="math inline">\(P(x)\)</span> is equivalent
+to the minimum of <span class="math inline">\(-\ln P(x)\)</span>.</li>
+</ul>
+<!-- Slide number: 19 -->
+</section>
+<section id="from-map-to-least-squares-34" class="slide level1">
+<h1>From MAP to Least Squares 3/4</h1>
+<ul>
+<li><p>Batch least squares</p></li>
+<li><p>Formulate residual function:</p></li>
+</ul>
+<p><span class="math display">\[r_k = z_k - h(x)\]</span></p>
+<ul>
+<li>Maximizing of <span class="math inline">\(P(x)\)</span> is
+equivalent to minimizing the sum of squared residuals:</li>
+</ul>
+<p><span class="math display">\[E(x) = \frac{1}{2} \sum_k{} r_k^T Q
+r_k\]</span></p>
+<!-- Slide number: 20 -->
+</section>
+<section id="from-map-to-least-squares-44" class="slide level1">
+<h1>From MAP to Least Squares 4/4</h1>
+<ul>
+<li>Some notes:
+<ul>
+<li>Because of noise, when we take the estimated trajectory and map into
+the models, they won’t fit perfectly</li>
+<li>Then we adjust our estimation to get a better estimation (minimize
+the error)</li>
+<li>The error distribution is affected by noise distribution
+(information matrix)</li>
+</ul></li>
+<li>Structure of the least square problem
+<ul>
+<li>Sum of many squared errors</li>
+<li>The dimension of total state variable may be high</li>
+<li>But single error item is easy (only related to two states in our
+case)</li>
+<li>If we use Lie group and Lie algebra, then it’s a non-constrained
+least square</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[E(x) = \frac{1}{2} \sum_k{} r_k^T Q
+r_k\]</span></p>
+<!-- Slide number: 21 -->
+</section>
+<section id="least-squares-12" class="slide level1">
+<h1>Least Squares 1/2</h1>
+<ul>
+<li><p>How to solve a least square problem?</p>
+<ul>
+<li>Non-linear, discrete time, non-constrained</li>
+</ul></li>
+<li><p>Let’s start from a simple example</p>
+<ul>
+<li>Consider minimizing a squared error:</li>
+</ul>
+<p><span class="math display">\[E(x) = \frac{1}{2} \sum_k{r_k(x)^T
+r_k(x)} = \frac{1}{2} r(x)^T r(x)\]</span></p>
+<ul>
+<li>When <span class="math inline">\(E(x)\)</span> is simple, just
+solve:</li>
+</ul>
+<p><span class="math display">\[\frac{\partial E(x)}{\partial x} =
+0\]</span></p></li>
+<li><p>And we will find the maxima/minima/saddle points</p></li>
+</ul>
+<!-- TODO@mateosss: what does it mean with E(x) simple? did it mean convex? -->
+<!-- Slide number: 22 -->
+</section>
+<section id="least-squares-22" class="slide level1">
+<h1>Least Squares 2/2</h1>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li><p>When <span class="math inline">\(E(x)\)</span> is a complicated
+function:</p>
+<ul>
+<li><p><span class="math inline">\(\frac{\partial E(x)}{\partial x} =
+0\)</span> is hard to solve</p></li>
+<li><p>We use iterative methods</p></li>
+</ul></li>
+<li><p>Iterative methods</p>
+<ol type="1">
+<li><p>Start from an initial estimate <span
+class="math inline">\(x_0\)</span></p></li>
+<li><p>At iteration <span class="math inline">\(n\)</span>, we find an
+increment <span class="math inline">\(\Delta x_n\)</span> that minimizes
+<span class="math inline">\(E(x_n + \Delta x_n)\)</span>.</p></li>
+<li><p>If the change in error function is small enough, stop
+(converged).</p></li>
+<li><p>If not, set <span class="math inline">\(x_{n+1} = x_n + \Delta
+x_n\)</span> and iterate to step 2.</p></li>
+</ol></li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><img data-src="res/l2/descending.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 23 -->
+</section>
+<section id="gradient-descent" class="slide level1">
+<h1>Gradient Descent</h1>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li><p>How to find the increment?</p></li>
+<li><p>First order methods - Gradient Descent</p>
+<ul>
+<li><p>Taylor expansion of the objective function</p></li>
+<li><p><span class="math inline">\(E(x + \Delta x) = E(x) + G(x) \Delta
+x\)</span></p></li>
+</ul></li>
+</ul>
+<p>The update step:</p>
+<p><span class="math display">\[\boxed{\Delta x = - \alpha
+G(x)}\]</span></p>
+</div><div class="column" style="width:30%;">
+<p><img data-src="res/l2/descending.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 24 -->
+</section>
+<section id="gradient-descent-performance" class="slide level1">
+<h1>Gradient Descent Performance</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l2/image_976819.png" style="width:100.0%"
+alt="Zig-zag in steepest descent:" />
+<figcaption aria-hidden="true">Zig-zag in steepest descent:</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<div class="vfill">
+
+</div>
+<ul>
+<li><p>Other shortcomings:</p>
+<ul>
+<li><p>Slow convergence speed</p></li>
+<li><p>Even slower when close to minimum</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<!-- Slide number: 25 -->
+</section>
+<section id="second-order-methods-12" class="slide level1">
+<h1>Second Order Methods 1/2</h1>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li><p>Second order methods</p>
+<ul>
+<li>Taylor expansion of the objective function <span
+class="math display">\[E(x + \Delta x) = E(x) + G(x) \Delta x +
+\frac{1}{2} \Delta x^T H(x) \Delta x\]</span></li>
+<li>Setting <span class="math display">\[\frac{\partial E(x + \Delta
+x)}{\partial \Delta x} = 0\]</span></li>
+<li>We get the update step: <span class="math display">\[H(x) \Delta x =
+- G(x) \Rightarrow \boxed{\Delta x = - H^{-1}(x) G(x)}\]</span></li>
+</ul></li>
+</ul>
+<p>This is called <strong>Newton’s method</strong>.</p>
+</div><div class="column" style="width:30%;">
+<p><img data-src="res/l2/descending.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 26 -->
+</section>
+<section id="second-order-methods-22" class="slide level1">
+<h1>Second Order Methods 2/2</h1>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li><p>Second order method converges more quickly than first order
+methods</p></li>
+<li><p>But the Hessian matrix may be hard to compute</p></li>
+<li><p>Can we avoid the Hessian matrix and also keep second order’s
+convergence speed?</p>
+<ul>
+<li><p>Gauss-Newton</p></li>
+<li><p>Levenberg-Marquardt</p></li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><img data-src="res/l2/descending.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 27 -->
+</section>
+<section id="gauss-newton-method-12" class="slide level1">
+<h1>Gauss-Newton Method 1/2</h1>
+<ul>
+<li><p>Gauss-Newton</p>
+<ul>
+<li><p>Taylor expansion of <span class="math inline">\(r(x)\)</span>:
+<span class="math inline">\(r(x + \Delta x) \simeq r(x) + J(x) \Delta
+x\)</span></p></li>
+<li><p>Then the squared error becomes:</p></li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+E(x + \Delta x) &amp;= \frac{1}{2} r(x)^T r(x) + \Delta x^T J(x)^T r(x)
++ \frac{1}{2} \Delta x^T J(x)^T J(x) \Delta x \\
+&amp;= F(x) + \Delta x^T J(x)^T r(x) + \frac{1}{2} \Delta x^T J(x)^T
+J(x) \Delta x
+\end{aligned}
+\]</span></p></li>
+</ul>
+<p>If we set <span class="math inline">\(\frac{\partial E(x + \Delta
+x)}{\partial \Delta x} = 0\)</span>, we get:</p>
+<p><span class="math display">\[
+\begin{aligned}
+J(x)^T J(x) \Delta x &amp;= - J(x)^T r(x) \\
+\Rightarrow \Delta x &amp;= - (J(x)^T J(x))^{-1} J(x)^T r(x) \\
+&amp;\simeq -H(x)^{-1} G(x) \quad \text{(from Newton&#39;s method)}
+\end{aligned}
+\]</span></p>
+<!-- Slide number: 28 -->
+</section>
+<section id="gauss-newton-method-22" class="slide level1">
+<h1>Gauss-Newton Method 2/2</h1>
+<ul>
+<li><p>Gauss-Newton uses <span class="math inline">\(J(x)^T
+J(x)\)</span> as an approximation of the Hessian</p>
+<ul>
+<li>Avoids the computation of <span class="math inline">\(H(x)\)</span>
+in the Newton’s method</li>
+</ul></li>
+<li><p>But <span class="math inline">\(J(x)^T J(x)\)</span> is only
+semi-positive definite</p></li>
+<li><p><span class="math inline">\(H(x)\)</span> may be singular when
+<span class="math inline">\(J(x)^T J(x)\)</span> has a non-empty null
+space</p></li>
+</ul>
+<!-- Slide number: 29 -->
+</section>
+<section id="levenberg-marquardt-method-12" class="slide level1">
+<h1>Levenberg-Marquardt Method 1/2</h1>
+<ul>
+<li>Trust region approach: approximation is only valid in a region</li>
+<li>Evaluate if the approximation is good: <span
+class="math display">\[\rho = \frac{r(x + \Delta x) - r(x)}{J(x) \Delta
+x}\]</span> i.e. <code>real descent / approximated descent</code></li>
+<li>If <span class="math inline">\(\rho\)</span> is large, increase the
+region</li>
+<li>If <span class="math inline">\(\rho\)</span> is small, decrease the
+region</li>
+</ul>
+<p>Then</p>
+<ul>
+<li><p>LM optimization: <span class="math display">\[E(x + \Delta x) =
+\frac{1}{2} r(x + \Delta x)^T r(x + \Delta x) + \lambda |\Delta
+x|^2\]</span></p>
+<ul>
+<li>Assume the approximation is only good within a region</li>
+<li><span class="math inline">\(\lambda\)</span> controls the region
+based on <span class="math inline">\(\rho\)</span></li>
+</ul></li>
+</ul>
+<!-- Slide number: 30 -->
+</section>
+<section id="levenberg-marquardt-method-22" class="slide level1">
+<h1>Levenberg-Marquardt Method 2/2</h1>
+<ul>
+<li><p>Trust region problem: <span class="math display">\[E(x + \Delta
+x) = \frac{1}{2} r(x + \Delta x)^T r(x + \Delta x) + \lambda \| \Delta x
+\|^2\]</span></p></li>
+<li><p>Expand it just like in GN case, the incremental is: <span
+class="math display">\[\Delta x = - (J(x)^T J(x) + \lambda I)^{-1}
+J(x)^T r(x)\]</span></p></li>
+<li><p>The <span class="math inline">\(\lambda I\)</span> part makes
+sure that Hessian is positive definite.</p></li>
+<li><p>When <span class="math inline">\(\lambda \to 0\)</span>, LM
+becomes GN.</p></li>
+<li><p>When <span class="math inline">\(\lambda \to \infty\)</span>, LM
+becomes gradient descent.</p></li>
+</ul>
+<!-- Slide number: 31 -->
+</section>
+<section id="other-methods" class="slide level1">
+<h1>Other Methods</h1>
+<ul>
+<li><p>Other methods include:</p>
+<ol type="1">
+<li>Dog-leg method</li>
+<li>Conjugate gradient method</li>
+<li>Quasi-Newton’s method</li>
+<li>Pseudo-Newton’s method</li>
+<li>…</li>
+</ol></li>
+<li><p>You can find more in optimization books if you are
+interested</p></li>
+<li><p>In SLAM/SfM/VO, Gauss-Netwton and Levenberg-Marquardt are used to
+solve camera motion, optical-flow, etc.</p></li>
+<li><p>More details:<br />
+<em>Triggs B, McLauchlan PF, Hartley RI, Fitzgibbon AW. Bundle
+adjustment—a modern synthesis. InInternational workshop on vision
+algorithms 1999 Sep 20 (pp. 298-372). Springer, Berlin,
+Heidelberg.</em></p></li>
+</ul>
+<!-- Slide number: 32 -->
+</section>
+<section id="ceres" class="slide level1">
+<h1>Ceres</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>We will use Ceres for least-squares optimization.</p></li>
+<li><p>Tutorial: <a href="http://ceres-solver.org/tutorial.html"
+class="uri">http://ceres-solver.org/tutorial.html</a></p></li>
+<li><p>Curve fitting example: <span class="math inline">\(y = \exp(mx +
+c)\)</span></p></li>
+<li><p>Observations: a set of <span class="math inline">\((x,
+y)\)</span> pairs</p></li>
+<li><p>Parameters to estimate: <span class="math inline">\(m,
+c\)</span>.</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l2/image_583022.png" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 33 -->
+</section>
+<section id="ceres-13" class="slide level1">
+<h1>Ceres 1/3</h1>
+<ul>
+<li>Define your residual class as a functor (overload the
+<code>operator()</code>)</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ExponentialResidual <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  ExponentialResidual<span class="op">(</span><span class="dt">double</span> x<span class="op">,</span> <span class="dt">double</span> y<span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="va">x_</span><span class="op">(</span>x<span class="op">),</span> <span class="va">y_</span><span class="op">(</span>y<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> <span class="kw">operator</span><span class="op">()(</span><span class="at">const</span> T<span class="op">*</span> <span class="at">const</span> m<span class="op">,</span> <span class="at">const</span> T<span class="op">*</span> <span class="at">const</span> c<span class="op">,</span> T<span class="op">*</span> residual<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    residual<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> T<span class="op">(</span><span class="va">y_</span><span class="op">)</span> <span class="op">-</span> exp<span class="op">(</span>m<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">*</span> T<span class="op">(</span><span class="va">x_</span><span class="op">)</span> <span class="op">+</span> c<span class="op">[</span><span class="dv">0</span><span class="op">]);</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a> <span class="kw">private</span><span class="op">:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Observations for a sample.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">double</span> <span class="va">x_</span><span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">double</span> <span class="va">y_</span><span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<!-- Slide number: 34 -->
+</section>
+<section id="ceres-23" class="slide level1">
+<h1>Ceres 2/3</h1>
+<ul>
+<li><p>Build the optimization problem</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> m <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> c <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Problem problem<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> kNumObservations<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  CostFunction<span class="op">*</span> cost_function <span class="op">=</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">new</span> AutoDiffCostFunction<span class="op">&lt;</span>ExponentialResidual<span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">&gt;(</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>          <span class="kw">new</span> ExponentialResidual<span class="op">(</span>data<span class="op">[</span><span class="dv">2</span> <span class="op">*</span> i<span class="op">],</span> data<span class="op">[</span><span class="dv">2</span> <span class="op">*</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">]));</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  problem<span class="op">.</span>AddResidualBlock<span class="op">(</span>cost_function<span class="op">,</span> NULL<span class="op">,</span> <span class="op">&amp;</span>m<span class="op">,</span> <span class="op">&amp;</span>c<span class="op">);</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>With auto-diff, Ceres will compute the Jacobians for you</p></li>
+</ul>
+<!-- Slide number: 35 -->
+</section>
+<section id="ceres-33" class="slide level1">
+<h1>Ceres 3/3</h1>
+<ul>
+<li><p>Finally solve it by calling the Solve() function and get the
+result summary</p></li>
+<li><p>You can set some parameters like number of iterations, stop
+conditions or the linear solver type.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Run the solver!</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Solver<span class="op">::</span>Options options<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>options<span class="op">.</span><span class="dt">linear_solver_type</span> <span class="op">=</span> ceres<span class="op">::</span>DENSE_QR<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>options<span class="op">.</span>minimizer_progress_to_stdout <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>Solver<span class="op">::</span>Summary summary<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>Solve<span class="op">(</span>options<span class="op">,</span> <span class="op">&amp;</span>problem<span class="op">,</span> <span class="op">&amp;</span>summary<span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> summary<span class="op">.</span>BriefReport<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;m : &quot;</span> <span class="op">&lt;&lt;</span> m</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>          <span class="op">&lt;&lt;</span> <span class="st">&quot;c : &quot;</span> <span class="op">&lt;&lt;</span> c <span class="op">&lt;&lt;</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span></code></pre></div></li>
+</ul>
+<!-- Slide number: 36 -->
+</section>
+<section id="least-squares-summary" class="slide level1">
+<h1>Least-Squares Summary</h1>
+<ul>
+<li><p>In the maximum a posteriori estimation we estimate all the state
+variable given using a set of noisy measurements.</p></li>
+<li><p>The MAP estimation problem with Gaussian noise can be
+reformulated into a least square problem</p></li>
+<li><p>It can be solved by iterative methods: Gradient Descent, Newton’s
+method, Gauss-Newton or Levernberg-Marquardt.</p></li>
+</ul>
+<!-- Slide number: 37 -->
+</section>
+<section id="exercise-2---setup" class="slide level1">
+<h1>Exercise 2 - Setup</h1>
+<ul>
+<li>We want to estimate
+<ul>
+<li>Poses of the camera setup with respect to pattern</li>
+<li>Intrinsic parameters of both cameras</li>
+<li>Extrinsic parameters (rigid body transformation from one camera to
+the other)</li>
+</ul></li>
+<li>Minimizing the projection residuals: <span class="math display">\[r
+= u_j - \pi(R_{cw}p_w^j + t_{cw}, \mathbf{i})\]</span>
+<ul>
+<li><span class="math inline">\(u_j\)</span>: detection of the corner
+<span class="math inline">\(j\)</span> in the image.</li>
+<li><span class="math inline">\(p_w^j\)</span>: 3D coordinates in the
+world (pattern) coordinate frame</li>
+<li><span class="math inline">\(\mathbf{i}\)</span>: intrinsic parameter
+of the camera</li>
+<li><span class="math inline">\(R_{wc}, t_{wc}\)</span>: rigid body
+transformation from the world (pattern) coordinate frame to the camera
+coordinate frame.</li>
+<li><span class="math inline">\(\pi(\cdot)\)</span>: is the projection
+function</li>
+</ul></li>
+<li>Corner points are detected using Apriltags:<br />
+<em>E. Olson. AprilTag: A robust and ﬂexible visual ﬁducial system. In
+Proceedings of the IEEE International Conference on Robotics and
+Automation (ICRA), pages 3400–3407. IEEE, May 2011.</em></li>
+</ul>
+<!-- Slide number: 38 -->
+</section>
+<section id="exercise-2---residual" class="slide level1">
+<h1>Exercise 2 - Residual</h1>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ReprojectionCostFunctor <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  EIGEN_MAKE_ALIGNED_OPERATOR_NEW</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  ReprojectionCostFunctor<span class="op">(</span><span class="at">const</span> Eigen<span class="op">::</span>Vector2d<span class="op">&amp;</span> p_2d<span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">const</span> Eigen<span class="op">::</span>Vector3d<span class="op">&amp;</span> p_3d<span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">const</span> <span class="bu">std::</span>string<span class="op">&amp;</span> cam_model<span class="op">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> p_2d<span class="op">(</span>p_2d<span class="op">),</span> p_3d<span class="op">(</span>p_3d<span class="op">),</span> cam_model<span class="op">(</span>cam_model<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">template</span> <span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> <span class="kw">operator</span><span class="op">()(</span>T <span class="at">const</span><span class="op">*</span> <span class="at">const</span> sT_w_i<span class="op">,</span> T <span class="at">const</span><span class="op">*</span> <span class="at">const</span> sT_i_c<span class="op">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                  T <span class="at">const</span><span class="op">*</span> <span class="at">const</span> sIntr<span class="op">,</span> T<span class="op">*</span> sResiduals<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>Sophus<span class="op">::</span>SE3<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="at">const</span><span class="op">&gt;</span> <span class="at">const</span> T_w_i<span class="op">(</span>sT_w_i<span class="op">);</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>Sophus<span class="op">::</span>SE3<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="at">const</span><span class="op">&gt;</span> <span class="at">const</span> T_i_c<span class="op">(</span>sT_i_c<span class="op">);</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span>T<span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">1</span><span class="op">&gt;&gt;</span> residuals<span class="op">(</span>sResiduals<span class="op">);</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>AbstractCamera<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span> cam <span class="op">=</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        AbstractCamera<span class="op">&lt;</span>T<span class="op">&gt;::</span>from_data<span class="op">(</span>cam_model<span class="op">,</span> sIntr<span class="op">);</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co"> SHEET 2: implement the rest of the functor</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  Eigen<span class="op">::</span>Vector2d p_2d<span class="op">;</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  Eigen<span class="op">::</span>Vector3d p_3d<span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>string cam_model<span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<!-- Slide number: 39 -->
+</section>
+<section id="exercise-2---before-optimization" class="slide level1">
+<h1>Exercise 2 - Before Optimization</h1>
+<p><img data-src="res/l2/image_156632.png" style="width:100.0%" /></p>
+<!-- Slide number: 40 -->
+</section>
+<section id="exercise-2---after-optimization" class="slide level1">
+<h1>Exercise 2 - After Optimization</h1>
+<p><img data-src="res/l2/image_827534.png" style="width:100.0%" /></p>
+<!-- Slide number: 41 -->
+</section>
+<section id="exercise-2---final-notes" class="slide level1">
+<h1>Exercise 2 - Final notes</h1>
+<ul>
+<li><p>Use camera models presented here to get initial
+projections</p></li>
+<li><p>Implement the projection function</p></li>
+<li><p>Implement the residual.</p></li>
+<li><p>Set up optimization problem. Use local parametrization where
+necessary.</p></li>
+<li><p>Test different models. How well do they fit the lens?</p></li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

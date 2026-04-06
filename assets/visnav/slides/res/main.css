@@ -1,0 +1,96 @@
+:root {
+  --r-heading1-size: 2.25em;
+  --r-heading2-size: 1.75em;
+  --r-main-font-size: 1em;
+  --r-code-font-size: 0.75em;
+  --r-background-color: white;
+  --r-code-font: Fira Code, monospace;
+  --r-link-color: #007acc;
+  --r-link-color-hover: #cc0081;
+  --code-bg: #f5f5f5;
+  --inline-code-color: #1b5276;
+}
+
+.reveal h1 {
+  font-weight: bold;
+}
+
+.reveal h1:only-child {
+  text-align: center;
+  font-size: 3em;
+}
+
+.reveal h2 {
+  margin-top: 2rem;
+}
+
+.reveal pre {
+  width: fit-content;
+  border-radius: 8px;
+  font-size: var(--r-code-font-size);
+  margin-left: 0;
+}
+
+.reveal pre code {
+  background-color: var(--code-bg);
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: none;
+}
+
+/* Inline code */
+p > code,
+p > a > code,
+p > em > code,
+p > em > strong > code,
+p > strong > code,
+ol code,
+ul code {
+  font-family: FiraCode;
+  font-size: var(--r-code-font-size);
+  background-color: var(--code-bg);
+  /* background-color: lightcoral; */
+  color: var(--inline-code-color);
+  padding: 0.125rem 0.25rem;
+  border-radius: 2px;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.left {
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.vfill {
+  height: 8rem;
+}
+
+.reveal img {
+  width: 50%;
+  border-radius: 12px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reveal figure {
+  text-align: center;
+}
+
+div.column {
+  overflow-x: visible;
+}
+
+.no-margin-right {
+  margin-right: 0 !important;
+}
+
+.no-margin-left {
+  margin-left: 0 !important;
+}

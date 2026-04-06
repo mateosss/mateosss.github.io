@@ -1,0 +1,1573 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2 id="lecture-1-introduction-3d-geometry-and-lie-groups">Lecture 1:
+Introduction, 3D Geometry and Lie Groups</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+<!-- Slide number: 2 -->
+</section>
+<section id="introduction" class="slide level1">
+<h1>Introduction</h1>
+<!-- Slide number: 3 -->
+</section>
+<section id="applications-of-navigation-algorithms"
+class="slide level1">
+<h1>Applications of Navigation Algorithms</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/l1/image_283566.jpeg" style="width:80.0%" /> <img
+data-src="res/l1/image_373637.jpeg" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l1/image_375073.jpeg" /> <img
+data-src="res/l1/image_362938.jpeg" style="width:80.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 4 -->
+</section>
+<section id="sensors-for-navigation" class="slide level1">
+<h1>Sensors for Navigation</h1>
+<ul>
+<li>Sensor provide the way to measure the state of the environment</li>
+<li>Interoseptive sensors: accelerometer, gyroscope …</li>
+<li>Exteroceptive sensors: camera, laser rangefinder, GPS …</li>
+</ul>
+<p><img data-src="res/l1/image_980050.png" style="width:80.0%" /></p>
+<!-- Slide number: 5 -->
+</section>
+<section id="benefits-of-cameras" class="slide level1">
+<h1>Benefits of Cameras</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Cheap</li>
+<li>Low power</li>
+<li>Lightweight</li>
+<li>Widely commercially available</li>
+<li>Passive (no interference)</li>
+<li><em>Note: very similar to human “sensors”</em></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l1/image_337827.jpeg" /></p>
+<figure>
+<img data-src="res/l1/image_836104.png"
+alt="Vestibulo–ocular reflex Source: Wikipedia" />
+<figcaption aria-hidden="true">Vestibulo–ocular reflex Source:
+Wikipedia</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 6 -->
+</section>
+<section id="types-of-cameras" class="slide level1">
+<h1>Types of cameras</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Cameras
+<ul>
+<li>Monocular</li>
+<li>Stereo</li>
+<li>RGB-D</li>
+<li>Event camera,</li>
+<li>…</li>
+</ul></li>
+</ul>
+<figure>
+<img data-src="res/l1/image_346170.png" style="width:100.0%"
+alt="Ambiguity in mono vision: small + close or large + far away?" />
+<figcaption aria-hidden="true">Ambiguity in mono vision: small + close
+or large + far away?</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l1/mono_camera.png" alt="Monocular camera" />
+<figcaption aria-hidden="true">Monocular camera</figcaption>
+</figure>
+<figure>
+<img data-src="res/l1/stereo_camera.png" alt="Stereo camera" />
+<figcaption aria-hidden="true">Stereo camera</figcaption>
+</figure>
+<figure>
+<img data-src="res/l1/rgbd_camera.png" alt="RGB-D (depth) camera" />
+<figcaption aria-hidden="true">RGB-D (depth) camera</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 7 -->
+</section>
+<section id="stereo-cameras" class="slide level1">
+<h1>Stereo Cameras</h1>
+<figure>
+<img data-src="res/l1/image_416744.png" style="width:100.0%"
+alt="Stereo vision estimates the depth from disparity" />
+<figcaption aria-hidden="true">Stereo vision estimates the depth from
+disparity</figcaption>
+</figure>
+<!-- TODO@mateosss: Low priority: merge the two images -->
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/l1/image_781316.jpeg"
+class="no-margin-right" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l1/image_438981.jpeg"
+class="no-margin-left" /></p>
+</div>
+</div>
+<div class="center">
+<p>Moving stereo: disparity can be estimated in the motion</p>
+</div>
+<!-- Slide number: 8 -->
+</section>
+<section id="content-of-the-practical-course" class="slide level1">
+<h1>Content of the Practical Course</h1>
+<div class="left">
+<p>You will implement three main components distributed in 5
+exercises:</p>
+<ul>
+<li>Camera Calibration</li>
+<li>Structure from Motion (SfM)</li>
+<li>Visual Odometry (VO)</li>
+</ul>
+<p>Implementation is done using:</p>
+<ul>
+<li>C++</li>
+<li>Eigen for linear algebra</li>
+<li>Sophus for Lie groups</li>
+<li>OpenGV for multiple view geometry algorithms</li>
+<li>Ceres for optimisation</li>
+<li>Pangolin for visualisation</li>
+<li>Git</li>
+<li>Supported OS: Ubuntu 22.04, 24.04, 26.04</li>
+<li>Unsupported but likely to work with some effort: MacOS (easier) and
+Windows</li>
+</ul>
+<p>The code is optimised for easy understanding and prototyping. We rely
+on Ceres auto-differentiation to compute Jacobians (slower than
+analytical Jacobians, but much lower development efforts).</p>
+</div>
+<!-- Slide number: 9 -->
+</section>
+<section id="camera-calibration" class="slide level1">
+<h1>Camera Calibration</h1>
+<figure>
+<img data-src="res/l1/image_562300.png" style="width:80.0%"
+alt="Before Optimization" />
+<figcaption aria-hidden="true">Before Optimization</figcaption>
+</figure>
+<figure>
+<img data-src="res/l1/image_345277.png" style="width:80.0%"
+alt="After Optimization" />
+<figcaption aria-hidden="true">After Optimization</figcaption>
+</figure>
+<!-- Slide number: 10 -->
+</section>
+<section id="structure-from-motion-sfm" class="slide level1">
+<h1>Structure from Motion (SFM)</h1>
+<div class="columns">
+<div class="column" style="width:40%;">
+<figure>
+<img data-src="res/l1/image_400956.png" style="width:65.0%"
+alt="Snavely N, Seitz SM, Szeliski R. Photo tourism: exploring photo collections in 3D. InACM Siggraph 2006 Papers 2006 Jul 1 (pp. 835-846)." />
+<figcaption aria-hidden="true">Snavely N, Seitz SM, Szeliski R. Photo
+tourism: exploring photo collections in 3D. InACM Siggraph 2006 Papers
+2006 Jul 1 (pp. 835-846).</figcaption>
+</figure>
+<figure>
+<img data-src="res/l1/image_657640.png" style="width:65.0%"
+alt="Agarwal S, Snavely N, Seitz SM, Szeliski R. Bundle adjustment in the large. In European conference on computer vision 2010 Sep 5 (pp. 29-42). Springer, Berlin, Heidelberg." />
+<figcaption aria-hidden="true">Agarwal S, Snavely N, Seitz SM, Szeliski
+R. Bundle adjustment in the large. In European conference on computer
+vision 2010 Sep 5 (pp. 29-42). Springer, Berlin,
+Heidelberg.</figcaption>
+</figure>
+</div><div class="column" style="width:60%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/aNP5UPTzwHA?mute=1&loop=1&playlist=aNP5UPTzwHA&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Dubrovnik SfM Video Example</p></div></p>
+</div>
+</div>
+<!-- Slide number: 11 -->
+</section>
+<section id="what-you-will-implement-sfm" class="slide level1">
+<h1>What You Will Implement (SFM)</h1>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/xYzXGSZiYM8?mute=1&loop=1&playlist=xYzXGSZiYM8&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">SfM Homework Demo</p></div></p>
+<!-- Slide number: 12 -->
+</section>
+<section id="visual-odometry-slam" class="slide level1">
+<h1>Visual Odometry / SLAM</h1>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/ufvPS5wJAx0?mute=1&loop=1&playlist=ufvPS5wJAx0&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">ORB-SLAM Video</p></div></p>
+<!-- Slide number: 13 -->
+</section>
+<section id="what-you-will-implement-vo" class="slide level1">
+<h1>What You Will Implement (VO)</h1>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/9MB1951M_Zs?mute=1&loop=1&playlist=9MB1951M_Zs&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">VO Homework Demo</p></div></p>
+<!-- Slide number: 14 -->
+</section>
+<section id="recommended-literature" class="slide level1">
+<h1>Recommended Literature</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l1/image_968011.png"
+alt="Hartley and Zisserman, Multiple view geometry in computer vision" />
+<figcaption aria-hidden="true">Hartley and Zisserman, Multiple view
+geometry in computer vision</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l1/image_200347.png"
+alt="Timothy Barfoot, State estimation for robotics" />
+<figcaption aria-hidden="true">Timothy Barfoot, State estimation for
+robotics</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 15 -->
+</section>
+<section id="multiple-view-geometry" class="slide level1">
+<h1>Multiple View Geometry</h1>
+<figure>
+<img data-src="res/l1/image_268126.jpeg"
+alt="Multiple View Geometry Lecture by Prof. Dr. Daniel Cremers - TU München" />
+<figcaption aria-hidden="true">Multiple View Geometry Lecture by
+Prof. Dr. Daniel Cremers - TU München</figcaption>
+</figure>
+<p>Video: <a
+href="https://www.youtube.com/watch?v=RDkwklFGMfo&amp;list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4"
+class="uri">https://www.youtube.com/watch?v=RDkwklFGMfo&amp;list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4</a></p>
+<p>Due to the issues with camera exposure we encourage you to download
+and follow the PDF version of the slides (link in the description of the
+corresponding lecture)</p>
+<!-- Slide number: 16 -->
+</section>
+<section id="d-geometry-and-lie-groups" class="slide level1">
+<h1>3D Geometry and Lie Groups</h1>
+<!-- Slide number: 17 -->
+</section>
+<section id="vector-space" class="slide level1">
+<h1>Vector Space</h1>
+<p>A set V is called a linear or vector space over the field <span
+class="math inline">\(\mathbb{R}\)</span> if it is closed under vector
+summation</p>
+<p><span class="math display">\[+ : V \times V \rightarrow
+V\]</span></p>
+<p>and under scalar multiplication</p>
+<p><span class="math display">\[\cdot : \mathbb{R} \times V \rightarrow
+V\]</span></p>
+<p>i.e. <span class="math inline">\(\alpha v_1 + \beta v_2 \in V,
+\forall \alpha, \beta \in \mathbb{R}\)</span>. With respect to addition
+(<span class="math inline">\(+\)</span>) it forms a commutative group
+(neutral element 0, inverse element <span
+class="math inline">\(-v\)</span> ). Scalar multiplication respects the
+structure of <span class="math inline">\(\mathbb{R} : \alpha (\beta v) =
+(\alpha \beta) v\)</span>. Multiplication and addition respect the
+distributive law:</p>
+<p><span class="math display">\[
+\begin{aligned}
+(\alpha + \beta) v = \alpha v + \beta v \\
+\alpha (v + u) = \alpha v + \alpha u
+\end{aligned}
+\]</span></p>
+<p>Example: <span class="math inline">\(V = \mathbb{R}^n, v = (x_1,
+\ldots, x_n)^T\)</span></p>
+<p>A subset <span class="math inline">\(W \in V\)</span> of a vector
+space <span class="math inline">\(V\)</span> is called
+<strong>subspace</strong> if <span class="math inline">\(0 \in
+W\)</span> and <span class="math inline">\(W\)</span> is closed under
+<span class="math inline">\(+\)</span> and <span
+class="math inline">\(\cdot\)</span> (for all <span
+class="math inline">\(\alpha \in \mathbb{R}\)</span>).</p>
+<p>In this course we use Eigen Library to represents vectors and
+matrices. Please have a look at the <a
+href="https://eigen.tuxfamily.org/dox/group__QuickRefPage.html">Eigen
+Quick Reference Guide</a>.</p>
+<!-- Slide number: 18 -->
+</section>
+<section id="linear-independence-and-basis" class="slide level1">
+<h1>Linear Independence and Basis</h1>
+<div class="columns">
+<div class="column" style="width:80%;">
+<p>The spanned subset of a set of vectors <span class="math inline">\(S
+= \{v_1, \ldots, v_k\} \subseteq V\)</span> is the subspace formed by
+all linear combinations of these vectors:</p>
+<p><span class="math display">\[span(S) = \left\{ \sum_{i=1}^k \alpha_i
+v_i \mid \alpha_i \in \mathbb{R} \right\}\]</span></p>
+<p>The set S is called <strong>linearly independent</strong> if:</p>
+<p><span class="math display">\[\sum_{i=1}^k \alpha_i v_i = 0 \implies
+\alpha_i = 0, \forall i\]</span></p>
+<p>in other words: if none of the vectors can be expressed as a linear
+combination of the remaining vectors. Otherwise the set is called
+<strong>linearly dependent</strong>.</p>
+<p>A set of vectors <span class="math inline">\(B = \{b_1, \ldots,
+b_n\}\)</span> is called a <strong>basis of <span
+class="math inline">\(V\)</span></strong> if it is linearly independent
+and if it spans the vector space. A basis is a maximal set of linearly
+independent vectors.</p>
+</div><div class="column" style="width:20%;">
+<figure>
+<img data-src="res/l1/image_204516.png" style="width:100.0%"
+alt="Right handed" />
+<figcaption aria-hidden="true">Right handed</figcaption>
+</figure>
+<figure>
+<img data-src="res/l1/image_445180.png" style="width:100.0%"
+alt="Left handed" />
+<figcaption aria-hidden="true">Left handed</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 19 -->
+</section>
+<section id="inner-product" class="slide level1">
+<h1>Inner Product</h1>
+<p>On <span class="math inline">\(V = \mathbb{R}^n\)</span>, one can
+define the canonical inner product for the canonical basis <span
+class="math inline">\(B = I_n\)</span> as</p>
+<p><span class="math display">\[\langle x, y \rangle = x^T y
+=\sum_{i=1}^n x_i y_i\]</span></p>
+<p>which induces the standard <span class="math inline">\(L_2\)</span>
+norm or Euclidean norm</p>
+<p><span class="math display">\[\|x\| = \sqrt{\langle x, x \rangle} =
+\sqrt{ x_1^2 + \cdots + x_n^2 }\]</span></p>
+<p>Two vectors <span class="math inline">\(v\)</span> and <span
+class="math inline">\(w\)</span> are <strong>orthogonal</strong> iff
+<span class="math inline">\(\langle v, w \rangle = 0\)</span>.</p>
+<div class="sourceCode" id="cb1" data-line-numbers="1,3-5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Eigen/Dense&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> std<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  Vector3d v<span class="op">(</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  Vector3d w<span class="op">(</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">);</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Dot product: &quot;</span> <span class="op">&lt;&lt;</span> v<span class="op">.</span>dot<span class="op">(</span>w<span class="op">)</span> <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- Slide number: 20 -->
+</section>
+<section id="three-dimensional-euclidean-space" class="slide level1">
+<h1>Three-dimensional Euclidean Space</h1>
+<p>The three-dimensional Euclidean space <span
+class="math inline">\(\mathbb{E}^3\)</span> consists of all points <span
+class="math inline">\(p \in \mathbb{E}^3\)</span> characterised by
+coordinates</p>
+<p><span class="math display">\[X = (X_1, X_2, X_3) \in
+\mathbb{R}^3\]</span></p>
+<p>such that <span class="math inline">\(\mathbb{E}^3\)</span> can be
+identified with <span class="math inline">\(\mathbb{R}^3\)</span>. That
+means we talk about points (<span
+class="math inline">\(\mathbb{E}^3\)</span>) and coordinates (<span
+class="math inline">\(\mathbb{R}^3\)</span>) as if they were the same
+thing. Given two points <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>, one can define a <strong>bound
+vector</strong> as</p>
+<p><span class="math display">\[v = X - Y \in \mathbb{R}^3\]</span></p>
+<p>Considering this vector independent of its base point <span
+class="math inline">\(Y\)</span> makes it a <strong>free
+vector</strong>. The set of free vectors <span class="math inline">\(v
+\in \mathbb{R}^3\)</span> forms a linear vector space. By defining <span
+class="math inline">\(\mathbb{E}^3\)</span> and <span
+class="math inline">\(\mathbb{R}^3\)</span>, one can endow <span
+class="math inline">\(\mathbb{E}^3\)</span> with a scalar product, a
+norm and a metric.</p>
+<!-- Slide number: 21 -->
+</section>
+<section id="cross-product-skew-symmetric-matrices"
+class="slide level1">
+<h1>Cross Product &amp; Skew-Symmetric Matrices</h1>
+<p>On <span class="math inline">\(\mathbb{R}^3\)</span>, one can define
+a cross product</p>
+<p><span class="math display">\[
+\begin{aligned}
+\times : \mathbb{R}^3 \times \mathbb{R}^3 \rightarrow \mathbb{R}^3\\
+u \times v =
+  \begin{pmatrix}
+    u_2 v_3 - u_3 v_2 \\
+    u_3 v_1 - u_1 v_3 \\
+    u_1 v_2 - u_2 v_1
+  \end{pmatrix}
+\end{aligned}
+\]</span></p>
+<p>which is a vector <strong>orthogonal to both</strong> <span
+class="math inline">\(u\)</span> and <span
+class="math inline">\(v\)</span>. Since the cross product is
+anti-commutative (<span class="math inline">\(u \times v = -v \times
+u\)</span>), it introduces an <strong>orientation</strong>. Fixing <span
+class="math inline">\(u\)</span> induces a linear mapping <span
+class="math inline">\(v \rightarrow u \times v\)</span> which can be
+represented by the <strong>skew-symmetric matrix</strong> <span
+class="math inline">\(\hat{u}\)</span> such that <span
+class="math inline">\(\hat{u} v = u \times v\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{u} =
+  \begin{pmatrix}
+    0 &amp; -u_3 &amp; u_2 \\
+    u_3 &amp; 0 &amp; -u_1 \\
+    -u_2 &amp; u_1 &amp; 0
+  \end{pmatrix} \in \mathbb{R}^{3 \times 3}
+\end{aligned}
+\]</span></p>
+<p>In turn, every skew symmetric matrix <span class="math inline">\(M =
+-M^T\)</span> can be identified with a vector <span
+class="math inline">\(u \in \mathbb{R}^3\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Eigen/Dense&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen<span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> std<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  Vector3d v<span class="op">(</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">);</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  Vector3d w<span class="op">(</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Cross product:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> v<span class="op">.</span>cross<span class="op">(</span>w<span class="op">)</span> <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- Slide number: 22 -->
+</section>
+<section id="linear-transformation-and-matrices" class="slide level1">
+<h1>Linear Transformation and Matrices</h1>
+<p>Linear algebra studies the properties of linear transformations
+between linear spaces. Since these can be represented by matrices,
+linear algebra studies the properties of matrices. A <strong>linear
+transformation</strong> L between two linear spaces <span
+class="math inline">\(V\)</span> and <span
+class="math inline">\(W\)</span> is a map <span class="math inline">\(L
+: V \rightarrow W\)</span> such that, <span
+class="math inline">\(\forall x, y \in V, \alpha \in
+\mathbb{R}\)</span>:</p>
+<ul>
+<li><span class="math inline">\(L(x + y) = L(x) + L(y)\)</span></li>
+<li><span class="math inline">\(L(\alpha x) = \alpha L(x)\)</span></li>
+</ul>
+<p>Due to the linearity, the action of <span
+class="math inline">\(L\)</span> on the space <span
+class="math inline">\(V\)</span> is uniquely defined by its actions on
+the basis vectors of <span class="math inline">\(V\)</span>. In the
+canonical basis <span class="math inline">\({e_1, \ldots, e_n}\)</span>
+we have:</p>
+<p><span class="math display">\[L(x) = Ax, \forall x \in V\]</span></p>
+<p>where</p>
+<p><span class="math display">\[A = (L(e_1), \ldots, L(e_n)) \in
+\mathbb{R}^{m \times n}\]</span></p>
+<p>The set of all real <span class="math inline">\(m \times n\)</span>
+matrices is denoted by <span class="math inline">\(\mathcal{M}(m,
+n)\)</span>. In the case of <span class="math inline">\(m = n\)</span>,
+the set <span class="math inline">\(\mathcal{M}(m, n) =
+\mathcal{M}(m)\)</span> forms a <strong>ring</strong> over the field
+<span class="math inline">\(\mathbb{R}\)</span>, i.e. it is closed under
+matrix multiplication and summation.</p>
+<p><img data-src="res/l1/image_517862.png" style="width:40.0%" /></p>
+<!-- Slide number: 23 -->
+</section>
+<section id="the-linear-groups-gln-and-sln" class="slide level1">
+<h1>The Linear Groups <span class="math inline">\(GL(n)\)</span> and
+<span class="math inline">\(SL(n)\)</span></h1>
+<p>There exist certain sets of linear transformations which form a
+group. A <strong>group</strong> is a set <span
+class="math inline">\(G\)</span> with an operation <span
+class="math inline">\(\circ : G \times G \rightarrow G\)</span> such
+that:</p>
+<ol type="1">
+<li>closed: <span class="math inline">\(g \circ h \in G, \forall g, h
+\in G\)</span></li>
+<li>associative: <span class="math inline">\(g \circ (h \circ z) = (g
+\circ h) \circ z, \forall g, h, z \in G\)</span></li>
+<li>neutral: <span class="math inline">\(\exists e \in G : e \circ g = g
+\circ e = g, \forall g \in G\)</span></li>
+<li>inverse: <span class="math inline">\(\forall g \in G, \exists g^{-1}
+\in G : g \circ g^{-1} = g^{-1} \circ g = e\)</span></li>
+</ol>
+<p>Example: All invertible (non-singular) real <span
+class="math inline">\(n \times n\)</span> matrices form a group with
+respect to matrix multiplication. This group is called the
+<strong>general linear group</strong> <span
+class="math inline">\(GL(n)\)</span>. It consists of all <span
+class="math inline">\(A \in \mathcal{M}(n)\)</span> matrices for
+which:</p>
+<p><span class="math display">\[\det(A) \neq 0\]</span></p>
+<p>All matrices <span class="math inline">\(A \in GL(n)\)</span> for
+which <span class="math inline">\(\det(A) = 1\)</span> form a group
+called special linear group <span class="math inline">\(SL(n)\)</span>.
+The inverse of <span class="math inline">\(A\)</span> is also in this
+group as <span class="math inline">\(\det(A^{-1}) = \det(A)^{-1} =
+1\)</span>.</p>
+<!-- Slide number: 24 -->
+</section>
+<section id="matrix-representation-of-groups" class="slide level1">
+<h1>Matrix Representation of Groups</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>A group <span class="math inline">\(G\)</span> has a <strong>matrix
+representation</strong> if there exists and injective
+transformation:</p>
+<p><span class="math display">\[R : G \rightarrow GL(n)\]</span></p>
+<p>which <strong>preserves the group structure</strong> of <span
+class="math inline">\(G\)</span>. That is, inverse and composition are
+preserved by the map:</p>
+<ul>
+<li><span class="math inline">\(R(e) = I_{n \times n}\)</span></li>
+<li><span class="math inline">\(R(g \circ h) = R(g) R(h) \quad \forall
+g, h \in G\)</span></li>
+</ul>
+<p>Such a map <span class="math inline">\(R\)</span> is called a
+<strong>group homomorphism</strong>.</p>
+<p>The idea of matrix representations of a group is that they allow to
+analyse more abstract groups by looking at the properties of the
+respective matrix group.</p>
+<ul>
+<li>Example: The rotations of an object form a group as there exists a
+neutral element (no rotation) and an inverse (the inverse rotation) and
+any concatenation of rotations is again a rotation (around a different
+axis).</li>
+<li>Studying the properties of the rotation group is easier if rotations
+are represented by respective matrices.</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode c++"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Eigen/Dense&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Eigen<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> std<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  Matrix2d mat<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  mat <span class="op">&lt;&lt;</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>         <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  Vector2d u<span class="op">(-</span><span class="dv">1</span><span class="op">,</span><span class="dv">1</span><span class="op">),</span> v<span class="op">(</span><span class="dv">2</span><span class="op">,</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is mat*mat:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> mat<span class="op">*</span>mat <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is mat*u:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> mat<span class="op">*</span>u <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is u^T*mat:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> u<span class="op">.</span>transpose<span class="op">()*</span>mat <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is u^T*v:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> u<span class="op">.</span>transpose<span class="op">()*</span>v <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is u*v^T:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> u<span class="op">*</span>v<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Let&#39;s multiply mat by itself&quot;</span> <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  mat <span class="op">=</span> mat<span class="op">*</span>mat<span class="op">;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Now mat is mat:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> mat <span class="op">&lt;&lt;</span> endl<span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+</div>
+<!-- Slide number: 25 -->
+</section>
+<section id="representations-of-rotation" class="slide level1">
+<h1>Representations of Rotation</h1>
+<ul>
+<li>Rotation representations:
+<ul>
+<li>SO(3) matrices</li>
+<li>Rotation vectors (angle-axis)</li>
+<li>Euler angles</li>
+<li>Quaternions</li>
+</ul></li>
+</ul>
+<p>For more rotation representations and conversions see:</p>
+<ul>
+<li><a
+href="https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions"
+class="uri">https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions</a></li>
+</ul>
+<!-- Slide number: 26 -->
+</section>
+<section id="euler-angles" class="slide level1">
+<h1>Euler Angles</h1>
+<p>Any rotation can be decomposed into three principal rotations</p>
+<figure>
+<img data-src="res/l1/euler.png" style="width:80.0%"
+alt="Euler ZYX order" />
+<figcaption aria-hidden="true">Euler ZYX order</figcaption>
+</figure>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>Reasons not to use:
+<ul>
+<li>Hard to combine rotations</li>
+<li>12 different conventions exist (however yaw-pitch-roll is the most
+used one)</li>
+<li>Singularities are bad for optimisation.</li>
+</ul></li>
+<li>Euler angles have gimbal lock!
+<ul>
+<li>Singularity always exist if we want to use 3 parameters to describe
+rotation</li>
+<li>Degree-of-Freedom is reduced in singular case</li>
+<li>In yaw-pitch-roll order, when pitch=90 degrees</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<figure>
+<img data-src="res/l1/gimbal.png" style="width:100.0%"
+alt="Gimbal lock" />
+<figcaption aria-hidden="true">Gimbal lock</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 27 -->
+</section>
+<section id="representations-of-rotation-1" class="slide level1">
+<h1>Representations of Rotation</h1>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>(Unit) Quaternions
+<ul>
+<li>Extended from complex numbers</li>
+<li>Three imaginary and one real part:</li>
+<li>The imaginary parts satisfy:</li>
+</ul></li>
+<li>Reasons to use
+<ul>
+<li>Require less memory than rotation matrices</li>
+<li>Easy to keep normalized</li>
+<li>Smaller number of operations (but not always faster on modern
+CPUs)</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<p><img data-src="res/l1/quaternion-definition.png" /></p>
+</div>
+</div>
+<p>Operations:</p>
+<p><img data-src="res/l1/quaternions-operations.png"
+style="width:80.0%" /></p>
+<!-- Slide number: 28 -->
+</section>
+<section id="reasons-to-use-matrix-groups" class="slide level1">
+<h1>Reasons to use Matrix Groups</h1>
+<ul>
+<li>Unified representation of many transformations
+<ul>
+<li>rotation SO(3)</li>
+<li>rigid body transformations SE(3)</li>
+<li>scaling Sim(3)</li>
+<li>and others</li>
+</ul></li>
+<li>Easy concatenation of transformations with matrix
+multiplication</li>
+<li>No singularities</li>
+<li>Overparametrized, but for optimisation minimal representation of
+updates can be used.</li>
+</ul>
+<!-- Slide number: 29 -->
+</section>
+<section id="the-orthogonal-group-on" class="slide level1">
+<h1>The Orthogonal Group <span class="math inline">\(O(n)\)</span></h1>
+<p>A matrix <span class="math inline">\(A \in \mathcal{M}()n\)</span> is
+called <strong>orthogonal</strong> if it preserves the inner product,
+i.e:</p>
+<p><span class="math display">\[\langle Ax, Ay \rangle = \langle x, y
+\rangle \quad \forall x, y \in \mathbb{R}^n\]</span></p>
+<p>The set of all orthogonal matrices forms the <strong>orthogonal
+group</strong> <span class="math inline">\(O(n)\)</span>, which is a
+subgroup of <span class="math inline">\(GL(n)\)</span>. For an
+orthonormal matrix <span class="math inline">\(R\)</span> we have</p>
+<p><span class="math display">\[\langle Rx, Ry \rangle = x^T R^T R y =
+x^T y \quad \forall x, y \in \mathbb{R}^n\]</span></p>
+<p>Therefore we must have <span class="math inline">\(R^T R = RR^T =
+I\)</span>, in other words:</p>
+<p><span class="math display">\[O(n) = \{R \in GL(n) \mid R^T R =
+I\}\]</span></p>
+<p>The above identity shows that for any orthogonal matrix <span
+class="math inline">\(R\)</span> we have <span
+class="math inline">\(\det(R^T R) = \det(R)^2 = \det(I) = 1\)</span>,
+which means <span class="math inline">\(det(R) = \pm 1\)</span>.</p>
+<p>The subgroup of <span class="math inline">\(O(n)\)</span> with <span
+class="math inline">\(\det(R) = 1\)</span> is called the <strong>special
+orthogonal group</strong> <span class="math inline">\(SO(n)\)</span>. In
+particular, <span class="math inline">\(SO(3)\)</span> is the group of
+all 3-dimensional <strong>rotation matrices</strong>.</p>
+<!-- Slide number: 30 -->
+</section>
+<section id="the-affine-group" class="slide level1">
+<h1>The Affine Group</h1>
+<p>An affine transformation <span class="math inline">\(L : \mathbb{R}^n
+\to \mathbb{R}^n\)</span> is defined by a matrix <span
+class="math inline">\(A \in GL(n)\)</span> and a vector <span
+class="math inline">\(b \in \mathbb{R}^n\)</span> such that:</p>
+<p><span class="math display">\[L(x) = Ax + b\]</span></p>
+<p>The set of all such affine transformations is called the
+<strong>affine group of dimensions n</strong>, denoted by <span
+class="math inline">\(A(n)\)</span>. <span
+class="math inline">\(L\)</span> defined above is not a linear map
+unless <span class="math inline">\(b = 0\)</span>. By introducing
+homogenous coordinates to represent <span class="math inline">\(x \in
+\mathbb{R}^n\)</span>, <span class="math inline">\(L\)</span> becomes a
+linear mapping from</p>
+<p><span class="math display">\[
+\begin{aligned}
+L : \mathbb{R}^{n+1} &amp;\to \mathbb{R}^{n+1} \\
+\begin{pmatrix} x \\ 1 \end{pmatrix} &amp;\to
+  \begin{pmatrix} A &amp; b \\ 0 &amp; 1 \end{pmatrix}
+  \begin{pmatrix} x \\ 1 \end{pmatrix}
+\end{aligned}
+\]</span></p>
+<p>A matrix <span class="math inline">\(\begin{pmatrix} A &amp; b \\ 0
+&amp; 1 \end{pmatrix}\)</span> with <span class="math inline">\(A \in
+GL(n)\)</span> and <span class="math inline">\(b \in
+\mathbb{R}^n\)</span> is called an <strong>affine matrix</strong>. It is
+an element <span class="math inline">\(GL(n + 1)\)</span>. The affine
+matrices form a subgroup in <span class="math inline">\(GL(n +
+1)\)</span>.</p>
+<!-- Slide number: 31 -->
+</section>
+<section id="rigid-body-motion" class="slide level1">
+<h1>Rigid-Body Motion</h1>
+<p>A <strong>rigid-body motion</strong> (or rigid-body transformation)
+is a family of maps</p>
+<p><span class="math display">\[
+\begin{aligned}
+g_t : \mathbb{R}^3 &amp;\to \mathbb{R}^3 \\
+X &amp;\to g_t(X) \quad t \in [0, T]
+\end{aligned}
+\]</span></p>
+<p>which preserve the norm and cross product of any two vectors:</p>
+<p><span class="math display">\[
+\begin{aligned}
+|g_t(v)| &amp;= |v| \quad &amp;\forall v \in \mathbb{R}^3 \\
+g_t(u) \times g_t(v) &amp;= g_t(u \times v) \quad &amp;\forall u, v \in
+\mathbb{R}^3
+\end{aligned}
+\]</span></p>
+<p>Since norm and scalar product are related by the <strong>polarisation
+identity</strong></p>
+<p><span class="math display">\[\langle u, v \rangle = \frac{1}{4}
+\left( |u + v|^2 - |u - v|^2 \right)\]</span></p>
+<p>one can also state that a rigid-body motion is a map which preserves
+inner product and cross product. As a consequence, rigid-body motions
+also preserve the triple product</p>
+<p><span class="math display">\[\langle g_t(u), g_t(v) \times g_t(w)
+\rangle = \langle u, v \times w \rangle \quad \forall u, v, w \in
+\mathbb{R}^3\]</span></p>
+<p>which means that they are <strong>volume-preserving</strong>.</p>
+<!-- Slide number: 32 -->
+</section>
+<section id="representation-of-rigid-body-motion" class="slide level1">
+<h1>Representation of Rigid-body Motion</h1>
+<p>Does the above definition lead to a mathematical representation of
+rigid-body motion?</p>
+<p>Since it preserves length and orientation, the motion <span
+class="math inline">\(g_t\)</span> of a rigid body is sufficiently
+defined by specifying the motion of a Cartesian coordinate frame
+attached to the object (given by an origin and orthonormal orientation
+vectors <span class="math inline">\(e_1, e_2, e_3 \in
+\mathbb{R}^3\)</span>). The motion of the origin can be represented by
+<strong>translation</strong> <span class="math inline">\(T \in
+\mathbb{R}^3\)</span>, whereas the transformation of the vectors <span
+class="math inline">\(e_i\)</span> is given by new vectors <span
+class="math inline">\(r_i = g_t(e_i)\)</span>.</p>
+<p>Scalar and cross product of these vectors are preserved:</p>
+<p><span class="math display">\[
+\begin{aligned}
+r_i^T r_j &amp;= g(e_i)^T g(e_j) = e_i^T e_j = \delta_{ij} \\
+r_1 \times r_2 &amp;= r_3
+\end{aligned}
+\]</span></p>
+<p>The first constraint amounts to the statement that the matrix <span
+class="math inline">\(R = (r_1, r_2, r_3)\)</span> is an
+<strong>orthogonal (rotation) matrix</strong>: <span
+class="math inline">\(R^T R = R R^T = I\)</span>, whereas the second
+property implies that <span class="math inline">\(\det(R) = +1\)</span>,
+in other words: <span class="math inline">\(R\)</span> is an element of
+the group <span class="math inline">\(SO(3) = \{R \in \mathbb{R}^{3
+\times 3} \mid R^T R = I, \det(R) = +1\}\)</span>. Thus the rigid-body
+motion <span class="math inline">\(g_t\)</span> can be written as:</p>
+<p><span class="math display">\[g_t(x) = R x + T\]</span></p>
+<p><img data-src="res/l1/image_556772.png" style="width:40.0%" /></p>
+<!-- Slide number: 33 -->
+</section>
+<section id="the-euclidean-group" class="slide level1">
+<h1>The Euclidean Group</h1>
+<p>A Euclidean transformation <span class="math inline">\(L :
+\mathbb{R}^n \to \mathbb{R}^n\)</span> is defined by an orthogonal
+matrix <span class="math inline">\(R \in O(n)\)</span> and a vector
+<span class="math inline">\(T \in \mathbb{R}^n\)</span>:</p>
+<p><span class="math display">\[L(x) = R x + T\]</span></p>
+<p>The set of all such transformation is called the Euclidean group
+<span class="math inline">\(E(n)\)</span>. It is a subgroup of the
+affine group <span class="math inline">\(A(n)\)</span>. Embedded by
+homogenous coordinates we get:</p>
+<p><span class="math display">\[E(n) = \left\{ \begin{pmatrix} R &amp; T
+\\ 0 &amp; 1 \end{pmatrix} \mid R \in O(n), T \in \mathbb{R}^n
+\right\}\]</span></p>
+<p>If <span class="math inline">\(R \in SO(n)\)</span>, then we have the
+<strong>special Euclidean group <span
+class="math inline">\(SE(n)\)</span></strong>. In particular <span
+class="math inline">\(SE(3)\)</span>, represents the rigid-body motions
+in <span class="math inline">\(\mathbb{R}^3\)</span>.</p>
+<p>In summary:</p>
+<p><span class="math display">\[
+\begin{aligned}
+SO(n) &amp;\subset O(n) \subset GL(n) \\
+SE(n) &amp;\subset E(n) \subset A(n) \subset GL(n + 1)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="in-summary" class="slide level1">
+<h1>In Summary</h1>
+<figure>
+<img data-src="res/l1/hasse-groups.svg" style="width:100.0%"
+alt="Hasse diagram of groups. De Mayo, M. “Real-Time Visual-Inertial Tracking for XR Applications”" />
+<figcaption aria-hidden="true">Hasse diagram of groups. De Mayo, M.
+“Real-Time Visual-Inertial Tracking for XR Applications”</figcaption>
+</figure>
+<!-- Slide number: 34 -->
+</section>
+<section id="sophus-library" class="slide level1">
+<h1>Sophus Library</h1>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Eigen/Core&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sophus/so3.h&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sophus/se3.h&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span><span class="op">*</span> argv<span class="op">[]){</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Matrix3d R_mat<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    R_mat <span class="op">&lt;&lt;</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>SO3d R_w_c<span class="op">(</span>R_mat<span class="op">);</span> <span class="co">// Rotation from camera to world</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;R_w_i:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> R_w_c<span class="op">.</span>matrix<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d t_w_c<span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    t_w_c <span class="op">&lt;&lt;</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;t: &quot;</span> <span class="op">&lt;&lt;</span> t_w_c<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>SE3d T_w_c<span class="op">(</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        R_w_c<span class="op">,</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        t_w_c<span class="op">);</span> <span class="co">// Rigid body transformation from camera to world</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;T_w_c:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> T_w_c<span class="op">.</span>matrix<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d p_c<span class="op">;</span> <span class="co">// Point in the camera coordinate frame</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    p_c <span class="op">&lt;&lt;</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d p_w <span class="op">=</span> T_w_c <span class="op">*</span> p_c<span class="op">;</span> <span class="co">// Should be (2, 3, 13)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector4d p_w_hom <span class="op">=</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        T_w_c<span class="op">.</span>matrix<span class="op">()</span> <span class="op">*</span> p_c<span class="op">.</span>homogeneous<span class="op">();</span> <span class="co">// Should be (2, 3, 13, 1)</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;p_w: &quot;</span> <span class="op">&lt;&lt;</span> p_w<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;p_w_hom: &quot;</span> <span class="op">&lt;&lt;</span> p_w_hom<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d p_c_new <span class="op">=</span> T_w_c<span class="op">.</span>inverse<span class="op">()</span> <span class="op">*</span> p_w<span class="op">;</span> <span class="co">// Should be (1, 1, 10)</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;p_c_new: &quot;</span> <span class="op">&lt;&lt;</span> p_c_new<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- Slide number: 35 -->
+</section>
+<section id="exponential-coordinates-of-rotation" class="slide level1">
+<h1>Exponential Coordinates of Rotation</h1>
+<p>We will now derive a representation of an <strong>infinitesimal
+rotation</strong>. To this end, consider a family of rotation matrices
+<span class="math inline">\(R(t)\)</span> which continuously transform a
+point from its original location (<span class="math inline">\(R(0) =
+I\)</span>) to a different one.</p>
+<p><span class="math display">\[X(t) = R(t)X_0 \quad R(t) \in
+SO(3)\]</span></p>
+<p>Since <span class="math inline">\(\forall t\)</span>, <span
+class="math inline">\(R(t) R(t)^T = I\)</span>, we have <span
+class="math display">\[
+\begin{aligned}
+\frac{d}{dt} R R^T = \dot{R} R^T + R \dot{R}^T = 0 \\
+\Rightarrow \dot{R} R^T = - R \dot{R}^T
+\end{aligned}
+\]</span></p>
+<p>Thus, <span class="math inline">\(\dot{R} R^T\)</span> is a
+<strong>skew-symmetric matrix</strong>. As shown in the section about
+the <span class="math inline">\(\hat{\cdot}\)</span> operator, this
+implies that there exists a vector <span class="math inline">\(\omega(t)
+\in \mathbb{R}^3\)</span> such that:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\dot{R}(t) R(t)^T = \hat{\omega}(t)
+\Longleftrightarrow \dot{R}(t) = \hat{\omega}(t) R(t)
+\end{aligned}
+\]</span></p>
+<p>Since <span class="math inline">\(R(0) = I\)</span>, it follows that
+<span class="math inline">\(\dot{R}(0) = \hat{\omega}(0)\)</span>.
+Therefore the <strong>skew-symmetric matrix</strong> <span
+class="math inline">\(\hat{\omega}(0) \in \mathfrak{so}(3)\)</span>
+gives the <strong>first order approximation</strong> of a rotation:</p>
+<p><span class="math display">\[R(t) \approx R(0) + \frac{d}{dt} R(0) t
+= I + \hat{\omega}(0) t\]</span></p>
+<p>And when <span class="math inline">\(\Delta t \to 0\)</span>,
+then</p>
+<p><span class="math display">\[R(\Delta t) = I + \hat{\omega}(0) \Delta
+t\]</span></p>
+<!-- Slide number: 36 -->
+</section>
+<section id="lie-group-and-lie-algebra" class="slide level1">
+<h1>Lie Group and Lie Algebra</h1>
+<p>The above calculation showed that the effect of any infinitesimal
+rotation <span class="math inline">\(R \in SO(3)\)</span> can be
+approximated by an element from the space of skew-symmetric matrices</p>
+<p><span class="math display">\[\mathfrak{so}(3) = \{ \hat{\omega} \mid
+\omega \in \mathbb{R}^3 \}\]</span></p>
+<p>The rotation group <span class="math inline">\(SO(3)\)</span> is
+called a <strong>Lie group</strong>. The space <span
+class="math inline">\(\mathfrak{so}(3)\)</span> is called <strong>Lie
+algebra</strong>.</p>
+<ul>
+<li><strong>Def.</strong> A Lie group (or infinitesimal group) is a
+smooth manifold that is also a group, such that the group operations
+multiplication and inversion are smooth maps.</li>
+</ul>
+<!-- TODO@mateosss: Add plot of manifold and example of a non-smooth manifold. e.g., polygonal icosphere -->
+<p>As shown above: The Lie algebra <span
+class="math inline">\(\mathfrak{so}(3)\)</span> is the tangent space at
+the identity of the rotation group <span
+class="math inline">\(SO(3)\)</span>.</p>
+<p>An <strong>algebra over a field <span
+class="math inline">\(K\)</span></strong> is a vector space <span
+class="math inline">\(V\)</span> over <span
+class="math inline">\(K\)</span> with multiplication on the space <span
+class="math inline">\(V\)</span>. Elements <span
+class="math inline">\(\hat{w}\)</span> and <span
+class="math inline">\(\hat{v}\)</span> of the Lie algebra generally do
+not commute.</p>
+<p>One can define the Lie bracket</p>
+<p><span class="math display">\[
+\begin{aligned}
+[\cdot, \cdot]&amp; : \mathfrak{so}(3) \times \mathfrak{so}(3) \to
+\mathfrak{so}(3) \\
+[\hat{w}, \hat{v}] &amp;= \hat{w} \hat{v} - \hat{v} \hat{w}
+\end{aligned}
+\]</span></p>
+<!--
+TODO@mateosss: maybe explain a bit more about the lie bracket? e.g.:
+
+which is bilinear, anti-symmetric and satisfies the Jacobi identity:
+
+- bilinear: $[a \hat{w} + b \hat{v}, \hat{z}] = a [\hat{w}, \hat{z}] + b [\hat{v}, \hat{z}]$ and $[\hat{z}, a \hat{w} + b \hat{v}] = a [\hat{z}, \hat{w}] + b [\hat{z}, \hat{v}]$
+- anti-symmetric: $[\hat{w}, \hat{v}] = - [\hat{v}, \hat{w}]$
+- Jacobi identity: $[\hat{w}, [\hat{v}, \hat{z}]] + [\hat{v}, [\hat{z}, \hat{w}]] + [\hat{z}, [\hat{w}, \hat{v}]] = 0$
+-->
+<!-- Slide number: 37 -->
+</section>
+<section id="the-exponential-map" class="slide level1">
+<h1>The Exponential Map</h1>
+<p>Given the infinitesimal formulation of rotation in terms of the
+skew-symmetric matrix <span class="math inline">\(\hat{\omega}\)</span>,
+is it possible to determine a useful representation of the rotation
+<span class="math inline">\(R(t)\)</span>? Let us assume <span
+class="math inline">\(\hat{\omega}\)</span> is constant in time.</p>
+<p>Let’s consider the initial value problem of the following ordinary
+differential equation:</p>
+<p><span class="math display">\[
+\begin{cases}
+\dot{R}(t) &amp;= \hat{\omega} R(t) \\
+R(0) &amp;= I
+\end{cases}
+\]</span></p>
+<p>has the solution</p>
+<p><span class="math display">\[
+R(t) = \exp(\hat{\omega} t) = \sum_{n=0}^{\infty} \frac{(\hat{\omega}
+t)^n}{n!} = I + \hat{\omega} t + \frac{(\hat{\omega} t)^2}{2!} + \cdots
+\]</span></p>
+<p>which is a rotation around the axis <span
+class="math inline">\(\omega \in \mathbb{R}^3\)</span> by an angle of
+<span class="math inline">\(t\)</span> (if <span
+class="math inline">\(|\omega| = 1\)</span>). Alternatively, one can
+absorb the scalar <span class="math inline">\(t \in \mathbb{R}\)</span>
+into the skew symmetric matrix <span
+class="math inline">\(\hat{\omega}\)</span> to obtain <span
+class="math inline">\(R(t) = \exp(\hat{v})\)</span> with <span
+class="math inline">\(\hat{v} = \hat{\omega} t\)</span>. This
+<strong>matrix exponential</strong>, therefore, defines a map from the
+Lie algebra to the Lie group:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\exp : \mathfrak{so}(3) &amp;\to SO(3) \\
+\hat{\omega} &amp;\mapsto \exp(\hat{\omega})
+\end{aligned}
+\]</span></p>
+<!-- Slide number: 38 -->
+</section>
+<section id="the-logarithm-of-so3" class="slide level1">
+<h1>The Logarithm of SO(3)</h1>
+<p>As in the case of real analysis one can define an inverse function to
+the exponential map by the logarithm. In the context of Lie groups, this
+will lead to a mapping from the Lie group to the Lie algebra. For any
+rotation matrix <span class="math inline">\(R \in SO(3)\)</span>, there
+exists <span class="math inline">\(\omega \in \mathbb{R}^3\)</span> such
+that <span class="math inline">\(R = \exp(\hat{\omega})\)</span>. Such
+an element is denoted by <span class="math inline">\(\hat{\omega} =
+\log(R)\)</span>.</p>
+<p>If <span class="math inline">\(R = (r_{ij}) \neq I\)</span>, then an
+appropriate <span class="math inline">\(\omega\)</span> is given by:</p>
+<p><span class="math display">\[
+\begin{aligned}
+|\omega| &amp;= \cos^{-1} \left( \frac{r_{11} + r_{22} + r_{33} - 1}{2}
+\right) \\
+\omega &amp;= \frac{|\omega|}{2 \sin(|\omega|)} \begin{pmatrix}
+r_{32} - r_{23} \\
+r_{13} - r_{31} \\
+r_{21} - r_{12}
+\end{pmatrix}
+\end{aligned}
+\]</span></p>
+<p>For <span class="math inline">\(R = I\)</span>, we have <span
+class="math inline">\(|\omega| = 0\)</span>, i.e. a rotation by an angle
+0. The above statement says: <em>Any orthogonal transformation <span
+class="math inline">\(R \in SO(3)\)</span> can be represented by
+rotating by an angle <span class="math inline">\(|\omega|\)</span>
+around an axis <span
+class="math inline">\(\frac{\omega}{|\omega|}\)</span> as defined
+above.</em></p>
+<p>Obviously the above representation is not unique since increasing the
+angle by multiples of <span class="math inline">\(2\pi\)</span> will
+give the same rotation <span class="math inline">\(R\)</span></p>
+<!-- Slide number: 39 -->
+</section>
+<section id="schematic-visualization-of-lie-group-and-algebra"
+class="slide level1">
+<h1>Schematic Visualization of Lie Group and Algebra</h1>
+<p><img data-src="res/l1/lie-schematics.png" /></p>
+<ul>
+<li><p><strong>Def.</strong> A <strong>Lie group</strong> is a smooth
+manifold that is also a group, such that the group operations
+multiplication and diversion are smooth maps.</p></li>
+<li><p><strong>Def.</strong> The tangent space to a Lie group at the
+identity element is called the associated <strong>Lie
+algebra</strong>.</p></li>
+</ul>
+<p>The mapping from the Lie algebra to the Lie group is called the
+<strong>exponential map</strong>. Its inverse is called
+<strong>logarithmic map</strong>.</p>
+<!-- Slide number: 40 -->
+</section>
+<section id="rodrigues-formula" class="slide level1">
+<h1>Rodrigues’ Formula</h1>
+<p>We have seen that any rotation can be computed by <span
+class="math inline">\(R = \exp(\hat{\omega})\)</span>. There exists a
+closed-form version of the exponential map for <span
+class="math inline">\(\hat{\omega} \in \mathfrak{so}(3)\)</span>.</p>
+<p><span class="math display">\[\exp(\hat{\omega}) = I +
+\frac{\sin|\omega|}{|\omega|} \hat{\omega} + \frac{1 -
+\cos|\omega|}{|\omega|^2} \hat{\omega}^2\]</span></p>
+<p>This is known as Rodrigues’ formula.</p>
+<p><strong>Proof</strong> Let <span class="math inline">\(t =
+|\omega|\)</span> and <span class="math inline">\(v =
+\frac{\omega}{|\omega|}\)</span>. Then</p>
+<ul>
+<li><span class="math inline">\(\hat{v}^2 = v v^T - I\)</span></li>
+<li><span class="math inline">\(\hat{v}^3 = \hat{v} \hat{v}^2 =
+-\hat{v}\)</span></li>
+<li><span class="math inline">\(\hat{v}^4 = \hat{v}^2 \hat{v}^2 =
+\hat{v}^2\)</span></li>
+<li><span class="math inline">\(\hat{v}^5 = \hat{v}^3 \hat{v}^2 =
+-\hat{v}^2\)</span></li>
+<li><span class="math inline">\(\hat{v}^6 = \hat{v}^4 \hat{v}^2 =
+\hat{v}^2\)</span></li>
+<li><span class="math inline">\(\ldots\)</span></li>
+</ul>
+<p>and</p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; \exp(\hat{\omega}) = \exp(\hat{v} t) = \\
+&amp; I + (t - \frac{t^3}{3!} + \frac{t^5}{5!} - \cdots) \hat{v} +
+(\frac{t^2}{2!} - \frac{t^4}{4!} + \frac{t^6}{6!} - \cdots) \hat{v}^2 =
+I + \sin(t) \hat{v} + (1 - \cos t) \hat{v}^2
+\end{aligned}
+\]</span></p>
+<!-- Slide number: 41 -->
+</section>
+<section id="lie-algebra-for-se3" class="slide level1">
+<h1>Lie Algebra for SE(3)</h1>
+<p>Given a continuous family of rigid-body transformation</p>
+<p><span class="math display">\[
+\begin{aligned}
+g : \mathbb{R} &amp;\to SE(3) \\
+g(t) &amp;\mapsto \begin{pmatrix} R(t) &amp; T(t) \\ 0 &amp; 1
+\end{pmatrix}
+\end{aligned}
+\]</span></p>
+<p>we consider</p>
+<p><span class="math display">\[\dot{g}(t) g^{-1}(t) = \begin{pmatrix}
+\dot{R} R^T &amp; \dot{T} - \dot{R} R^T T \\ 0 &amp; 0
+\end{pmatrix}\]</span></p>
+<p>As in the case of <span class="math inline">\(SO(3)\)</span>, the
+matrix <span class="math inline">\(\dot{R} R^T\)</span> corresponds to
+some skew-symmetric matrix <span class="math inline">\(\hat{\omega} \in
+\mathfrak{so}(3)\)</span>..</p>
+<p>Defining a vector <span class="math inline">\(v(t) = \dot{T} -
+\hat{\omega} T(t)\)</span>, we have:</p>
+<p><span class="math display">\[\dot{g}(t) g^{-1}(t) = \begin{pmatrix}
+\hat{\omega}(t) &amp; v(t) \\ 0 &amp; 0 \end{pmatrix}\]</span></p>
+<p>The matrix <span class="math inline">\(\hat{\xi} \in
+\mathfrak{se}(3)\)</span> is called twist and can be parametrized with
+twist coordinates <span class="math inline">\(\xi \in
+\mathbb{R}^6\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{\xi} &amp;= \begin{pmatrix} v \\ w \end{pmatrix}^\wedge &amp;=
+\begin{pmatrix} \hat{\omega} &amp; v \\ 0 &amp; 0 \end{pmatrix} \\
+\xi &amp;= \begin{pmatrix} v \\ w\end{pmatrix} &amp;= \begin{pmatrix}
+\hat{\omega} &amp; v \\ 0 &amp; 0 \end{pmatrix}^\vee
+\end{aligned}
+\]</span></p>
+<!-- Slide number: 42 -->
+</section>
+<section id="exponential-map-and-logarithm-for-se3"
+class="slide level1">
+<h1>Exponential map and Logarithm for SE(3)</h1>
+<p>Similarly to <span class="math inline">\(SO(3)\)</span> any rigid
+body transformation can be (not uniquely) represented by <span
+class="math inline">\(R = \exp(\hat{\xi})\)</span>.</p>
+<p>There exists a closed-form version of the exponential map for <span
+class="math inline">\(\hat{\xi} = \begin{pmatrix} v \\ w
+\end{pmatrix}^\wedge \in \mathfrak{se}(3)\)</span>:</p>
+<p><span class="math display">\[\exp(\hat{\xi}) = \begin{pmatrix}
+\exp(\hat{\omega}) &amp; J v \\ 0 &amp; 1 \end{pmatrix}\]</span></p>
+<p>where <span class="math inline">\(J\)</span> is the left Jacobian of
+<span class="math inline">\(SO(3)\)</span> and can be computed in closed
+form:</p>
+<p><span class="math display">\[J = I + \frac{1 - \cos\theta}{\theta^2}
+\hat{\omega} + \frac{\theta - \sin\theta}{\theta^3}
+\hat{\omega}^2\]</span></p>
+<p>where <span class="math inline">\(\theta = |\omega|\)</span>.</p>
+<p>The logarithm also has a closed-form solution:</p>
+<p><span class="math display">\[\begin{pmatrix} v \\ w \end{pmatrix} =
+\log \begin{pmatrix} R &amp; T \\ 0 &amp; 1
+\end{pmatrix}^\vee\]</span></p>
+<p>In this case we first find <span class="math inline">\(\omega =
+\log(R)^\vee\)</span> with <span class="math inline">\(SO(3)\)</span>
+logarithm and then <span class="math inline">\(v = J^{-1}t\)</span>,
+where the inverse Jacobian also has a closed form:</p>
+<p><span class="math display">\[J^{-1} = I - \frac{1}{2} \hat{\omega} +
+\left( \frac{1}{\theta^2} - \frac{1 + \cos\theta}{2\theta \sin\theta}
+\right) \hat{\omega}^2\]</span></p>
+<!-- Slide number: 43 -->
+</section>
+<section id="lie-group-and-algebra-summary" class="slide level1">
+<h1>Lie Group and Algebra Summary</h1>
+<p><img data-src="res/l1/lie-summary.png" style="width:100.0%" /></p>
+<!-- Slide number: 44 -->
+</section>
+<section id="sophus-expmap-and-logmap" class="slide level1">
+<h1>Sophus Expmap and Logmap</h1>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Eigen/Core&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sophus/so3.h&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sophus/se3.h&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span><span class="op">*</span> argv<span class="op">[]){</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d rand_vec3 <span class="op">=</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        Eigen<span class="op">::</span>Vector3d<span class="op">::</span>Random<span class="op">()</span> <span class="op">/</span> <span class="fl">100.0</span><span class="op">;</span> <span class="co">// Small random vector</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;rand_vec3: &quot;</span> <span class="op">&lt;&lt;</span> rand_vec3<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sophus also has a hat and vee operator, but exp and log already include them as shown below</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sophus::SO3d::hat(rand_vec3);</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>SO3d rand_R <span class="op">=</span> Sophus<span class="op">::</span>SO3d<span class="op">::</span>exp<span class="op">(</span>rand_vec3<span class="op">);</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;rand_R:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> rand_R<span class="op">.</span>matrix<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Vector3d log_rand_R <span class="op">=</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        rand_R<span class="op">.</span>log<span class="op">();</span> <span class="co">// Should be the same as rand_vec3</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;log_rand_R: &quot;</span> <span class="op">&lt;&lt;</span> log_rand_R<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sophus::Vector6d is an alias for Eigen::Matrix&lt;double, 6, 1&gt;</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>Vector6d rand_vec6 <span class="op">=</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        Sophus<span class="op">::</span>Vector6d<span class="op">::</span>Random<span class="op">()</span> <span class="op">/</span> <span class="fl">100.0</span><span class="op">;</span> <span class="co">// Small random vector</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;rand_vec6: &quot;</span> <span class="op">&lt;&lt;</span> rand_vec6<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>SE3d rand_T <span class="op">=</span> Sophus<span class="op">::</span>SE3d<span class="op">::</span>exp<span class="op">(</span>rand_vec6<span class="op">);</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;rand_T:</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">&lt;&lt;</span> rand_T<span class="op">.</span>matrix<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    Sophus<span class="op">::</span>Vector6d log_rand_T <span class="op">=</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        rand_T<span class="op">.</span>log<span class="op">();</span> <span class="co">// Should be the same as rand_vec3</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;log_rand_T: &quot;</span> <span class="op">&lt;&lt;</span> log_rand_T<span class="op">.</span>transpose<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- Slide number: 45 -->
+</section>
+<section id="summary-of-lie-groups" class="slide level1">
+<h1>Summary of Lie Groups</h1>
+<ul>
+<li>Reasons to use Lie Groups
+<ul>
+<li>Unified representation of many transformations
+<ul>
+<li>rotation <span class="math inline">\(SO(3)\)</span>, <span
+class="math inline">\(SO(2)\)</span></li>
+<li>rigid body transformations <span
+class="math inline">\(SE(3)\)</span>, <span
+class="math inline">\(SE(2)\)</span></li>
+<li>scaling <span class="math inline">\(Sim(3)\)</span>, <span
+class="math inline">\(Sim(2)\)</span></li>
+<li>and others</li>
+</ul></li>
+<li>Easy concatenation of transformations with matrix
+multiplication</li>
+<li>Easy applications</li>
+<li>No singularities (because overparametrizes)</li>
+<li>Minimal parametrization of updates using Lie algebra coordinates
+(allows unconstrained optimization)</li>
+</ul></li>
+</ul>
+<!-- Slide number: 46 -->
+</section>
+<section id="local-parametrization-in-ceres" class="slide level1">
+<h1>Local Parametrization in Ceres</h1>
+<p><em>NOTE: Old example, in reality now we use
+<code>ceres_manifold.hpp</code>.</em></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LocalParameterizationSE3 <span class="op">:</span> <span class="kw">public</span> ceres<span class="op">::</span>LocalParameterization <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="op">~</span>LocalParameterizationSE3<span class="op">()</span> <span class="op">{}</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="dt">bool</span> Plus<span class="op">(</span><span class="dt">double</span> <span class="at">const</span><span class="op">*</span> T_raw<span class="op">,</span> <span class="dt">double</span> <span class="at">const</span><span class="op">*</span> delta_raw<span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">double</span><span class="op">*</span> T_plus_delta_raw<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>SE3d <span class="at">const</span><span class="op">&gt;</span> <span class="at">const</span> T<span class="op">(</span>T_raw<span class="op">);</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>Vector6d <span class="at">const</span><span class="op">&gt;</span> <span class="at">const</span> delta<span class="op">(</span>delta_raw<span class="op">);</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>SE3d<span class="op">&gt;</span> T_plus_delta<span class="op">(</span>T_plus_delta_raw<span class="op">);</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    T_plus_delta <span class="op">=</span> T <span class="op">*</span> SE3d<span class="op">::</span>exp<span class="op">(</span>delta<span class="op">);</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="dt">bool</span> ComputeJacobian<span class="op">(</span><span class="dt">double</span> <span class="at">const</span><span class="op">*</span> T_raw<span class="op">,</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                               <span class="dt">double</span><span class="op">*</span> jacobian_raw<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>SE3d <span class="at">const</span><span class="op">&gt;</span> T<span class="op">(</span>T_raw<span class="op">);</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    Eigen<span class="op">::</span>Map<span class="op">&lt;</span>Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">6</span><span class="op">,</span> Eigen<span class="op">::</span>RowMajor<span class="op">&gt;&gt;</span> jacobian<span class="op">(</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        jacobian_raw<span class="op">);</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    jacobian <span class="op">=</span> T<span class="op">.</span>Dx_this_mul_exp_x_at_0<span class="op">();</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="dt">int</span> GlobalSize<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> SE3d<span class="op">::</span>num_parameters<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="dt">int</span> LocalSize<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> SE3d<span class="op">::</span>DoF<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<!-- Slide number: 47 -->
+</section>
+<section id="exercise-1" class="slide level1">
+<h1>Exercise 1</h1>
+<p>In the first exercise you should:</p>
+<ul>
+<li>Review the history and current state of SLAM.</li>
+<li>Clone and set up the repository with the code for the practical
+course.</li>
+<li>Get familiar with CMake parameters used in the project.</li>
+<li>Implement exp and log functions without built-in Sophus
+functions.</li>
+<li>Enable the tests for this exercise and push your solution to the
+server for automatic evaluation</li>
+<li>Prove the formula of the Jacobian used in SE(3) exponential
+map.</li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,1568 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2
+id="lecture-3-keypoint-detection-matching-and-motion-estimation">Lecture
+3: Keypoint Detection, Matching and Motion Estimation</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+<!-- Slide number: 2 -->
+</section>
+<section id="topics-covered" class="slide level1">
+<h1>Topics Covered</h1>
+<ul>
+<li>Keypoint detection
+<ul>
+<li>Corner detection</li>
+<li>Blob detection</li>
+<li>Rotation estimation</li>
+<li>Scale selection</li>
+</ul></li>
+<li>Keypoint description
+<ul>
+<li>Scale-Invariant Feature Transform (SIFT)</li>
+<li>Binary Features: BRIEF, ORB</li>
+</ul></li>
+<li>Keypoint matching</li>
+<li>Robust model fitting with RANSAC</li>
+<li>Epipolar constraint</li>
+<li>Keypoint-based motion estimation</li>
+<li>Place recognition with bag of words</li>
+</ul>
+<!-- Slide number: 3 -->
+</section>
+<section id="local-features" class="slide level1">
+<h1>Local Features</h1>
+<!-- Slide number: 4 -->
+</section>
+<section id="keypoint-detection" class="slide level1">
+<h1>Keypoint Detection</h1>
+<p>Desirable properties of keypoint detectors for visual SLAM / SfM:</p>
+<ul>
+<li>High repeatability</li>
+<li>Localization accuracy</li>
+<li>Robustness</li>
+<li>Invariance</li>
+<li>Computational efficiency</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l3/image_599691.jpg" style="width:100.0%"
+alt="Harris Corners (Image source: Svetlana Lazebnik)" />
+<figcaption aria-hidden="true">Harris Corners (Image source: Svetlana
+Lazebnik)</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l3/image_627502.jpg" style="width:100.0%"
+alt="DoG (SIFT) blobs (Image source: Svetlana Lazebnik)" />
+<figcaption aria-hidden="true">DoG (SIFT) blobs (Image source: Svetlana
+Lazebnik)</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 5 -->
+</section>
+<section id="keypoint-matching" class="slide level1">
+<h1>Keypoint Matching</h1>
+<p>Desirable properties of feature matching for visual SLAM / SfM:</p>
+<ul>
+<li>High recall</li>
+<li>Precision</li>
+<li>Robustness</li>
+<li>Computational efficiency</li>
+<li>One possible approach to keypoint matching: by descriptor</li>
+</ul>
+<figure>
+<img data-src="res/l3/image_244194.jpg" style="width:100.0%"
+alt="Descriptor matching" />
+<figcaption aria-hidden="true">Descriptor matching</figcaption>
+</figure>
+<!-- Slide number: 6 -->
+</section>
+<section id="local-feature-descriptors" class="slide level1">
+<h1>Local Feature Descriptors</h1>
+<ul>
+<li>Desirable properties for SLAM / SfM: distinctiveness, robustness,
+invariance</li>
+<li>Extract signatures that describe local image regions, examples:
+<ul>
+<li>Histograms over image gradients (SIFT)</li>
+<li>Histograms over Haar-wavelet responses (SURF)</li>
+<li>Binary patterns (BRIEF, BRISK, FREAK, etc.)</li>
+<li>Learning-based descriptors (f.e. Calonder et al., ECCV 2008)</li>
+</ul></li>
+<li>Rotation-invariance: Align with dominant orientation in local
+region</li>
+<li>Scale-invariance: Adapt described region extent to keypoint
+scale</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_855015.png" style="width:100.0%"
+alt="SIFT pools" />
+<figcaption aria-hidden="true">SIFT pools</figcaption>
+</figure>
+</div><div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_486602.png" style="width:100.0%"
+alt="SIFT gradient histogram" />
+<figcaption aria-hidden="true">SIFT gradient histogram</figcaption>
+</figure>
+</div><div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_619901.png" style="width:100.0%"
+alt="BRIEF binary tests" />
+<figcaption aria-hidden="true">BRIEF binary tests</figcaption>
+</figure>
+</div>
+</div>
+<p><em>Image source: Svetlana Lazebnik / Calonder et al., ECCV
+2010</em>.</p>
+<!-- Slide number: 7 -->
+</section>
+<section id="image-matching-12" class="slide level1">
+<h1>Image Matching 1/2</h1>
+<figure>
+<img data-src="res/l3/marsrover.png" style="width:100.0%"
+alt="NASA Mars Rover images" />
+<figcaption aria-hidden="true">NASA Mars Rover images</figcaption>
+</figure>
+<!-- Slide number: 8 -->
+</section>
+<section id="image-matching-22" class="slide level1">
+<h1>Image Matching 2/2</h1>
+<figure>
+<img data-src="res/l3/marsrover-matched.png" style="width:100.0%"
+alt="NASA Mars Rover images with SIFT feature matches" />
+<figcaption aria-hidden="true">NASA Mars Rover images with SIFT feature
+matches</figcaption>
+</figure>
+<!-- Slide number: 9 -->
+</section>
+<section id="invariant-local-features" class="slide level1">
+<h1>Invariant Local Features</h1>
+<p>Find features that are invariant to transformations</p>
+<ul>
+<li>geometric invariance: translation, rotation, scale</li>
+<li>photometric invariance: brightness, exposure, …</li>
+</ul>
+<figure>
+<img data-src="res/l3/image_897330.png" style="width:100.0%"
+alt="Feature Descriptors" />
+<figcaption aria-hidden="true">Feature Descriptors</figcaption>
+</figure>
+<!-- Slide number: 10 -->
+</section>
+<section id="advantages-of-local-features" class="slide level1">
+<h1>Advantages of Local Features</h1>
+<ul>
+<li>Locality
+<ul>
+<li>features are local, so robust to occlusion and clutter</li>
+</ul></li>
+<li>Distinctiveness
+<ul>
+<li>can differentiate a large database of objects</li>
+</ul></li>
+<li>Quantity
+<ul>
+<li>hundreds or thousands in a single image</li>
+</ul></li>
+<li>Efficiency
+<ul>
+<li>real-time performance achievable</li>
+</ul></li>
+</ul>
+<!-- Slide number: 11 -->
+</section>
+<section id="section-keypoint-detection" class="slide level1">
+<h1>Section: Keypoint Detection</h1>
+<!-- Slide number: 12 -->
+</section>
+<section id="local-measure-of-uniqueness-13" class="slide level1">
+<h1>Local Measure of Uniqueness 1/3</h1>
+<p>Suppose we only consider a small window of pixels: <strong><em>What
+defines whether a feature is well localized and
+unique?</em></strong></p>
+<p><img data-src="res/l3/locality-1.png" style="width:100.0%" /></p>
+<!-- Slide number: 13 -->
+</section>
+<section id="local-measure-of-uniqueness-23" class="slide level1">
+<h1>Local Measure of Uniqueness 2/3</h1>
+<p>How does the window change when you shift by a small amount?</p>
+<p><img data-src="res/l3/locality-move.png" style="width:100.0%" /></p>
+<ul>
+<li>“flat” region: no change in any directions</li>
+<li>“edge”: no change along the edge direction</li>
+<li>“corner”: significant change in all directions</li>
+</ul>
+<!-- Slide number: 14 -->
+</section>
+<section id="local-measure-of-uniqueness-33" class="slide level1">
+<h1>Local Measure of Uniqueness 3/3</h1>
+<p>Define:</p>
+<ul>
+<li><span class="math inline">\(E(u, v) =\)</span> amount of change when
+you shift the window by <span class="math inline">\((u, v)\)</span></li>
+</ul>
+<p><img data-src="res/l3/locality-move.png" style="width:100.0%" /></p>
+<ul>
+<li><span class="math inline">\(E(u, v)\)</span> is small for all
+shifts</li>
+<li><span class="math inline">\(E(u, v)\)</span> is small for some
+shifts</li>
+<li><span class="math inline">\(E(u, v)\)</span> is large for all
+shifts</li>
+</ul>
+<p>What do we want <span class="math inline">\(\min_{u, v} E(u,
+v)\)</span> to be?</p>
+<!-- Slide number: 15 -->
+</section>
+<section id="corner-detection" class="slide level1">
+<h1>Corner Detection</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Consider shifting the window W by <span class="math inline">\((u,
+v)\)</span></p>
+<ul>
+<li>How do the pixels in <span class="math inline">\(W\)</span>
+change?</li>
+<li>Compare each pixel before and after by Sum of Squared Differences
+(SSD)</li>
+<li>This defines an SSD “error”: <span class="math display">\[E(u, v) =
+\sum_{(x,y) \in W} [I(x+u, y+v) - I(x, y)]^2\]</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-w.png" style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 16 -->
+</section>
+<section id="corner-detection-small-motion-assumption-13"
+class="slide level1">
+<h1>Corner Detection: Small Motion Assumption 1/3</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Consider shifting the window W by <span class="math inline">\((u,
+v)\)</span></p>
+<ul>
+<li>How do the pixels in <span class="math inline">\(W\)</span>
+change?</li>
+<li>Compare each pixel before and after by Sum of Squared Differences
+(SSD)</li>
+<li>This defines an SSD “error”: <span class="math display">\[E(u, v) =
+\sum_{(x,y) \in W} [I(x+u, y+v) - I(x, y)]^2\]</span></li>
+</ul>
+<p>Taylor Series expansion of <span class="math inline">\(I(x,
+y)\)</span>:</p>
+<p><span class="math display">\[I(x+u, y+v) = I(x, y) + \frac{\partial
+I}{\partial x} u + \frac{\partial I}{\partial y} v + \text{higher order
+terms}\]</span></p>
+<p>If the motion <span class="math inline">\((u, v)\)</span> is small,
+then the first order approximation is good:</p>
+<p><span class="math display">\[I(x+u, y+v) \approx I(x, y) +
+\frac{\partial I}{\partial x} u + \frac{\partial I}{\partial y} v = I(x,
+y) + (I_x I_y) \begin{pmatrix} u \\ v \end{pmatrix}\]</span></p>
+<p>With <span class="math inline">\(I_x = \frac{\partial I}{\partial
+x}\)</span> and <span class="math inline">\(I_y = \frac{\partial
+I}{\partial y}\)</span></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-w.png" style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 17 -->
+</section>
+<section id="corner-detection-small-motion-assumption-23"
+class="slide level1">
+<h1>Corner Detection: Small Motion Assumption 2/3</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Consider shifting the window W by <span class="math inline">\((u,
+v)\)</span></p>
+<ul>
+<li><p>How do the pixels in <span class="math inline">\(W\)</span>
+change?</p></li>
+<li><p>Compare each pixel before and after by Sum of Squared Differences
+(SSD)</p></li>
+<li><p>This defines an SSD “error”: <span class="math display">\[
+\begin{aligned}
+E(u, v) &amp;= \sum_{(x,y) \in W} [I(x+u, y+v) - I(x, y)]^2 \\
+        &amp;\approx \sum_{(x,y) \in W} [(I(x, y) + (I_x I_y)
+\begin{pmatrix} u \\ v \end{pmatrix}) - I(x, y)]^2
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[I(x+u, y+v) \approx I(x, y) +
+\frac{\partial I}{\partial x} u + \frac{\partial I}{\partial y} v = I(x,
+y) + (I_x I_y) \begin{pmatrix} u \\ v \end{pmatrix}\]</span></p></li>
+</ul>
+<p>With <span class="math inline">\(I_x = \frac{\partial I}{\partial
+x}\)</span> and <span class="math inline">\(I_y = \frac{\partial
+I}{\partial y}\)</span></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-w.png" style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 18 -->
+</section>
+<section id="corner-detection-small-motion-assumption-33"
+class="slide level1">
+<h1>Corner Detection: Small Motion Assumption 3/3</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Consider shifting the window W by <span class="math inline">\((u,
+v)\)</span></p>
+<ul>
+<li>How do the pixels in <span class="math inline">\(W\)</span>
+change?</li>
+<li>Compare each pixel before and after by Sum of Squared Differences
+(SSD)</li>
+<li>This defines an SSD “error”: <span class="math display">\[
+\begin{aligned}
+E(u, v) &amp;= \sum_{(x,y) \in W} [I(x+u, y+v) - I(x, y)]^2 \\
+        &amp;\approx \sum_{(x,y) \in W} [(I(x, y) + (I_x I_y)
+\begin{pmatrix} u \\ v \end{pmatrix}) - I(x, y)]^2 \\
+        &amp;= \sum_{(x,y) \in W} [(I_x I_y) \begin{pmatrix} u \\ v
+\end{pmatrix}]^2 \\
+\end{aligned}
+\]</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-w.png" style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 19 -->
+</section>
+<section id="corner-detection-structure-tensor-h" class="slide level1">
+<h1>Corner Detection: Structure Tensor <span
+class="math inline">\(H\)</span></h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>This can be rewritten:</p>
+<p><span class="math display">\[
+\begin{aligned}
+E(u, v) &amp;\approx \sum_{(x,y) \in W} \begin{bmatrix} (I_x I_y)
+\begin{pmatrix} u \\ v \end{pmatrix} \end{bmatrix}^2 \\
+&amp;= \sum_{(x,y) \in W} (u, v) \underbrace{\begin{pmatrix} I_x^2 &amp;
+I_x I_y \\ I_x I_y &amp; I_y^2 \end{pmatrix}}_{\text{&quot;structure
+tensor&quot; $H$}} \begin{pmatrix} u \\ v \end{pmatrix} \\
+\end{aligned}
+\]</span></p>
+<p>For the example above:</p>
+<ul>
+<li>You can move the center of the window to anywhere on the blue unit
+circle</li>
+<li>Which directions will result in the largest and smallest <span
+class="math inline">\(E\)</span> values?</li>
+<li>We can find these directions by looking at the eigenvectors of <span
+class="math inline">\(H\)</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-vector.png" style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 20 -->
+</section>
+<section id="corner-detection-eigenvalues-of-h" class="slide level1">
+<h1>Corner Detection: Eigenvalues of <span
+class="math inline">\(H\)</span></h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>This can be rewritten:</p>
+<p><span class="math display">\[
+\begin{aligned}
+E(u, v) &amp;\approx \sum_{(x,y) \in W} \begin{bmatrix} (I_x I_y)
+\begin{pmatrix} u \\ v \end{pmatrix} \end{bmatrix}^2 \\
+&amp;= \sum_{(x,y) \in W} (u, v) \underbrace{\begin{pmatrix} I_x^2 &amp;
+I_x I_y \\ I_x I_y &amp; I_y^2 \end{pmatrix}}_{\text{&quot;structure
+tensor&quot; $H$}} \begin{pmatrix} u \\ v \end{pmatrix} \\
+\end{aligned}
+\]</span></p>
+<p>Eigenvalues and eigenvectors of <span
+class="math inline">\(H\)</span></p>
+<ul>
+<li>Define shifts with the smallest and largest change (<span
+class="math inline">\(E\)</span> value)</li>
+<li><span class="math inline">\(x_+\)</span>: direction of largest
+increase in <span class="math inline">\(E\)</span></li>
+<li><span class="math inline">\(\lambda_+\)</span>: amount of increase
+in direction <span class="math inline">\(x_+\)</span></li>
+<li><span class="math inline">\(x_-\)</span>: direction of smallest
+increase in <span class="math inline">\(E\)</span></li>
+<li><span class="math inline">\(\lambda_-\)</span>: amount of increase
+in direction <span class="math inline">\(x_-\)</span></li>
+<li><span class="math inline">\(H x_+ = \lambda_+ x_+\)</span> and <span
+class="math inline">\(H x_- = \lambda_- x_-\)</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/locality-eigvals.png"
+style="width:75.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 21 -->
+</section>
+<section id="corner-detection-1" class="slide level1">
+<h1>Corner Detection</h1>
+<p>Define:</p>
+<ul>
+<li><span class="math inline">\(E(u, v) =\)</span> amount of change when
+you shift the window by <span class="math inline">\((u, v)\)</span></li>
+</ul>
+<p><img data-src="res/l3/locality-move.png" style="width:100.0%" /></p>
+<ul>
+<li><span class="math inline">\(E(u, v)\)</span> is small for all
+shifts</li>
+<li><span class="math inline">\(E(u, v)\)</span> is small for some
+shifts</li>
+<li><span class="math inline">\(E(u, v)\)</span> is large for all
+shifts</li>
+</ul>
+<p>We want <span class="math inline">\(\min_{u, v} E(u, v)\)</span> to
+be large, i.e., maximize <span
+class="math inline">\(\lambda_-\)</span></p>
+<!-- Slide number: 22 -->
+</section>
+<section id="corner-detection-recipe-12" class="slide level1">
+<h1>Corner Detection Recipe 1/2</h1>
+<ul>
+<li>Compute the gradient at each point in the image.</li>
+<li>Create the <span class="math inline">\(H\)</span> matrix from the
+entries in the gradient.</li>
+<li>Compute the eigenvalues.</li>
+<li>Find points with large response (<span
+class="math inline">\(\lambda_-\)</span> &gt; threshold).</li>
+<li>Choose those points where <span
+class="math inline">\(\lambda_-\)</span> is a local maximum as
+features.</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_637262.png" style="width:100.0%" alt="I" />
+<figcaption aria-hidden="true"><span
+class="math inline">\(I\)</span></figcaption>
+</figure>
+</div><div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_941675.png" style="width:100.0%"
+alt="\lambda_+" />
+<figcaption aria-hidden="true"><span
+class="math inline">\(\lambda_+\)</span></figcaption>
+</figure>
+</div><div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l3/image_432030.png" style="width:100.0%"
+alt="\lambda_-" />
+<figcaption aria-hidden="true"><span
+class="math inline">\(\lambda_-\)</span></figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 23 -->
+</section>
+<section id="corner-detection-recipe-22" class="slide level1">
+<h1>Corner Detection Recipe 2/2</h1>
+<ul>
+<li>Compute the gradient at each point in the image.</li>
+<li>Create the <span class="math inline">\(H\)</span> matrix from the
+entries in the gradient.</li>
+<li>Compute the eigenvalues.</li>
+<li>Find points with large response (<span
+class="math inline">\(\lambda_-\)</span> &gt; threshold).</li>
+<li>Choose those points where <span
+class="math inline">\(\lambda_-\)</span> is a local maximum as
+features.</li>
+</ul>
+<figure>
+<img data-src="res/l3/min-eigval.png" style="width:90.0%"
+alt="\lambda_-" />
+<figcaption aria-hidden="true"><span
+class="math inline">\(\lambda_-\)</span></figcaption>
+</figure>
+<!-- Slide number: 24 -->
+</section>
+<section id="corner-detection-harris-operator" class="slide level1">
+<h1>Corner Detection: Harris Operator</h1>
+<ul>
+<li>Thresholding <span class="math inline">\(\lambda_-\)</span> is also
+known as “Shi-Tomasi corners” or “Good Features to Track” (Shi &amp;
+Tomasi, CVPR 1994)</li>
+<li>This is a variant of the “Harris operator” for corner detection:
+<span class="math display">\[f = \frac{\lambda_+ \lambda_-}{\lambda_+ +
+\lambda_-} = \frac{\det(H)}{\text{trace}(H)}\]</span>
+<!-- TODO@mateosss: This is probably unclear, det(H) as we defined H would always be zero, we need to say somehwere that H is the sum of multiple 2x2 matrices (is it the sum right?) --></li>
+<li>The trace is the sum of the diagonals, i.e., <span
+class="math inline">\(trace(H) = h_{11} + h_{22} = I_x^2 +
+I_y^2\)</span>
+<!-- TODO@mateosss: in this same direction, this definition of trace(H) is wrong, it's $(\sum{I_x})^2$ --></li>
+<li>Very similar to <span class="math inline">\(\lambda_-\)</span>, but
+less expensive (no square root).</li>
+<li>Called the “Harris Corner Detector” or “Harris Operator” (Harris and
+Stephens, AVC 1988)</li>
+<li>Lots of other detectors, this is one of the most popular</li>
+</ul>
+<!-- Slide number: 25 -->
+</section>
+<section id="corner-detection-harris-operator-vs-shi-tomasi"
+class="slide level1">
+<h1>Corner Detection: Harris Operator vs Shi Tomasi</h1>
+<p><img data-src="res/l3/harris-vs-shitomasi.png"
+style="width:75.0%" /></p>
+<!-- Slide number: 26 -->
+</section>
+<section id="harris-detector-example-15" class="slide level1"
+data-transition="none">
+<h1 data-transition="none">Harris Detector Example 1/5</h1>
+<figure>
+<img data-src="res/l3/cow.png" style="width:90.0%"
+alt="Original Image" />
+<figcaption aria-hidden="true">Original Image</figcaption>
+</figure>
+<!-- Slide number: 27 -->
+</section>
+<section id="harris-detector-example-25" class="slide level1"
+data-transition="none">
+<h1 data-transition="none">Harris Detector Example 2/5</h1>
+<figure>
+<img data-src="res/l3/cow-harris-response.png" style="width:90.0%"
+alt="Harris Corner Response" />
+<figcaption aria-hidden="true">Harris Corner Response</figcaption>
+</figure>
+<!-- Slide number: 28 -->
+</section>
+<section id="harris-detector-example-35" class="slide level1"
+data-transition="none">
+<h1 data-transition="none">Harris Detector Example 3/5</h1>
+<figure>
+<img data-src="res/l3/cow-thresholded.png" style="width:90.0%"
+alt="Thresholded Harris Corner Response" />
+<figcaption aria-hidden="true">Thresholded Harris Corner
+Response</figcaption>
+</figure>
+<!-- Slide number: 29 -->
+</section>
+<section id="harris-detector-example-45" class="slide level1"
+data-transition="none">
+<h1 data-transition="none">Harris Detector Example 4/5</h1>
+<figure>
+<img data-src="res/l3/cow-local-maxima.png" style="width:90.0%"
+alt="Local Maxima of Harris Corner Response" />
+<figcaption aria-hidden="true">Local Maxima of Harris Corner
+Response</figcaption>
+</figure>
+<!-- Slide number: 30 -->
+</section>
+<section id="harris-detector-example-55" class="slide level1"
+data-transition="none">
+<h1 data-transition="none">Harris Detector Example 5/5</h1>
+<figure>
+<img data-src="res/l3/cow-harris-corner.png" style="width:90.0%"
+alt="Harris Corner Response" />
+<figcaption aria-hidden="true">Harris Corner Response</figcaption>
+</figure>
+<!-- Slide number: 31 -->
+</section>
+<section id="fast-detector" class="slide level1">
+<h1>FAST Detector</h1>
+<ul>
+<li>Features from Accelerated Segment Test</li>
+<li>Check relation of brightness values to center pixel along
+circle</li>
+<li>Specific number of contiguous pixels brighter or darker than
+center</li>
+<li>Very fast corner detection</li>
+</ul>
+<figure>
+<img data-src="res/l3/image_873180.jpg" style="width:70.0%"
+alt="Rosten, Drummond, Fusing Points and Lines for High Performance Tracking, ICCV 2005" />
+<figcaption aria-hidden="true">Rosten, Drummond, Fusing Points and Lines
+for High Performance Tracking, ICCV 2005</figcaption>
+</figure>
+<!-- Slide number: 32 -->
+</section>
+<section id="section-keypoint-descriptors" class="slide level1">
+<h1>Section: Keypoint Descriptors</h1>
+<!-- Slide number: 33 -->
+</section>
+<section id="keypoint-descriptors" class="slide level1">
+<h1>Keypoint Descriptors</h1>
+<ul>
+<li>We know how to detect good points.</li>
+<li>Next question: How to match them?</li>
+</ul>
+<p><img data-src="res/l3/defdescriptors.png" style="width:100.0%" /></p>
+<ul>
+<li>Idea: extract distinctive descriptor vector from a local patch
+around the keypoint.</li>
+</ul>
+<!-- Slide number: 34 -->
+</section>
+<section id="invariance-12" class="slide level1">
+<h1>Invariance 1/2</h1>
+<ul>
+<li>Goal: match keypoints regardless of image transformation.
+<ul>
+<li>This is called transformational invariance.</li>
+</ul></li>
+<li>Most keypoint detection and description methods are designed to be
+invariant to:
+<ul>
+<li>Translation, 2D rotation, scale</li>
+</ul></li>
+<li>They can usually also handle:
+<ul>
+<li>Limited 3D rotations (SIFT works up to about 60 degrees)</li>
+<li>Limited affine transformations (some are fully affine
+invariant)</li>
+<li>Limited illumination/contrast changes</li>
+</ul></li>
+</ul>
+<p><img data-src="res/l3/defdescriptors.png" style="width:100.0%" /></p>
+<!-- Slide number: 35 -->
+</section>
+<section id="invariance-22" class="slide level1">
+<h1>Invariance 2/2</h1>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>Make sure your detector is invariant.
+<ul>
+<li>Harris is invariant to translation and rotation.</li>
+<li>Scale is trickier:
+<ul>
+<li>Image pyramids</li>
+<li>Scale selection for blobs (f.e. SIFT)</li>
+<li>Keypoints at multiple scales for same location</li>
+</ul></li>
+</ul></li>
+<li>Design an invariant feature descriptor
+<ul>
+<li>A descriptor captures the information in a region around the
+detected feature point.</li>
+<li>The simplest descriptor: a square window of pixels
+<ul>
+<li>What’s this invariant to?</li>
+</ul></li>
+<li>Let’s look at some better approaches…</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<figure>
+<img data-src="res/l3/image_708770.png" style="width:100.0%"
+alt="Image: “Visual representation of an image pyramid with 5 levels” by Cmglee used under CC BY-SA 3.0" />
+<figcaption aria-hidden="true">Image: “Visual representation of an image
+pyramid with 5 levels” by Cmglee used under CC BY-SA 3.0</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 36 -->
+</section>
+<section id="d-rotation-invariance" class="slide level1">
+<h1>2D Rotation Invariance</h1>
+<ul>
+<li>Idea: align the descriptor with a dominant 2D orientation</li>
+<li>Some possible approaches:
+<ul>
+<li>Use the eigenvector of H corresponding to larger eigenvalue</li>
+<li>Use intensity centroid (ORB)</li>
+</ul></li>
+</ul>
+<figure>
+<img data-src="res/l3/image_972247.jpg" alt="Figure by Matthew Brown" />
+<figcaption aria-hidden="true">Figure by Matthew Brown</figcaption>
+</figure>
+<!-- Slide number: 37 -->
+</section>
+<section id="d-rotation-invariance-sift" class="slide level1">
+<h1>2D Rotation Invariance: SIFT</h1>
+<ul>
+<li>Take 16x16 square window around detected feature</li>
+<li>Compute edge orientation (angle of the gradient) for each pixel</li>
+<li>Throw out weak edges (threshold gradient magnitude)</li>
+<li>Create histogram of surviving edge orientations</li>
+<li>Select strong local orientation maxima and create one or more
+descriptors</li>
+</ul>
+<p><img data-src="res/l3/sift1.png" style="width:100.0%" /></p>
+<!-- Slide number: 38 -->
+</section>
+<section id="sift-descriptor" class="slide level1">
+<h1>SIFT Descriptor</h1>
+<ul>
+<li>Divide the 16x16 window into a 4x4 grid of cells (2x2 case shown
+below)</li>
+<li>Compute an orientation histogram for each cell</li>
+<li>16 cells * 8 orientations = 128 dimensional descriptor</li>
+<li>Many important details, e.g.,
+<ul>
+<li>Trilinear interpolation for binning: viewpoing invariance</li>
+<li>Descriptor normalization: brightness invariance</li>
+</ul></li>
+</ul>
+<p><img data-src="res/l3/image_121518.png" style="width:100.0%" /></p>
+<!-- Slide number: 39 -->
+</section>
+<section id="properties-of-sift" class="slide level1">
+<h1>Properties of SIFT</h1>
+<ul>
+<li>“Scale-Invariant Feature Transform” (Lowe, IJCV 2004)</li>
+<li>Can handle changes in viewpoint
+<ul>
+<li>Up to about 60 degrees out of plane rotation</li>
+</ul></li>
+<li>Can handle significant changes in illumination
+<ul>
+<li>Sometimes even day vs. night</li>
+</ul></li>
+<li>Fast and efficient: can run in real time (but still costly)</li>
+<li>Lots of code available, CPU, GPU, … (US patent recently
+expired)</li>
+<li>Many alternatives since (SURF, KAZE, learning-based, …), but still
+popular.</li>
+<li>But: false positive matches still possible</li>
+</ul>
+<p><img data-src="res/l3/sift-false-positives.png"
+style="width:100.0%" /></p>
+<!-- Slide number: 40 -->
+</section>
+<section id="binary-descriptors-brief" class="slide level1">
+<h1>Binary Descriptors: BRIEF</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>“Binary Robust Independent Elementary Features” (Calonder et
+al. ECCV 2010)</p></li>
+<li><p>Binary descriptor from intensity comparisons at sample
+positions</p></li>
+<li><p>Very efficient to compute</p></li>
+<li><p>Fast matching distance through Hamming distance (xor and popcount
+CPU instructions)</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/image_374740.jpg" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 41 -->
+</section>
+<section id="binary-descriptors-orb" class="slide level1">
+<h1>Binary Descriptors: ORB</h1>
+<div class="columns">
+<div class="column" style="width:35%;">
+<ul>
+<li><p>“Oriented Fast and Rotated BRIEF” (Rublee et al. ICCV
+2011)</p></li>
+<li><p>Combination of FAST detector and BRIEF descriptor</p></li>
+<li><p>Rotation-invariant BRIEF: Estimate dominant orientation from
+patch moments (intensity centroid)</p></li>
+<li><p>Improved binary pattern</p></li>
+<li><p>Very popular for SLAM / VO</p></li>
+</ul>
+</div><div class="column" style="width:65%;">
+<p><img data-src="res/l3/image_690164.jpg" style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 42 -->
+</section>
+<section id="section-keypoint-matching" class="slide level1">
+<h1>Section: Keypoint Matching</h1>
+<!-- Slide number: 43 -->
+</section>
+<section id="keypoint-matching-1" class="slide level1">
+<h1>Keypoint Matching</h1>
+<p><img data-src="res/l3/image_325990.jpg" style="width:100.0%" /></p>
+<ul>
+<li>Main idea: Match keypoints with similar descriptors</li>
+</ul>
+<!-- Slide number: 44 -->
+</section>
+<section id="matching-distance-12" class="slide level1">
+<h1>Matching Distance 1/2</h1>
+<ul>
+<li>How to define the difference between two descriptors <span
+class="math inline">\(f_1\)</span>, <span
+class="math inline">\(f_2\)</span>?</li>
+<li>Simple approach is to assign keypoints with minimal sum of square
+differences <span class="math inline">\(SSD(f_1, f_2)\)</span> between
+entries of the two descriptors</li>
+</ul>
+<p><img data-src="res/l3/secondbest-1.png" style="width:100.0%" /></p>
+<!-- Slide number: 45 -->
+</section>
+<section id="matching-distance-22" class="slide level1">
+<h1>Matching Distance 2/2</h1>
+<ul>
+<li>Better approach: best to second best ratio distance: <span
+class="math inline">\(\frac{SSD(f_1, f_2)}{SSD(f_1,
+f&#39;_2)}\)</span></li>
+<li><span class="math inline">\(f_2\)</span> is best SSD match to <span
+class="math inline">\(f_1\)</span> in <span
+class="math inline">\(I_2\)</span></li>
+<li><span class="math inline">\(f&#39;_2\)</span> is second best SSD
+match to <span class="math inline">\(f_1\)</span> in <span
+class="math inline">\(I_2\)</span></li>
+<li>Match should be “unique”</li>
+</ul>
+<p><img data-src="res/l3/secondbest-2.png" style="width:100.0%" /></p>
+<!-- Slide number: 46 -->
+</section>
+<section id="eliminating-bad-matches" class="slide level1">
+<h1>Eliminating Bad Matches</h1>
+<p><img data-src="res/l3/bad-matches.png" style="width:100.0%" /></p>
+<ul>
+<li>Only accept matches with distance smaller a threshold.</li>
+<li>How to choose the threshold?</li>
+</ul>
+<!-- Slide number: 47 -->
+</section>
+<section id="truefalse-positives" class="slide level1">
+<h1>True/False Positives</h1>
+<p><img data-src="res/l3/bad-matches.png" style="width:100.0%" /></p>
+<ul>
+<li>Choice of threshold affects performance
+<ul>
+<li>Too restrictive: less false positives, but also less true
+positives</li>
+<li>Too lax: more true positives, but also more false positives</li>
+</ul></li>
+<li>Can we do more? Yes: Robust model fitting with RANSAC!</li>
+</ul>
+<!-- Slide number: 48 -->
+</section>
+<section id="random-sample-consensus-ransac-intro" class="slide level1">
+<h1>Random Sample Consensus (RANSAC): Intro</h1>
+<ul>
+<li>Model fitting in presence of noise and outliers</li>
+<li>Example: fitting a line through 2D points</li>
+</ul>
+<p><img data-src="res/l3/ransac1.png" style="width:100.0%" /></p>
+<!-- Slide number: 49 -->
+</section>
+<section id="random-sample-consensus-ransac-least-squares"
+class="slide level1">
+<h1>Random Sample Consensus (RANSAC): Least Squares</h1>
+<ul>
+<li>Least-squares solution, assuming constant noise for all points</li>
+</ul>
+<p><img data-src="res/l3/ransac2.png" style="width:100.0%" /></p>
+<!-- Slide number: 50 -->
+</section>
+<section id="random-sample-consensus-ransac-one-random-sample"
+class="slide level1">
+<h1>Random Sample Consensus (RANSAC): One Random Sample</h1>
+<ul>
+<li>We only need 2 points to fit a line. Let’s try 2 random points.</li>
+</ul>
+<p><img data-src="res/l3/ransac3.png" style="width:100.0%" /></p>
+<!-- Slide number: 51 -->
+</section>
+<section id="random-sample-consensus-ransac-second-random-sample"
+class="slide level1">
+<h1>Random Sample Consensus (RANSAC): Second Random Sample</h1>
+<p>Let’s try 2 other random points again.</p>
+<p><img data-src="res/l3/ransac4.png" style="width:100.0%" /></p>
+<!-- Slide number: 52 -->
+</section>
+<section id="random-sample-consensus-ransac-third-random-sample"
+class="slide level1">
+<h1>Random Sample Consensus (RANSAC): Third Random Sample</h1>
+<ul>
+<li>And again.</li>
+</ul>
+<p><img data-src="res/l3/ransac5.png" style="width:100.0%" /></p>
+<!-- Slide number: 53 -->
+</section>
+<section id="random-sample-consensus-ransac-refine-solution"
+class="slide level1">
+<h1>Random Sample Consensus (RANSAC): Refine solution</h1>
+<ul>
+<li>Let’s use the inliers of the best trial so far to perform least
+squares fitting.</li>
+</ul>
+<p><img data-src="res/l3/ransac6.png" style="width:100.0%" /></p>
+<!-- Slide number: 54 -->
+</section>
+<section id="ransac-algorithm" class="slide level1">
+<h1>RANSAC Algorithm</h1>
+<p>RANdom SAmple Consensus algorithm formalizes this idea</p>
+<p><strong>Algorithm:</strong></p>
+<ul>
+<li>Input: data <span class="math inline">\(D\)</span>, min. required
+#data points for fitting <span class="math inline">\(s\)</span>, success
+probability <span class="math inline">\(p\)</span>, outlier ratio <span
+class="math inline">\(\epsilon\)</span></li>
+<li>Output: inlier set</li>
+<li>Compute required number of iterations <span
+class="math display">\[\boxed{N =
+\frac{\log(1-p)}{\log(1-(1-\epsilon)^s)}}\]</span></li>
+<li>For <span class="math inline">\(N\)</span> iterations do:
+<ul>
+<li>Randomly select a subset of <span class="math inline">\(s\)</span>
+data points</li>
+<li>Fit model on the subset</li>
+<li>Count inliers and keep model/subset with largest number of
+inliers</li>
+</ul></li>
+<li>Refit model using found inlier set</li>
+</ul>
+<!-- Slide number: 55 -->
+</section>
+<section id="ransac-number-of-iterations" class="slide level1">
+<h1>RANSAC Number of Iterations</h1>
+<ul>
+<li><span class="math inline">\(s\)</span>: Required data points for
+fitting the model</li>
+<li><span class="math inline">\(p\)</span>: Success probability</li>
+<li><span class="math inline">\(\epsilon\)</span>: Outlier ratio</li>
+<li><span class="math inline">\(N\)</span>: Number of iterations
+needed</li>
+</ul>
+<p><span class="math display">\[\boxed{N =
+\frac{\log(1-p)}{\log(1-(1-\epsilon)^s)}}\]</span></p>
+<p>For example, these are the <span class="math inline">\(N\)</span>
+needed for reaching <span class="math inline">\(p = 0.99\)</span></p>
+<!-- ![](res/l3/ransac-table.png){width=100%} -->
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 18%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Model</th>
+<th style="text-align: left;">Points <span
+class="math inline">\(s\quad\epsilon=\)</span></th>
+<th style="text-align: left;">10%</th>
+<th style="text-align: left;">20%</th>
+<th style="text-align: left;">30%</th>
+<th style="text-align: left;">40%</th>
+<th style="text-align: left;">50%</th>
+<th style="text-align: left;">60%</th>
+<th style="text-align: left;">70%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">Line</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">17</td>
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">49</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">Plane</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">19</td>
+<td style="text-align: left;">35</td>
+<td style="text-align: left;">70</td>
+<td style="text-align: left;">169</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">Essential Matrix</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">78</td>
+<td style="text-align: left;">272</td>
+<td style="text-align: left;">1177</td>
+<td style="text-align: left;">7025</td>
+<td style="text-align: left;">70188</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: this was recently (2025) improved by Schönberger, Larson,
+Pollefeys in <a href="https://arxiv.org/pdf/2503.07829">Fixing the
+RANSAC Stopping Criterion</a>.</em></p>
+<!-- Slide number: 56 -->
+</section>
+<section id="epipolar-constraint" class="slide level1">
+<h1>Epipolar Constraint</h1>
+<!-- Slide number: 57 -->
+</section>
+<section id="epipolar-constraint-on-the-image-plane"
+class="slide level1">
+<h1>Epipolar Constraint on the Image Plane</h1>
+<ul>
+<li>The epipolar constraint can be computed for a pair of matched 2D
+image points when the <strong>relative camera pose is known</strong>,
+here encoded by <span class="math inline">\(R,T\)</span> (e.g. stereo
+pair)</li>
+<li>The <strong>epipolar plane</strong> is spanned by <span
+class="math inline">\(\mathbf{x}_L\)</span> and the two camera centers
+<span class="math inline">\(O_L\)</span> and <span
+class="math inline">\(O_R\)</span></li>
+<li>The <strong>epipolar line</strong> is the intersection of the
+epipolar plane and the right image plane</li>
+<li>The <strong>epipolar constraint</strong> encodes that <span
+class="math inline">\(\mathbf{x}_R\)</span> must lie on the epipolar
+line in the right image <span
+class="math display">\[\boxed{\mathbf{x}_R^T \hat{T} R \mathbf{x}_L =
+0}\]</span></li>
+<li><span class="math inline">\(E = \hat{T} R\)</span> is called the
+Essential Matrix</li>
+<li>Note that the epipolar constraint is not sufficient to guarantee a
+correct match. A wrong match may still lie elsewhere on the epipolar
+line. However, in many cases outliers can be correctly filtered.</li>
+</ul>
+<figure>
+<img data-src="res/l3/image_941057.png" style="width:40.0%"
+alt="“Epipolar geometry” by Arne Nordmann (norro) used under CC BY-SA 3.0 / relative pose R, T added" />
+<figcaption aria-hidden="true">“Epipolar geometry” by Arne Nordmann
+(norro) used under CC BY-SA 3.0 / relative pose R, T added</figcaption>
+</figure>
+</section>
+<section id="epipolar-constraint-on-the-image-plane-visualization"
+class="slide level1">
+<h1>Epipolar Constraint on the Image Plane: Visualization</h1>
+<p>Go to the visualization page: <a
+href="https://mateosss.github.io/assets/visnav/epipolar-geometry.html"
+class="uri">https://mateosss.github.io/assets/visnav/epipolar-geometry.html</a></p>
+<iframe style="width: 100%; height: 46vh;" src="res/l3/epipolar-geometry.html" title="Epipolar Geometry Visualization" frameborder="0" allowfullscreen></iframe>
+<!-- Slide number: 58 -->
+</section>
+<section id="epipolar-constraint-on-a-sphere" class="slide level1">
+<h1>Epipolar Constraint on a Sphere</h1>
+<ul>
+<li>Epipolar constraint is also possible in 3D with unit-vectors.</li>
+<li>Epipolar line generalises to epipolar curve.</li>
+</ul>
+<p><img data-src="res/l3/epipolar-constraint-on-sphere.png"
+style="width:80.0%" /></p>
+<!-- Slide number: 59 -->
+</section>
+<section id="motion-estimation" class="slide level1">
+<h1>Motion Estimation</h1>
+<!-- Slide number: 60 -->
+</section>
+<section id="motion-estimation-from-point-correspondences"
+class="slide level1">
+<h1>Motion Estimation from Point Correspondences</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p><strong>2D-to-2D</strong></p>
+<ul>
+<li><p>Reprojection error: <span
+class="math display">\[E(\mathbf{T}_{ba}, \mathscr{X}) = \sum_{i=1}^N \|
+\mathbf{y}_{a,i} - \pi(\mathbf{X}_i)\|^2 + \| \mathbf{y}_{b,i} -
+\pi(\mathbf{T}_{ba} \mathbf{X}_i)\|^2\]</span></p></li>
+<li><p>Linear Algorithm: 8-point, 5-point</p></li>
+</ul></li>
+<li><p><strong>2D-to-3D</strong></p>
+<ul>
+<li><p>Reprojection error: <span
+class="math display">\[E(\mathbf{T}_{wa}, \mathscr{X}) = \sum_{i=1}^N \|
+\mathbf{y}_{a,i} - \pi(\mathbf{T}_{wa}^{-1}
+\mathbf{X}_i)\|^2\]</span></p></li>
+<li><p>Linear Algorithm: DLT PnP</p></li>
+</ul></li>
+<li><p><strong>3D-to-3D</strong></p>
+<ul>
+<li><p>3D geometric error: <span
+class="math display">\[E(\mathbf{T}_{ab}) = \sum_{i=1}^N \|
+\mathbf{Y}_{a,i} - \mathbf{T}_{ab}
+\mathbf{Y}_{b,i}\|^2\]</span></p></li>
+<li><p>Linear Algorithm: Arun, Horn</p></li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/motion-2d2d.png" /> <img
+data-src="res/l3/motion-3d2d.png" /> <img
+data-src="res/l3/motion-3d3d.png" /></p>
+</div>
+</div>
+<!-- Slide number: 61 -->
+</section>
+<section id="d-to-2d-motion-estimation" class="slide level1">
+<h1>2D-to-2D Motion Estimation</h1>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li><p>Given corresponding image point observations <span
+class="math display">\[\mathscr{Y}_a = \{\mathbf{y}_{a,1}, \ldots,
+\mathbf{y}_{a,N}\}\]</span> <span class="math display">\[\mathscr{Y}_b =
+\{\mathbf{y}_{b,1}, \ldots, \mathbf{y}_{b,N}\}\]</span> of unknown 3D
+points <span class="math inline">\(\mathscr{X} = \{\mathbf{X}_1, \ldots,
+\mathbf{X}_N\}\)</span> (expressed in camera frame <span
+class="math inline">\(a\)</span>) determine relative motion <span
+class="math inline">\(\mathbf{T}_{ba}\)</span> between the
+frames</p></li>
+<li><p>Reprojection Error (Bundle Adjustment): <span
+class="math display">\[\boxed{E(\mathbf{T}_{ba}, \mathscr{X}) =
+\sum_{i=1}^N \| \mathbf{y}_{a,i} - \pi(\mathbf{X}_i)\|^2 + \|
+\mathbf{y}_{b,i} - \pi(\mathbf{T}_{ba} \mathbf{X}_i)\|^2}\]</span>
+Non-linear optimization requires good initialization. Non-convex,
+non-unique (scale ambiguity).</p></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<p><img data-src="res/l3/motion-2d2d.png" style="width:100.0%" /></p>
+</div>
+</div>
+<ul>
+<li><p>Algebraic approach based on epipolar geometry to recover relative
+pose (up to scale) without explicitly recovering 3D point location:
+8-point, 5-point algorithm</p></li>
+<li><p>Applications:</p>
+<ul>
+<li>Filtering pairwise feature matches with RANSAC</li>
+<li>Monocular SLAM / SfM initialisation</li>
+</ul></li>
+</ul>
+<!-- Slide number: 62 -->
+</section>
+<section id="d-to-3d-motion-estimation" class="slide level1">
+<h1>2D-to-3D Motion Estimation</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>Given a set of 3D points in world frame <span
+class="math inline">\(W\)</span> <span
+class="math display">\[\mathscr{X} = \{\mathbf{X}_1, \ldots,
+\mathbf{X}_N\}\]</span> and corresponding image observations <span
+class="math display">\[\mathscr{Y}_a = \{\mathbf{y}_{a,1}, \ldots,
+\mathbf{y}_{a,N}\}\]</span> determine camera pose <span
+class="math inline">\(\mathbf{T}_{wa}\)</span> in world frame</p></li>
+<li><p>Reprojection Error (Pose-only Bundle Adjustment): <span
+class="math display">\[\boxed{E(\mathbf{T}_{wa}, \mathscr{X}) =
+\sum_{i=1}^N \| \mathbf{y}_{a,i} - \pi(\mathbf{T}_{wa}^{-1}
+\mathbf{X}_i)\|^2}\]</span></p>
+<p>Non-linear optimization requires good initialization.
+Non-convex.</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/motion-3d2d.png" style="width:100.0%" /></p>
+</div>
+</div>
+<ul>
+<li>A.k.a. Perspective-n-Points (PnP) problem, many approaches exist,
+e.g.
+<ul>
+<li>Direct linear transform (DLT)</li>
+<li>EPnP (Lepetit et al., An accurate O(n) Solution to the PnP problem,
+IJCV 2009)</li>
+<li>OPnP (Zheng et al., Revisiting the PnP Problem: A Fast, General and
+Optimal Solution, ICCV 2013)</li>
+</ul></li>
+<li>Applications:
+<ul>
+<li>Localize camera in local keypoint map (with RANSAC)</li>
+</ul></li>
+</ul>
+<!-- Slide number: 63 -->
+</section>
+<section id="d-to-3d-motion-estimation-1" class="slide level1">
+<h1>3D-to-3D Motion Estimation</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>Given corresponding 3D points in two camera frames <span
+class="math display">\[\mathscr{Y}_a = \{\mathbf{Y}_{a,1}, \ldots,
+\mathbf{Y}_{a,N}\}\]</span> <span class="math display">\[\mathscr{Y}_b =
+\{\mathbf{Y}_{b,1}, \ldots, \mathbf{Y}_{b,N}\}\]</span> determine the
+relative camera pose <span
+class="math inline">\(\mathbf{T}_{ab}\)</span></p></li>
+<li><p>3D geometric error: <span
+class="math display">\[\boxed{E(\mathbf{T}_{ab}) = \sum_{i=1}^N \|
+\mathbf{Y}_{a,i} - \mathbf{T}_{ab} \mathbf{Y}_{b,i}\|^2}\]</span>
+Corresponds to least-squares point cloud alignment.</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l3/motion-3d3d.png" style="width:100.0%" /></p>
+</div>
+</div>
+<ul>
+<li>Closed-form solutions available, e.g. Arun et al., 1987</li>
+<li>Applications:
+<ul>
+<li>Relative pose for calibrated stereo cameras (triangulation of 3D
+points) or RGB-D cameras (measured depth)</li>
+<li>Loop-closure correction (variant with scale estimate available for
+monocular SLAM)</li>
+</ul></li>
+</ul>
+<!-- Slide number: 64 -->
+</section>
+<section id="place-recognition" class="slide level1">
+<h1>Place Recognition</h1>
+<!-- Slide number: 65 -->
+</section>
+<section id="place-recognition-with-bag-of-words" class="slide level1">
+<h1>Place Recognition with Bag of Words</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Place recognition aims to find similar images to a given query image
+<ul>
+<li>SfM: Which images to match?</li>
+<li>SLAM: Detect loops</li>
+</ul></li>
+<li>Idea: Discretize the feature-descriptor space by hierarchical
+clustering in a “vocabulary tree”
+<ul>
+<li>visual “words” correspond to leaf-nodes</li>
+<li>words are weighted by distinctiveness: e.g. “inverse document
+frequency” <span class="math inline">\(\log(N/N_i)\)</span></li>
+</ul></li>
+<li>Image comparison:
+<ul>
+<li>each feature is assigned to a word by passing it down the tree</li>
+<li>for an image, count occurrence of each word (“term frequency”):
+bag-of-words vector</li>
+<li>to compare images, compute the distance of (normalized) bag-of-words
+vectors</li>
+<li>close bag-of-words vectors correspond to potentially similar
+images</li>
+</ul></li>
+<li>Vocabulary tree and weights are built offline from large collection
+of features</li>
+<li>False positives possible: Combine with geometric, temporal, …
+consistency checks</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l3/image_674892.png" style="width:70.0%"
+alt="Nistér &amp; Stewénius, CVPR 2006" />
+<figcaption aria-hidden="true">Nistér &amp; Stewénius, CVPR
+2006</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 66 -->
+</section>
+<section id="efficient-query-and-feature-matching" class="slide level1">
+<h1>Efficient Query and Feature Matching</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Image query with “inverse index”:
+<ul>
+<li>For each word store list of images, and for each image cache the
+word count.</li>
+<li>During query, consider only images from the inverse index of each
+word</li>
+</ul></li>
+<li>Efficient BoW distance (scoring):
+<ul>
+<li>BoW vectors are sparse (most entries are 0)</li>
+<li>For normalised vectors, use <span class="math display">\[\|
+\mathbf{q} - \mathbf{d} \|_p^p = 2 + \sum_{i | q_i \neq 0, d_i \neq 0}
+|q_i - d_i|^p - |q_i|^p - |d_i|^p\]</span></li>
+<li>L1-norm is often used (<span class="math inline">\(p =
+1\)</span>)</li>
+</ul></li>
+<li>Approximate nearest neighbour feature matching using “direct index”
+<ul>
+<li>For each image, store occurrence of nodes at each tree level and
+list of corresponding features</li>
+<li>When matching images, only consider features from direct image at
+given level</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/l3/image_197072.png" style="width:100.0%"
+alt="Gálvez-López &amp; Tardós, T-RO 2012" />
+<figcaption aria-hidden="true">Gálvez-López &amp; Tardós, T-RO
+2012</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 67 -->
+</section>
+<section id="lessons-learned" class="slide level1">
+<h1>Lessons Learned</h1>
+<ul>
+<li>Keypoint detection, description and matching is a well researched
+topic</li>
+<li>Highly performant corner and blob detectors exist</li>
+<li>Descriptors can be invariant to translation, rotation, scale,
+viewpoint, brightness, … (e.g. SIFT)</li>
+<li>Binary descriptors are highly efficient and effective (e.g. ORB) and
+thus popular for real-time</li>
+<li>Keypoint matching by descriptor distance; uniqueness ensured by
+ratio-to-second-best</li>
+<li>Robust matching based on model fitting using RANSAC</li>
+<li>Motion estimation from 2D-to-2D, 2D-to-3D, 3D-to-3D matches</li>
+<li>Image retrieval and loop-closure detection with bag-of-words</li>
+</ul>
+<!-- Slide number: 68 -->
+</section>
+<section id="exercise-sheet-3" class="slide level1">
+<h1>Exercise Sheet 3</h1>
+<p>In the third exercise sheet you will:</p>
+<ul>
+<li>Implement rotation estimation and descriptor matching for a simple
+variant of ORB.</li>
+<li>Filter inlier matches for stereo pairs using the epipolar
+constraint.</li>
+<li>Filter inlier matches for arbitrary pairs using RANSAC with the
+5-point algorithm.</li>
+<li>Implement bag-of-words for efficient image retrieval using an
+inverse index.</li>
+</ul>
+<p><img data-src="res/l3/image_485956.png" style="width:75.0%" /></p>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,468 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2 id="premeeting">Premeeting</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+<!-- Slide number: 2 -->
+</section>
+<section id="motivations" class="slide level1">
+<h1>Motivations</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/pm/image_968466.jpeg" style="width:90.0%"
+alt="No GPS" />
+<figcaption aria-hidden="true">No GPS</figcaption>
+</figure>
+<figure>
+<img data-src="res/pm/image_531475.jpeg" style="width:85.0%"
+alt="Pose estimation" />
+<figcaption aria-hidden="true">Pose estimation</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/pm/image_679372.jpeg" style="width:90.0%"
+alt="Path planning" />
+<figcaption aria-hidden="true">Path planning</figcaption>
+</figure>
+<figure>
+<img data-src="res/pm/image_213184.jpeg" style="width:70.0%"
+alt="3D reconstruction" />
+<figcaption aria-hidden="true">3D reconstruction</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 3 -->
+</section>
+<section id="dso" class="slide level1">
+<h1>DSO</h1>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/C6-xwSOOdqQ?mute=1&loop=1&playlist=C6-xwSOOdqQ&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">DSO Video</p></div></p>
+<!-- Slide number: 4 -->
+</section>
+<section id="orb-slam" class="slide level1">
+<h1>ORB-SLAM</h1>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/8DISRmsO2YQ?mute=1&loop=1&playlist=8DISRmsO2YQ&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">ORB-SLAM Video</p></div></p>
+<!-- Slide number: 5 -->
+</section>
+<section id="content-of-this-course" class="slide level1">
+<h1>Content of this course</h1>
+<ul>
+<li><p>You can gain practical experience with</p>
+<ul>
+<li>Visual odometry and localisation / state estimation</li>
+<li>Vision-based Simultaneous Localization and Mapping (SLAM)</li>
+<li>Structure from Motion (SfM)</li>
+</ul></li>
+<li><p>Implementation of algorithms</p></li>
+<li><p>Benefits / drawbacks of specific methods when applied to
+concrete, relevant problems</p></li>
+<li><p>Get familiar with relevant software libraries (Eigen, Ceres,
+OpenGV, …)</p></li>
+<li><p>Learn how to work in teams / on projects</p></li>
+<li><p>Improve your presentation skills</p></li>
+</ul>
+<!-- Slide number: 6 -->
+</section>
+<section id="course-organisation" class="slide level1">
+<h1>Course organisation</h1>
+<ul>
+<li><p>Course takes place during the lecture period</p></li>
+<li><p>In Garching CIT in a seminar room TBD</p>
+<ul>
+<li>Work on your own machine</li>
+<li>We support Ubuntu 22.04, 24.04, and 26.04 (MacOS and Windows may
+work with some cmake tweaking)</li>
+</ul></li>
+<li><p>Initial phase (first 5 weeks): Lectures &amp; Exercises</p>
+<ul>
+<li>Mondays 2-4 pm lecture</li>
+<li>Mondays 4-6 pm exercise session</li>
+<li>Programming assignments will be handed out every week and checked /
+graded by the tutors</li>
+<li>Assignments are worked on individually by every student; each
+participant should be able to explain their solution</li>
+<li>Attendance to lecture and exercise sessions voluntary (but
+<strong>highly</strong> encouraged)</li>
+</ul></li>
+<li><p>Second phase (5-7 weeks): project</p>
+<ul>
+<li>Work in small groups (1-2 people) on a project</li>
+<li>Mandatory weekly meeting with tutors to discuss progress and next
+steps (Mondays 2-6 pm)</li>
+<li>Implement a specific algorithm / extension / paper, which one
+tbd</li>
+<li>Present project outcome in talk and Q&amp;A session (15+5 min per
+group)</li>
+<li>Written report on project outcome (10-12 pages, single column,
+single-spaced lines, 11pt)</li>
+</ul></li>
+</ul>
+<!-- Slide number: 7 -->
+</section>
+<section id="topics-covered" class="slide level1">
+<h1>Topics covered</h1>
+<div class="columns">
+<div class="column" style="width:40%;">
+<ul>
+<li>3D geometry and camera models</li>
+<li>Non-linear optimisation and camera calibration</li>
+<li>Feature detectors and descriptors, feature matching, RANSAC</li>
+<li>Offline Structure from Motion, Bundle Adjustment, Schur
+complement</li>
+<li>Visual odometry and SLAM (online BA)</li>
+<li>Possible topics for projects:
+<ul>
+<li>Large-scale consistency for SLAM</li>
+<li>Visual place recognition</li>
+<li>Optical flow for visual odometry</li>
+<li>Gaussian Splatting SLAM</li>
+<li>Direct methods (odometry, BA)</li>
+<li>Dense reconstruction</li>
+<li>Rotation / Translation averaging (global SfM)</li>
+<li>…</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:60%;">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/pm/image_431110.png" style="width:100.0%"
+alt="flow.png" /> <img data-src="res/pm/image_636723.png"
+style="width:100.0%" alt="dso.png" /> <img
+data-src="res/pm/image_224685.png" style="width:50.0%"
+alt="notredame.png" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/pm/image_366243.png" style="width:100.0%"
+alt="orbslam" /> <img data-src="res/pm/image_341898.png"
+style="width:100.0%" alt="Screenshot 2020-12-07 at 14.21.41.png" /> <img
+data-src="res/pm/image_183623.png" style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Slide number: 8 -->
+</section>
+<section id="course-requirements" class="slide level1">
+<h1>Course requirements</h1>
+<ul>
+<li><p><strong>Knowledge of C++ is essential</strong> (C/Zig/Rust
+experience may be accepted)</p></li>
+<li><p>Good knowledge of basic mathematics such as linear algebra,
+calculus, probability theory, and numerics is required</p></li>
+<li><p>Prior practical knowledge in robotics and computer vision topics
+is a plus</p></li>
+<li><p>Participation in at least one of the following lectures of the
+TUM Computer Vision Group</p>
+<ul>
+<li>Computer Vision I: Variational Methods</li>
+<li>Computer Vision II: Multiple View Geometry</li>
+<li>Similar lectures can also be accepted</li>
+</ul></li>
+<li><p>Note: If you don’t satisfy the requirements but are still
+interested in the course, please contact us and we can discuss your case
+individually</p></li>
+</ul>
+<!-- Slide number: 9 -->
+</section>
+<section id="course-registration" class="slide level1">
+<h1>Course registration</h1>
+<ul>
+<li><p>You apply for this course through the matching system: <a
+href="https://matching.in.tum.de/"
+class="uri">https://matching.in.tum.de/</a></p></li>
+<li><p>Additionally, you have to send us an email:</p>
+<ul>
+<li>Please specify how you meet the course requirements / if you have
+attended any related computer vision courses before!</li>
+<li><strong>Comment on your programming experience in C++</strong>! List
+concrete examples of projects you have worked on or send us your
+github/gitlab/etc profile.</li>
+<li>Send all your grade transcripts, in particular showing any lectures
+on pre-requisite topics (computer vision / robotics / maths) that you
+have attended to: <a href="mailto:visnav-ss26@vision.in.tum.de"
+class="email">visnav-ss26@vision.in.tum.de</a></li>
+</ul></li>
+</ul>
+<p>The deadline for the matching system and prerequisite email is
+17.02.2026.</p>
+<p>We can only guarantee places to students assigned through the
+matching process (and fitting the course requirements)!</p>
+<p>Watch announcements on the course website: <a
+href="https://cvg.cit.tum.de/teaching/ss2026/visnav_ss2026"
+class="uri">https://cvg.cit.tum.de/teaching/ss2026/visnav_ss2026</a></p>
+<p>The course starts on Monday, 20.04.20267 at 2 pm in CIT seminar room
+TBD.</p>
+<!-- Slide number: 10 -->
+</section>
+<section id="demo" class="slide level1">
+<h1>Demo</h1>
+<!-- Slide number: 11 -->
+</section>
+<section id="questions" class="slide level1">
+<h1>Questions?</h1>
+<div class="columns">
+<div class="column" style="width:33%;">
+<p><img data-src="res/pm/image_676206.png" style="width:100.0%" /> <img
+data-src="res/pm/image_163464.png" style="width:100.0%" /> <img
+data-src="res/pm/image_916669.png" style="width:100.0%" /></p>
+</div><div class="column" style="width:33%;">
+<p><img data-src="res/pm/image_616911.png" style="width:100.0%" /> <img
+data-src="res/pm/image_762352.png" style="width:100.0%" /> <img
+data-src="res/pm/image_439577.png" style="width:100.0%" /> <img
+data-src="res/pm/image_882307.png" style="width:75.0%" /></p>
+</div><div class="column" style="width:33%;">
+<p><img data-src="res/pm/image_152005.png" style="width:100.0%" /> <img
+data-src="res/pm/image_264949.png" style="width:40.0%" /> <img
+data-src="res/pm/image_349388.png" style="width:100.0%" /></p>
+</div>
+</div>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

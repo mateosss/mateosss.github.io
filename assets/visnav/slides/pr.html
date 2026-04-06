@@ -1,0 +1,774 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2 id="project-phase">Project Phase</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+</section>
+<section id="project-phase-1" class="slide level1">
+<h1>Project Phase</h1>
+<p>Projects:</p>
+<ul>
+<li>Start after sheet 5 is complete. For the remainder of the lecture
+period.</li>
+<li>Work on open-ended project (1-2 people).</li>
+<li>Registrate your group and select your project topic <a
+href="https://docs.google.com/spreadsheets/d/1Dvdd1HJMfh8NxzjA8rl0NlP3csakQ70mC45aPFCLjOM/edit?usp=sharing">here</a>
+by 01.06.2026</li>
+<li>We will assign your group a tutor before 08.06.2026 (day of first
+session)</li>
+<li>Mandatory weekly meeting with tutors to discuss progress and next
+steps.
+<ul>
+<li>Fixed 30 min time slot</li>
+<li>Mondays between 2pm-6pm</li>
+</ul></li>
+<li>Project goal is to be determined:
+<ul>
+<li>Choose from list of suggested projects or suggest your own.</li>
+<li>“Advanced” topics have more uncertain scope / solution. More
+independent work required.</li>
+<li>At most 2 groups should work on the same project (first come first
+served).</li>
+</ul></li>
+</ul>
+<p>Presentation:</p>
+<ul>
+<li>Present project outcome in talk and Q&amp;A session (15min +
+5min)</li>
+<li>Written report on project outcome (10-12 pages, single column,
+single-spaced lines, 11 pt)</li>
+</ul>
+<p>Important dates:</p>
+<ul>
+<li>Fix groups, project topic, and time for weekly meeting:
+01.06.2026</li>
+<li>First meeting on 08.06.2026</li>
+<li>Other meeting dates on 15.06, 22.06, 29.06, 06.07</li>
+<li>Project presentations: 13.07.2026 2:00pm</li>
+<li>Project report due: 20.07.2026</li>
+</ul>
+</section>
+<section id="registration-spreadsheet" class="slide level1">
+<h1>Registration Spreadsheet</h1>
+<ul>
+<li>Go to spreadsheet: <a
+href="https://docs.google.com/spreadsheets/d/1Dvdd1HJMfh8NxzjA8rl0NlP3csakQ70mC45aPFCLjOM/edit"
+class="uri">https://docs.google.com/spreadsheets/d/1Dvdd1HJMfh8NxzjA8rl0NlP3csakQ70mC45aPFCLjOM/edit</a></li>
+</ul>
+<iframe style="border: 1px solid gray; height: 32vh;" width="100%" src="https://docs.google.com/spreadsheets/d/1Dvdd1HJMfh8NxzjA8rl0NlP3csakQ70mC45aPFCLjOM/preview"></iframe>
+<!-- Slide number: 2 -->
+</section>
+<section id="loop-closure" class="slide level1">
+<h1>1. Loop closure</h1>
+<p><img data-src="res/pr/image_268969.png" style="width:80.0%" /></p>
+<ul>
+<li>ORB_SLAM: <a
+href="http://webdiis.unizar.es/~raulmur/MurMontielTardosTRO15.pdf"
+class="uri">http://webdiis.unizar.es/~raulmur/MurMontielTardosTRO15.pdf</a></li>
+<li>ORB_SLAM2: <a href="https://arxiv.org/abs/1610.06475"
+class="uri">https://arxiv.org/abs/1610.06475</a></li>
+<li>Map management</li>
+<li>Reusing Keyframes</li>
+<li>Spanning tree for pose-graph optimization</li>
+</ul>
+<!-- Slide number: 3 -->
+</section>
+<section id="indirect-visual-odometry-with-optical-flow"
+class="slide level1">
+<h1>2. Indirect Visual Odometry with Optical Flow</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Sparse optical flow as alternative to feature matching</li>
+<li>Extend odometry application</li>
+<li>Compare runtime, accuracy, …</li>
+<li>Possible extensions:
+<ul>
+<li>patch similarity norms</li>
+<li>Keyframing, local optimization</li>
+<li>Different image warping strategies</li>
+<li>Implement Gauss-Newton (or LM) manually</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_396159.png" style="width:80.0%" /></p>
+</div>
+</div>
+<ul>
+<li>Visual-Inertial Mapping with Non-Linear Factor Recovery (V. Usenko,
+N. Demmel, D. Schubert, J. Stueckler and D. Cremers), In
+arXiv:1904.06504, 2019. <a href="https://arxiv.org/pdf/1904.06504"
+class="uri">https://arxiv.org/pdf/1904.06504</a></li>
+<li>Equivalence and efficiency of image alignment algorithms (Baker,
+Simon, and Iain Matthews), In IEEE Computer Society Conference on
+Computer Vision and Pattern Recognition. Vol. 1. IEEE Computer Society;
+1999, 2001. <a
+href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.70.20&amp;rep=rep1&amp;type=pdf"
+class="uri">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.70.20&amp;rep=rep1&amp;type=pdf</a></li>
+</ul>
+<!-- Slide number: 4 -->
+</section>
+<section id="relative-map-formulation-for-slam" class="slide level1">
+<h1>3. Relative Map Formulation for SLAM</h1>
+<ul>
+<li>Change the map formulation to the relative one
+<ul>
+<li>Parameters are relative poses between keyframes</li>
+<li>All points are defined relative to some frame</li>
+</ul></li>
+<li>Extend either SfM or Odometry application</li>
+<li>Paper: <a
+href="http://www.robots.ox.ac.uk/~mobile/Papers/2010IJCV_mei.pdf"
+class="uri">http://www.robots.ox.ac.uk/~mobile/Papers/2010IJCV_mei.pdf</a></li>
+</ul>
+<p><img data-src="res/pr/relative-map-slam.png"
+style="width:60.0%" /></p>
+<p><img data-src="res/pr/image_517968.png" style="width:60.0%" /></p>
+<!-- Slide number: 5 -->
+</section>
+<section id="advanced-matching-and-keypoint-evaluation"
+class="slide level1">
+<h1>4. Advanced Matching and Keypoint Evaluation</h1>
+<figure>
+<img data-src="res/pr/image_109539.png" style="width:75.0%"
+alt="Alcantarilla, Pablo F., and T. Solutions. “Fast explicit diffusion for accelerated features in nonlinear scale spaces.” IEEE Trans. Patt. Anal. Mach. Intell 34.7 (2011): 1281-1298." />
+<figcaption aria-hidden="true">Alcantarilla, Pablo F., and T. Solutions.
+“Fast explicit diffusion for accelerated features in nonlinear scale
+spaces.” IEEE Trans. Patt. Anal. Mach. Intell 34.7 (2011):
+1281-1298.</figcaption>
+</figure>
+<ul>
+<li>Keypoints evaluation:
+<ul>
+<li>ORB, AKAZE, SIFT, BRISK</li>
+<li>Computation time / matching statistics</li>
+</ul></li>
+<li>Cascade Hashing for descriptor matching:
+<ul>
+<li><a
+href="http://www.nlpr.ia.ac.cn/jcheng/papers/CameraReady-CasHash.pdf"
+class="uri">http://www.nlpr.ia.ac.cn/jcheng/papers/CameraReady-CasHash.pdf</a></li>
+</ul></li>
+</ul>
+<!-- Slide number: 6 -->
+</section>
+<section id="improving-sfm-with-reliable-resectioning-advanced"
+class="slide level1">
+<h1>5. Improving SfM with Reliable Resectioning
+(<strong>advanced</strong>)</h1>
+<p><img data-src="res/pr/image_781819.png" /></p>
+<ul>
+<li>R. Kataria et al., 3DV 2020
+<ul>
+<li>paper &amp; code: <a
+href="https://github.com/rajkataria/ReliableResectioning"
+class="uri">https://github.com/rajkataria/ReliableResectioning</a></li>
+<li>video: <a href="https://slideslive.com/embed/presentation/38941065"
+class="uri">https://slideslive.com/embed/presentation/38941065</a></li>
+</ul></li>
+<li>Implement ideas from paper in our SfM pipeline:
+<ul>
+<li>Adjust order of adding cameras (weight shorter tracks higher)</li>
+<li>Initialise pose only with reliable matches; then find more matches
+by projection</li>
+</ul></li>
+</ul>
+<!-- Slide number: 7 -->
+</section>
+<section id="visualizing-spectral-ba-uncertainty-advanced"
+class="slide level1">
+<h1>6. Visualizing Spectral BA Uncertainty
+(<strong>advanced</strong>)</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_591921.png" class="no-margin-right"
+style="width:85.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_898677.png" class="no-margin-left"
+style="width:85.0%" /></p>
+</div>
+</div>
+<ul>
+<li>K. Wilson and S. Wehrwein, 3DV 2020
+<ul>
+<li><a href="https://facultyweb.cs.wwu.edu/~wehrwes/files/sfmflex.pdf"
+class="uri">https://facultyweb.cs.wwu.edu/~wehrwes/files/sfmflex.pdf</a></li>
+<li>video: <a href="https://slideslive.com/embed/presentation/38941084"
+class="uri">https://slideslive.com/embed/presentation/38941084</a></li>
+</ul></li>
+<li>Implement pose uncertainty visualisation in our SfM application
+<ul>
+<li>static (ellipses)</li>
+<li>animated</li>
+</ul></li>
+<li>Investigate relative scaling of units (rotation vs translation)</li>
+<li>public implementation for reference: <a
+href="https://wilsonkl.github.io/sfmflex-release/"
+class="uri">https://wilsonkl.github.io/sfmflex-release/</a></li>
+</ul>
+<!-- Slide number: 8 -->
+</section>
+<section
+id="visual-inertial-tracking-using-preintegrated-factors-advanced"
+class="slide level1">
+<h1>7. Visual-Inertial Tracking using Preintegrated Factors
+(<strong>advanced</strong>)</h1>
+<ul>
+<li>Use camera + IMU for stability and scale observability</li>
+<li>Estimate IMU biases and velocity</li>
+<li>Preintegrate measurements between image frames</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_435680.png" class="no-margin-right"
+style="width:80.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_860655.png" class="no-margin-left"
+style="width:80.0%" /></p>
+</div>
+</div>
+<ul>
+<li>Theory: Forster et al., “On-manifold preintegration for real-time
+visual-inertial odometry”, 2016 <a
+href="http://rpg.ifi.uzh.ch/docs/TRO16_forster.pdf"
+class="uri">http://rpg.ifi.uzh.ch/docs/TRO16_forster.pdf</a></li>
+<li>Library with preintegrated factors: &lt;gtsam.org&gt;</li>
+<li>Example system with preintegrated factors: visual-inertial ORB-SLAM
+<a href="https://arxiv.org/pdf/1610.05949.pdf"
+class="uri">https://arxiv.org/pdf/1610.05949.pdf</a></li>
+</ul>
+<!-- Slide number: 9 -->
+</section>
+<section id="monocular-camera-localization-in-3d-lidar-maps"
+class="slide level1">
+<h1>8. Monocular Camera Localization in 3D LiDAR Maps</h1>
+<figure>
+<img data-src="res/pr/image_230324.png"
+alt="T. Caselitz, B. Steder, M. Ruhnke and W. Burgard, “Monocular camera localization in 3D LiDAR maps,” 2016 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2016, pp. 1926-1931, doi: 10.1109/IROS.2016.7759304." />
+<figcaption aria-hidden="true">T. Caselitz, B. Steder, M. Ruhnke and W.
+Burgard, “Monocular camera localization in 3D LiDAR maps,” 2016 IEEE/RSJ
+International Conference on Intelligent Robots and Systems (IROS), 2016,
+pp. 1926-1931, doi: 10.1109/IROS.2016.7759304.</figcaption>
+</figure>
+<ul>
+<li>Localize camera with using pre-built Lidar map</li>
+<li>use ICP(3D-3D pose estimation)</li>
+<li>Voxelized the Lidar map</li>
+<li>avoid boundary effect through map distribution</li>
+</ul>
+<!-- Slide number: 10 -->
+</section>
+<section
+id="evaluating-feature-uncertainty-representations-in-the-covariance-matrix"
+class="slide level1">
+<h1>9. Evaluating feature uncertainty representations in the covariance
+matrix</h1>
+<p><img data-src="res/pr/image_537113.png" style="width:20.0%" /></p>
+<ul>
+<li>There are different sources of uncertainty coming from the
+observations Photometric uncertainty:
+<ul>
+<li>descriptor distance / patch intensity difference</li>
+<li>Model uncertainty: reprojection and epipolar errors</li>
+<li>Outlier detection: ransac, ignoring quartiles</li>
+</ul></li>
+<li>This project looks for the best and fastest ways of quantifying the
+uncertainties Requires implementing the weight matrix, modifying it in
+different ways (to be discussed with the instructors), and making a
+thorough evaluation of the results</li>
+<li>PS: if you are looking for a potential thesis, you would like to
+come up with experiment ideas and evaluating them</li>
+</ul>
+<!-- Slide number: 11 -->
+</section>
+<section id="hand-crafted-optimization-advanced" class="slide level1">
+<h1>10. Hand crafted optimization (<strong>advanced</strong>)</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="res/pr/image_368858.png" style="width:75.0%"
+alt="Hessian of reprojection loss" />
+<figcaption aria-hidden="true">Hessian of reprojection loss</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="res/pr/image_312780.png" style="width:75.0%"
+alt="Derivation of rotated 3D point w.r.t rotation" />
+<figcaption aria-hidden="true">Derivation of rotated 3D point w.r.t
+rotation</figcaption>
+</figure>
+</div>
+</div>
+<ul>
+<li>Remove the dependency on Ceres and make things fast</li>
+<li>You will need to derive all jacobians in the process And you will
+need to make a data-oriented implementation that leverages the sparsity
+of the problem</li>
+<li>PS: you like making things go fast and using c++ for performance.
+You like the idea of implementing numerical optimization methods and
+deriving jacobians.</li>
+</ul>
+<!-- Slide number: 12 -->
+</section>
+<section id="online-multi-sensor-temporal-alignment"
+class="slide level1">
+<h1>11. Online multi-sensor temporal alignment</h1>
+<figure>
+<img data-src="res/pr/image_498990.png" style="width:75.0%"
+alt="Red and blue curve are representing two measurements from two different sensor" />
+<figcaption aria-hidden="true">Red and blue curve are representing two
+measurements from two different sensor</figcaption>
+</figure>
+<ul>
+<li>Initial focus on aligning IMU and camera unsynced timestamps
+(similar scenario to e.g. phones) This is NOT visual-inertial odometry,
+just producing an temporal offset for each frame, and minimizing the
+error against the known offset Expandability to aligning other
+trajectories like mocap-camera, gps-camera</li>
+<li>Given datasets with both aligned and unaligned timestamps, from the
+unaligned, in realtime get the temporal alignment offset.</li>
+<li>Should be fast and isolated How could it be done? IMU-camera
+aligning rotational velocities, gps-camera: aligning trajectories How
+can it be improved? study answers to: when to trigger the alignment to
+minimize performance hit? how many samples to use? moving window?
+etc</li>
+<li>PS: you like to derive and implement a simple optimization of your
+own, you would like to tackle a real problem and maybe contribute to an
+open source system</li>
+</ul>
+</section>
+<section id="other-projects" class="slide level1">
+<h1>Other Projects</h1>
+<p>Other possibilities, <strong>we do not guarantee that we will allow
+them</strong>:</p>
+<h2 id="recommend-your-own-project">Recommend Your Own Project</h2>
+<ul>
+<li>If you have an idea for a project that is not on the list, feel free
+to discuss it with the instructors.</li>
+<li>We are open to any project that is related to vision-based
+navigation and is feasible within the given time frame.</li>
+<li>If you have a specific paper or topic in mind, please share it with
+us and we can discuss how to implement it as a project.</li>
+</ul>
+<h2 id="combine-projects-with-thesis-or-guided-research">Combine
+Projects with Thesis or Guided Research</h2>
+<ul>
+<li>If you think you might want to do a thesis or guided research with
+any of us the lecturers, you can use the project phase to explore a
+potential topic and get a head start on your research.</li>
+<li>However, keep in mind that the project phase is meant to be a
+learning experience and is not a guarantee of a thesis topic or research
+position. You should still be open to exploring other topics and working
+with other lecturers if you find something that interests you.</li>
+</ul>
+<h2 id="deprecated-projects">Deprecated Projects</h2>
+<p>These projects are not recommended, but if you are interested in
+them, feel free to discuss with the instructors.</p>
+<!-- Slide number: 13 -->
+</section>
+<section id="sdf-based-tracking-and-reconstruction-advanced"
+class="slide level1">
+<h1>SDF-based Tracking and Reconstruction
+(<strong>advanced</strong>)</h1>
+<p><img data-src="res/pr/image_164548.png" style="width:60.0%" /></p>
+<ul>
+<li><p>Signed distance function (SDF) for surface
+representation</p></li>
+<li><p>Implement SDF-based tracking in reconstruction pipeline</p></li>
+<li><p>Slavcheva et al., “Sdf-2-sdf: Highly accurate 3d object
+reconstruction”, ECCV 2016 <a
+href="http://campar.in.tum.de/pub/slavcheva2016eccv/slavcheva2016eccv.pdf"
+class="uri">http://campar.in.tum.de/pub/slavcheva2016eccv/slavcheva2016eccv.pdf</a></p></li>
+<li><p>Bylow et al., Real-time camera tracking and 3D reconstruction
+using signed distance functions, RSS 2013 <a
+href="https://vision.cs.tum.edu/_media/spezial/bib/bylow_etal_rss2013.pdf"
+class="uri">https://vision.cs.tum.edu/_media/spezial/bib/bylow_etal_rss2013.pdf</a></p></li>
+</ul>
+<p><img data-src="res/pr/image_236832.png" style="width:60.0%" /></p>
+<!-- Slide number: 14 -->
+</section>
+<section id="structure-from-motion-revisited" class="slide level1">
+<h1>Structure from Motion Revisited</h1>
+<p><img data-src="res/pr/image_907103.png" style="width:75.0%" /></p>
+<ul>
+<li>Improve different stages of SfM application
+<ul>
+<li>Initialisation</li>
+<li>Next-best-view selection</li>
+<li>Triangulation</li>
+<li>Re-triangulation and Outlier Filtering</li>
+</ul></li>
+<li>Schonberger, Johannes L., and Jan-Michael Frahm.
+“Structure-from-motion revisited.” Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition. 2016. (<a
+href="https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.pdf"
+class="uri">https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.pdf</a>)</li>
+</ul>
+<!-- Slide number: 15 -->
+</section>
+<section id="sfm-for-large-image-collections-advanced"
+class="slide level1">
+<h1>SfM for Large Image Collections (<strong>advanced</strong>)</h1>
+<p><img data-src="res/pr/image_796477.png" style="width:75.0%" /></p>
+<ul>
+<li>Make SfM work for thousands of images
+<ul>
+<li>Full Euroc sequences or other datasets</li>
+<li>Select subset of images
+<ul>
+<li>Subsample</li>
+<li>Discard too close or similar images</li>
+</ul></li>
+<li>Use BoW for candidate selection</li>
+<li>Implement direct index for more efficient feature matching</li>
+<li>More efficient geometric verification
+<ul>
+<li>Schönberger J.L., Price T., Sattler T., Frahm JM., Pollefeys M. A
+Vote-and-Verify Strategy for Fast Spatial Verification in Image
+Retrieval. ACCV 2016. (<a
+href="https://demuc.de/papers/schoenberger2016vote.pdf"
+class="uri">https://demuc.de/papers/schoenberger2016vote.pdf</a>)</li>
+</ul></li>
+</ul></li>
+</ul>
+<!-- Slide number: 16 -->
+</section>
+<section id="bag-of-words-for-place-recognition" class="slide level1">
+<h1>Bag of Words for Place Recognition</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_908702.png" style="width:100.0%" /></p>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>Applications:
+<ul>
+<li>SfM: Speed up pairwise matching</li>
+<li>SLAM: re-localization, loop-closure</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<ul>
+<li>DBoW2/3
+<ul>
+<li>Paper: <a href="http://doriangalvez.com/papers/GalvezTRO12.pdf"
+class="uri">http://doriangalvez.com/papers/GalvezTRO12.pdf</a></li>
+<li>Code: <a href="https://github.com/rmsalinas/DBow3"
+class="uri">https://github.com/rmsalinas/DBow3</a></li>
+</ul></li>
+<li>HBST: A Hamming Distance embedding Binary Search Tree
+<ul>
+<li>Paper: <a href="https://arxiv.org/abs/1802.09261"
+class="uri">https://arxiv.org/abs/1802.09261</a></li>
+<li>Code: <a href="https://gitlab.com/srrg-software/srrg_hbst"
+class="uri">https://gitlab.com/srrg-software/srrg_hbst</a></li>
+</ul></li>
+</ul>
+<!-- Slide number: 17 -->
+</section>
+<section id="dense-3d-reconstruction-for-sfm" class="slide level1">
+<h1>Dense 3D reconstruction for SfM</h1>
+<p><img data-src="res/pr/image_465577.png" style="width:75.0%" /></p>
+<ul>
+<li>PSMNet
+<ul>
+<li><a href="https://arxiv.org/abs/1803.08669"
+class="uri">https://arxiv.org/abs/1803.08669</a></li>
+<li><a href="https://github.com/JiaRenChang/PSMNet"
+class="uri">https://github.com/JiaRenChang/PSMNet</a></li>
+</ul></li>
+<li>Depth images Fusion
+<ul>
+<li>Voxblox: <a href="https://github.com/ethz-asl/voxblox"
+class="uri">https://github.com/ethz-asl/voxblox</a></li>
+</ul></li>
+</ul>
+<!-- Slide number: 18 -->
+</section>
+<section id="global-sfm-with-motion-averaging" class="slide level1">
+<h1>Global SfM with Motion Averaging</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Goal: Implement global SfM pipeline using Motion Averaging (as
+opposed to the incremental pipeline from sheet 4)</li>
+<li>Approach:
+<ul>
+<li>Estimate relative rotation between pairs of cameras</li>
+<li>Solve for global camera orientations</li>
+<li>Given the global orientations, estimate global translations</li>
+<li>Triangulate structure</li>
+</ul></li>
+</ul>
+<p><img data-src="res/pr/image_415313.png" style="width:75.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/pr/image_737342.png" /></p>
+</div>
+</div>
+<ul>
+<li>Chatterjee, Avishek, and Venu Madhav Govindu. “Efficient and robust
+large-scale rotation averaging.” Proceedings of the IEEE International
+Conference on Computer Vision. 2013. <a
+href="https://www.cv-foundation.org/openaccess/content_iccv_2013/papers/Chatterjee_Efficient_and_Robust_2013_ICCV_paper.pdf"
+class="uri">https://www.cv-foundation.org/openaccess/content_iccv_2013/papers/Chatterjee_Efficient_and_Robust_2013_ICCV_paper.pdf</a></li>
+<li>Wilson, Kyle, and Noah Snavely. “Robust global translations with
+1dsfm.” European Conference on Computer Vision. Springer, Cham, 2014. <a
+href="https://research.cs.cornell.edu/1dsfm/docs/1DSfM_ECCV14.pdf"
+class="uri">https://research.cs.cornell.edu/1dsfm/docs/1DSfM_ECCV14.pdf</a></li>
+<li>Zhu, Siyu, et al. “Very large-scale global sfm by distributed motion
+averaging.” Proceedings of the IEEE Conference on Computer Vision and
+Pattern Recognition. 2018. <a
+href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Zhu_Very_Large-Scale_Global_CVPR_2018_paper.pdf"
+class="uri">http://openaccess.thecvf.com/content_cvpr_2018/papers/Zhu_Very_Large-Scale_Global_CVPR_2018_paper.pdf</a></li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

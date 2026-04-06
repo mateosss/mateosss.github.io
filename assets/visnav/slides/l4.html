@@ -1,0 +1,1068 @@
+<!-- This file is the output of `pandoc -D revealjs`
+ with a modification to window.MathJax to support fully offline mathjax
+ see:
+ https://github.com/mathjax/MathJax/issues/3521#issuecomment-3897824738
+ https://github.com/jgm/pandoc/issues/2750
+ https://docs.mathjax.org/en/latest/web/hosting.html#obtaining-the-needed-fonts
+ https://revealjs.com/math/#mathjax-4-6.0.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Computer Vision Group - TUM">
+  <title>Vision Based Navigation</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script>
+  window.MathJax = {
+    output: {
+      fontPath: 'node_modules/@mathjax/mathjax-newcm-font',
+    }
+  };
+  </script>
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="res/main.css"/>
+  
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Vision Based Navigation</h1>
+  <p class="author">Computer Vision Group - TUM</p>
+</section>
+
+<section class="slide level1">
+
+<!-- Slide number: 1 -->
+</section>
+<section id="practical-course-vision-based-navigation"
+class="slide level1">
+<h1>Practical Course: Vision Based Navigation</h1>
+<h2 id="lecture-4-structure-from-motion-sfm">Lecture 4: Structure from
+Motion (SfM)</h2>
+<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Prof. Dr. Daniel Cremers</p>
+<p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
+<p>Version: 01.04.2026</p>
+<!-- Slide number: 2 -->
+</section>
+<section id="topics-covered" class="slide level1">
+<h1>Topics Covered</h1>
+<ul>
+<li><p>Introduction</p>
+<ul>
+<li><p>Structure from Motion (SfM)</p></li>
+<li><p>Simultaneous Localization and Mapping (SLAM)</p></li>
+</ul></li>
+<li><p>Bundle Adjustment</p>
+<ul>
+<li><p>Energy Function</p></li>
+<li><p>Non-linear Least Squares</p></li>
+<li><p>Exploiting the Sparse Structure</p></li>
+</ul></li>
+<li><p>Triangulation</p></li>
+</ul>
+<!-- Slide number: 3 -->
+</section>
+<section id="structure-from-motion" class="slide level1">
+<h1>Structure from Motion</h1>
+<figure>
+<img data-src="res/l4/image_338326.png" style="width:100.0%"
+alt="Agarwal et al., “Building Rome in a day”, ICCV 2009, “Dubrovnik” image set" />
+<figcaption aria-hidden="true">Agarwal et al., “Building Rome in a day”,
+ICCV 2009, “Dubrovnik” image set</figcaption>
+</figure>
+<ul>
+<li><p>3D reconstruction using a set of unordered images</p></li>
+<li><p>Requires estimation of 6DoF poses</p></li>
+</ul>
+<!-- Slide number: 4 -->
+</section>
+<section id="simultaneous-localization-and-mapping-slam"
+class="slide level1">
+<h1>Simultaneous Localization and Mapping (SLAM)</h1>
+<figure>
+<img data-src="res/l4/image_177702.png" style="width:80.0%"
+alt="Engel et al., “LSD-SLAM: Large-Scale Direct Monocular SLAM”, ECCV 2014" />
+<figcaption aria-hidden="true">Engel et al., “LSD-SLAM: Large-Scale
+Direct Monocular SLAM”, ECCV 2014</figcaption>
+</figure>
+<ul>
+<li><p>Estimate 6DoF poses and map from sequential image data</p></li>
+<li><p>Update once new frames arrive</p></li>
+</ul>
+<!-- Slide number: 5 -->
+</section>
+<section id="problem-definition-sfm-visual-slam" class="slide level1">
+<h1>Problem Definition SfM / Visual SLAM</h1>
+<div class="columns">
+<div class="column" style="width:65%;">
+<p>Estimate camera poses and map from a set of images</p>
+<ul>
+<li><p>Input</p>
+<ul>
+<li>Set of images <span class="math inline">\(I_{0:t} = {I_0, \ldots,
+I_t}\)</span></li>
+<li>Additional input possible
+<ul>
+<li>Stereo</li>
+<li>Depth</li>
+<li>Inertial measurements</li>
+<li>Control input</li>
+</ul></li>
+</ul></li>
+<li><p>Output</p>
+<ul>
+<li><p>Camera pose estimates <span class="math inline">\(\mathbf{T}_i
+\in SE(3)\)</span>,</p>
+<p>also written as <span class="math inline">\(\mathbf{\xi}_i = (log
+\mathbf{T}_i)^\vee \in \mathbb{R}^6\)</span> <span
+class="math inline">\(\quad i \in {0, \ldots, t}\)</span></p></li>
+<li><p>Environment map <span class="math inline">\(M\)</span></p></li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:35%;">
+<p><img data-src="res/l4/tumrgbd.png" style="width:100.0%" /></p>
+<figure>
+<img data-src="res/l4/image_257942.png" style="width:75.0%"
+alt="Mur-Artal et al., 2015" />
+<figcaption aria-hidden="true">Mur-Artal et al., 2015</figcaption>
+</figure>
+</div>
+</div>
+<!-- Slide number: 6 -->
+</section>
+<section id="typical-sfm-pipeline" class="slide level1">
+<h1>Typical SfM Pipeline</h1>
+<p><img data-src="res/l4/pipeline.png" /></p>
+<!-- Slide number: 7 -->
+</section>
+<section id="visual-slam" class="slide level1">
+<h1>Visual SLAM</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>SLAM <span class="math inline">\(\subset\)</span> SfM, with special
+focus:</p>
+<ul>
+<li>Sequential image data</li>
+<li>Data arrives sequentially</li>
+<li>Preferably realtime</li>
+<li>More focus on trajectory</li>
+</ul>
+<p>Technical solutions:</p>
+<ul>
+<li>Windowed optimization</li>
+<li>Selection of keyframes</li>
+<li>Removal of keyframes (e.g. marginalization)</li>
+</ul>
+<p>Accumulation of drift:</p>
+<ul>
+<li>Detect loop closures</li>
+<li>Global mapping in separate thread (e.g. pose graph
+optimization)</li>
+</ul>
+<p>Odometry:</p>
+<ul>
+<li>No global mapping</li>
+<li>Incremental tracking only</li>
+<li>Local map possible</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l4/slam-subset-sfm.png" style="width:50.0%" /></p>
+<p><img data-src="res/l4/loopclosure-example.png"
+style="width:70.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 8 -->
+</section>
+<section id="landmarks-and-features" class="slide level1">
+<h1>Landmarks and Features</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>The map consists of 3D locations of landmarks <span
+class="math display">\[M = \{\mathbf{m}_1, \ldots, \mathbf{m}_S\}
+\subseteq \mathbb{R}^3\]</span></p></li>
+<li><p>For image <span class="math inline">\(\tau\)</span>, the set of
+2D image coordinates of detected features is denoted <span
+class="math display">\[Y_\tau = \{\mathbf{y}_{\tau, 1}, \ldots,
+\mathbf{y}_{\tau, N_\tau}\} \subseteq \mathbb{R}^2\]</span></p></li>
+<li><p>Known data association:<br />
+Feature <span class="math inline">\(i\)</span> in image <span
+class="math inline">\(\tau\)</span> corresponds to landmark <span
+class="math inline">\(j = c_{\tau, j}\)</span><br />
+<span class="math inline">\(1 \leq i \leq N_\tau, 1 \leq j \leq
+S\)</span></p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="res/l4/landmarks-and-features.png"
+style="width:100.0%" /></p>
+</div>
+</div>
+<!-- Slide number: 9 -->
+</section>
+<section id="bundle-adjustment-energy" class="slide level1">
+<h1>Bundle Adjustment Energy</h1>
+<p><span class="math display">\[
+\begin{aligned}
+E(\mathbf{\xi}_{0:t}, M) &amp;= \frac{1}{2} \| \mathbf{\xi}_0 -
+\mathbf{\xi}^0 \|^2_{\Sigma_{0,\mathbf{\xi}}^{-1}} &amp;&amp;
+\text{Absolute pose prior} \\
+&amp;+ \frac{1}{2} \sum_{\tau=0}^t \sum_{i=1}^{N_\tau} \|
+\mathbf{y}_{\tau, i} - h(\mathbf{\xi}_\tau, \mathbf{m}_{c_{\tau, i}})
+\|^2_{\Sigma_{\mathbf{y_{\tau,i}}}^{-1}} &amp;&amp; \text{Reprojection
+error}\\
+\end{aligned}
+\]</span></p>
+<p>Notation: <span class="math inline">\(\| \mathbf{r} \|^2_{A} =
+\mathbf{r}^T A \mathbf{r} = \langle \mathbf{r}, A \mathbf{r}
+\rangle\)</span></p>
+<ul>
+<li>Pose prior: Fix absolute pose ambiguity
+<ul>
+<li>In this case equivalent to keeping <span
+class="math inline">\(\mathbf{\xi}_0 = \mathbf{\xi}^0\)</span></li>
+<li>Keep absolute pose information e.g. when first frame is
+marginalized</li>
+</ul></li>
+<li>Additional prior to fix scale ambiguity might be necessary</li>
+<li>Induced factor graph:</li>
+</ul>
+<figure>
+<img data-src="res/l4/factor-graph.png" style="width:75.0%"
+alt="factor_graph.png" />
+<figcaption aria-hidden="true">factor_graph.png</figcaption>
+</figure>
+<!-- Slide number: 10 -->
+</section>
+<section id="energy-function-as-non-linear-least-squares"
+class="slide level1">
+<h1>Energy Function as Non-linear Least Squares</h1>
+<ul>
+<li><p>Residuals as function of state vector <span
+class="math inline">\(\mathbf{x} := (\mathbf{\xi}_0, \ldots
+,\mathbf{\xi}_t, \mathbf{m}_1, \ldots ,\mathbf{m}_S)^T\)</span></p>
+<ul>
+<li><span class="math inline">\(\mathbf{r}^0(\mathbf{x}) :=
+\mathbf{\xi}_0 \ominus \mathbf{\xi}^0\)</span></li>
+<li><span class="math inline">\(\mathbf{r}^y_{\tau,i}(\mathbf{x}) :=
+\mathbf{y}_{\tau, i} - h(\mathbf{\xi}_\tau, \mathbf{m}_{c_{\tau,
+i}})\)</span></li>
+</ul></li>
+<li><p>Stack the residuals in a vector-valued function und collect the
+residual covariances on the diagonal blocks of a square matrix <span
+class="math display">\[
+\mathbf{r}(\mathbf{x}) := \begin{pmatrix}
+\mathbf{r}^0(\mathbf{x}) \\
+\mathbf{r}^y_{0,i}(\mathbf{x}) \\
+\vdots \\
+\mathbf{r}^y_{t,N_t}(\mathbf{x}) \\
+\end{pmatrix} \in \mathbb{R}^{6 + 2 \sum_{\tau=0}^t N_\tau}
+\qquad
+\mathbf{W} := \begin{pmatrix}
+\Sigma_{0,\mathbf{\xi}}^{-1} &amp; &amp; &amp; 0\\
+&amp; \Sigma_{\mathbf{y}_{0,1}}^{-1} &amp; \\
+&amp; &amp; \ddots \\
+0 &amp; &amp; &amp; \Sigma_{\mathbf{y}_{t,N_t}}^{-1} \\
+\end{pmatrix}
+\in \mathbb{R}^{(6 + 2 \sum_{\tau=0}^t N_\tau) \times (6 + 2
+\sum_{\tau=0}^t N_\tau)}
+\]</span></p></li>
+<li><p>Rewrite energy function as <span
+class="math display">\[\boxed{E(\mathbf{x}) = \frac{1}{2} \|
+\mathbf{r}(\mathbf{x}) \|^2_{\mathbf{W}}}\]</span></p></li>
+</ul>
+<!-- Slide number: 11 -->
+</section>
+<section id="recap-gauss-newton-method" class="slide level1">
+<h1>Recap: Gauss-Newton Method</h1>
+<ul>
+<li>Idea: Approximate Newton’s method to minimize <span
+class="math inline">\(E(\mathbf{x})\)</span>
+<ul>
+<li>Approximate <span class="math inline">\(E(\mathbf{x})\)</span>
+through linearization of residuals <span class="math display">\[
+\begin{aligned}
+\tilde{E}(\mathbf{x}) &amp;= \frac{1}{2} \|
+\mathbf{\tilde{r}}(\mathbf{x}) \|^2 &amp;&amp; \text{k iteration
+index}\\
+&amp;= \frac{1}{2} \| \mathbf{r}(\mathbf{x}_k) + \mathbf{J}_k
+(\mathbf{x} - \mathbf{x}_k) \|^2 &amp;&amp; \mathbf{J}_k :=
+\nabla_\mathbf{x} \mathbf{r}(\mathbf{x}) |_{\mathbf{x} = \mathbf{x}_k}
+\\
+&amp;= \frac{1}{2} (\mathbf{r}(\mathbf{x}_k) + \mathbf{J}_k (\mathbf{x}
+- \mathbf{x}_k))^T \mathbf{W} (\mathbf{r}(\mathbf{x}_k) + \mathbf{J}_k
+(\mathbf{x} - \mathbf{x}_k)) &amp;&amp; \text{unroll}\\
+&amp;= \underbrace{\frac{1}{2} \mathbf{r}(\mathbf{x}_k)^T \mathbf{W}
+\mathbf{r}(\mathbf{x}_k)}_{\text{constant}} +
+\underbrace{\mathbf{r}(\mathbf{x}_k)^T \mathbf{W} \mathbf{J}_k}_{=:
+\mathbf{b}_k^T} (\mathbf{x} - \mathbf{x}_k) + \frac{1}{2} (\mathbf{x} -
+\mathbf{x}_k)^T \underbrace{\mathbf{J}_k^T \mathbf{W} \mathbf{J}_k}_{=:
+\mathbf{H}_k} (\mathbf{x} - \mathbf{x}_k) &amp;&amp; \text{rearrange}
+\end{aligned}
+\]</span></li>
+</ul></li>
+</ul>
+<p>Finding root of gradient as in Newton’s method leads to update rule -
+<span class="math inline">\(\nabla_\mathbf{x} \tilde{E}(\mathbf{x}) =
+\mathbf{b}_k^T + (\mathbf{x} - \mathbf{x}_k)^T \mathbf{H}_k\)</span> -
+<span class="math inline">\(\nabla_\mathbf{x}
+\tilde{E}(\mathbf{x}_{k+1}) = 0 \Leftrightarrow \mathbf{x} =
+\mathbf{x}_k - \mathbf{H}_k^{-1} \mathbf{b}_k\)</span> - <span
+class="math inline">\(\Rightarrow \boxed{\mathbf{x}_{k+1} = \mathbf{x}_k
+- \mathbf{H}_k^{-1} \mathbf{b}_k}\)</span></p>
+<ul>
+<li>Pros:
+<ul>
+<li>Faster convergence than gradient descent (approx. quadratic
+convergence rate)</li>
+</ul></li>
+<li>Cons:
+<ul>
+<li>Divergence if too far from local optimum (<span
+class="math inline">\(\mathbf{H}_k\)</span> not positive definite)</li>
+<li>Solution quality depends on initial guess iteration index</li>
+</ul></li>
+</ul>
+<!-- Slide number: 12 -->
+</section>
+<section id="structure-of-the-bundle-adjustment-problem-13"
+class="slide level1">
+<h1>Structure of the Bundle Adjustment Problem 1/3</h1>
+<ul>
+<li><p><span class="math inline">\(\mathbf{b}_k\)</span> and <span
+class="math inline">\(\mathbf{H}_k\)</span> are formed by summing terms
+from individual residuals: <span class="math display">\[
+\begin{aligned}
+\mathbf{b}_k
+= \mathbf{b}_k^0 + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\mathbf{b}_k^{\tau,i}
+= \left( \mathbf{J}_k^0 \right)^\top \Sigma_{0,\xi}^{-1}
+\mathbf{r}^0(\mathbf{x}_k) + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\left( \mathbf{J}_k^{\tau,i} \right)^\top
+\Sigma_{y_{\tau,i},\,\tau,i}^{-1} \mathbf{r}^y(\mathbf{x}_k)\\
+\mathbf{H}_k
+= \mathbf{H}_k^0 + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\mathbf{H}_k^{\tau,i}
+= \left( \mathbf{J}_k^0 \right)^\top \Sigma_{0,\xi}^{-1} \left(
+\mathbf{J}_k^0 \right) +
+\sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau} \left( \mathbf{J}_k^{\tau,i}
+\right)^\top \Sigma_{y_{\tau,i}}^{-1} \left( \mathbf{J}_k^{\tau,i}
+\right)
+\end{aligned}
+\]</span></p></li>
+<li><p><span class="math inline">\(\mathbf{J}_k^0\)</span>: Jaocobian of
+pose prior residual</p></li>
+<li><p><span class="math inline">\(\mathbf{J}_k^{\tau,i}\)</span>:
+Jacobian of reprojection error for feature <span
+class="math inline">\(i\)</span> in image <span
+class="math inline">\(\tau\)</span></p></li>
+<li><p>What is the structure of these terms?</p></li>
+</ul>
+<!-- Slide number: 13 -->
+</section>
+<section id="structure-of-the-bundle-adjustment-problem---mathbfb_k-23"
+class="slide level1">
+<h1>Structure of the Bundle Adjustment Problem - <span
+class="math inline">\(\mathbf{b}_k\)</span> 2/3</h1>
+<p><span class="math display">\[
+\mathbf{b}_k
+  = \mathbf{b}_k^0 + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\mathbf{b}_k^{\tau,i}
+  = \left( \mathbf{J}_k^0 \right)^\top \Sigma_{0,\xi}^{-1}
+\mathbf{r}^0(\mathbf{x}_k) + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\left( \mathbf{J}_k^{\tau,i} \right)^\top
+\Sigma_{y_{\tau,i},\,\tau,i}^{-1} \mathbf{r}^y(\mathbf{x}_k)
+\]</span></p>
+<p><img data-src="res/l4/b-structure.png" style="width:100.0%" /></p>
+<!-- Slide number: 14 -->
+</section>
+<section id="structure-of-the-bundle-adjustment-problem---mathbfh_k-33"
+class="slide level1">
+<h1>Structure of the Bundle Adjustment Problem - <span
+class="math inline">\(\mathbf{H}_k\)</span> 3/3</h1>
+<p><span class="math display">\[
+\mathbf{H}_k
+  = \mathbf{H}_k^0 + \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau}
+\mathbf{H}_k^{\tau,i}
+  = \left( \mathbf{J}_k^0 \right)^\top \Sigma_{0,\xi}^{-1} \left(
+\mathbf{J}_k^0 \right) +
+  \sum_{\tau=0}^{t} \sum_{i=1}^{N_\tau} \left( \mathbf{J}_k^{\tau,i}
+\right)^\top \Sigma_{y_{\tau,i}}^{-1} \left( \mathbf{J}_k^{\tau,i}
+\right)
+\]</span></p>
+<p><img data-src="res/l4/h-structure.png" style="width:100.0%" /></p>
+<!-- Slide number: 15 -->
+</section>
+<section id="example-hessian-of-a-ba-problem" class="slide level1">
+<h1>Example Hessian of a BA Problem</h1>
+<figure>
+<img data-src="res/l4/hessian-example.png" style="width:100.0%"
+alt="Lourakis et al., 2009" />
+<figcaption aria-hidden="true">Lourakis et al., 2009</figcaption>
+</figure>
+<ul>
+<li>Large, but sparse!</li>
+<li>How to invert efficiently?</li>
+</ul>
+<!-- Slide number: 16 -->
+</section>
+<section id="exploiting-the-sparse-structure---schur-complement"
+class="slide level1">
+<h1>Exploiting the Sparse Structure - Schur Complement</h1>
+<p>Idea: Apply the Schur complement to solve the system in a partitioned
+way <span class="math display">\[
+\begin{aligned}
+&amp;\mathbf{H}_k \Delta \mathbf{x} = -\mathbf{b}_k\\
+&amp;\Rightarrow \begin{pmatrix}
+  \mathbf{H}_{\xi\xi} &amp; \mathbf{H}_{\xi m} \\ \mathbf{H}_{m \xi}
+&amp; \mathbf{H}_{mm}
+  \end{pmatrix}
+  \begin{pmatrix} \Delta \mathbf{x_\xi} \\ \Delta \mathbf{x_m}
+\end{pmatrix} =
+  -\begin{pmatrix}
+  \mathbf{b}_\xi \\
+  \mathbf{b}_m
+  \end{pmatrix}\\
+&amp;\Leftrightarrow
+\begin{cases}
+\mathbf{H}_{\xi\xi} \Delta \mathbf{x_\xi} + \mathbf{H}_{\xi m} \Delta
+\mathbf{x_m} = -\mathbf{b}_\xi \\
+\mathbf{H}_{m \xi} \Delta \mathbf{x_\xi} + \mathbf{H}_{mm} \Delta
+\mathbf{x_m} = -\mathbf{b}_m
+\end{cases}\\
+&amp;\Leftrightarrow
+\begin{cases}
+\Delta \mathbf{x_\xi} = -\mathbf{H}_{\xi\xi}^{-1} \mathbf{b}_\xi -
+\mathbf{H}_{\xi\xi}^{-1} \mathbf{H}_{\xi m} \Delta \mathbf{x_m} \\
+\Delta \mathbf{x_m} = -\mathbf{H}_{mm}^{-1} \mathbf{b}_m -
+\mathbf{H}_{mm}^{-1} \mathbf{H}_{m \xi} \Delta \mathbf{x_\xi}
+\end{cases}\\
+&amp;\Leftrightarrow
+\begin{cases}
+\Delta \mathbf{x_\xi} = - (\mathbf{H}_{\xi\xi} - \mathbf{H}_{\xi m}
+\mathbf{H}_{mm}^{-1} \mathbf{H}_{m \xi})^{-1} (\mathbf{b}_\xi -
+\mathbf{H}_{\xi m} \mathbf{H}_{mm}^{-1} \mathbf{b}_m) &amp;\leftarrow
+\text{&quot;Reduced camera system&quot; (RCS)}\\
+\Delta \mathbf{x_m} = -\mathbf{H}_{mm}^{-1} (\mathbf{b}_m +
+\mathbf{H}_{m \xi} \Delta \mathbf{x_\xi}) &amp;\leftarrow \text{Given by
+backsubstitution of $\Delta \mathbf{x_\xi}$}
+\end{cases}
+\end{aligned}
+\]</span></p>
+<ul>
+<li>Is this any better?</li>
+</ul>
+<!-- Slide number: 17 -->
+</section>
+<section id="exploiting-the-sparse-structure---reduced-camera-system"
+class="slide level1">
+<h1>Exploiting the Sparse Structure - Reduced camera system</h1>
+<ul>
+<li><p>What is the structure of the two sub-problems?</p></li>
+<li><p>Reduced camera system (RCS): Only involves pose variables <span
+class="math display">\[\Delta \mathbf{x_\xi} = -
+(\underbrace{\mathbf{H}_{\xi\xi} - \mathbf{H}_{\xi m}
+\mathbf{H}_{mm}^{-1} \mathbf{H}_{m \xi}}_{\text{Reduced pose Hessian
+$\mathbf{\tilde{H}}$}})^{-1} (\underbrace{\mathbf{b}_\xi -
+\mathbf{H}_{\xi m} \mathbf{H}_{mm}^{-1} \mathbf{b}_m}_{\text{Reduced
+pose gradient $\mathbf{\tilde{b}}$}}) \Leftrightarrow
+\underbrace{\mathbf{\tilde{H}} \Delta \mathbf{x_\xi} =
+-\mathbf{\tilde{b}}}_{\text{Reduced camera system}}\]</span></p></li>
+<li><p>Reduced pose hessian rewrite (<strong>low memory and
+parallelizable</strong>) <span class="math display">\[\mathbf{\tilde{H}}
+= \mathbf{H}_{\xi\xi} - \mathbf{H}_{\xi m} \mathbf{H}_{mm}^{-1}
+\mathbf{H}_{m \xi} = \mathbf{H}_{\xi\xi} - \sum_{j=1}^S \mathbf{H}_{\xi
+m_j} \mathbf{H}_{m_j m_j}^{-1} \mathbf{H}_{m_j \xi} \in
+\mathbb{R}^{6(t+1) \times 6(t+1)}\]</span></p></li>
+<li><p>Reduced pose gradient rewrite: <span
+class="math display">\[\mathbf{\tilde{b}} = \mathbf{b}_\xi -
+\mathbf{H}_{\xi m} \mathbf{H}_{mm}^{-1} \mathbf{b}_m = \mathbf{b}_\xi -
+\sum_{j=1}^S \mathbf{H}_{\xi m_j} \mathbf{H}_{m_j m_j}^{-1}
+\mathbf{b}_{m_j} \in \mathbb{R}^{6(t+1)}\]</span></p></li>
+<li><p><strong>No need to save landmark variables in memory
+anymore!</strong></p></li>
+</ul>
+<!-- Slide number: 18 -->
+</section>
+<section id="exploiting-the-sparse-structure---poses-sparsity"
+class="slide level1">
+<h1>Exploiting the Sparse Structure - Poses Sparsity</h1>
+<ul>
+<li><p>What is the structure of the two sub-problems?</p></li>
+<li><p>Poses: <span class="math inline">\(\Delta \mathbf{x_\xi} = -
+\mathbf{\tilde{H}}^{-1} (\mathbf{\tilde{b}})\)</span></p></li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><span class="math inline">\(\mathbf{\tilde{H}} = \mathbf{H}_{\xi\xi}
+- \sum_{j=1}^S \mathbf{H}_{\xi m_j} \mathbf{H}_{m_j m_j}^{-1}
+\mathbf{H}_{m_j \xi}\)</span> <img data-src="res/l4/h-sparsity.png"
+style="width:100.0%" /></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li><span class="math inline">\(\mathbf{\tilde{b}} = \mathbf{b}_\xi -
+\sum_{j=1}^S \mathbf{H}_{\xi m_j} \mathbf{H}_{m_j m_j}^{-1}
+\mathbf{b}_{m_j}\)</span> <img data-src="res/l4/b-sparsity.png"
+style="width:60.0%" /></li>
+</ul>
+</div>
+</div>
+<!-- Slide number: 19 -->
+</section>
+<section id="exploiting-the-sparse-structure---landmarks-sparsity"
+class="slide level1">
+<h1>Exploiting the Sparse Structure - Landmarks Sparsity</h1>
+<ul>
+<li>What is the structure of the two sub-problems?</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Landmarks part of the schur complement: <span
+class="math display">\[
+\begin{aligned}
+\Delta \mathbf{x_m} &amp;= -\mathbf{H}_{mm}^{-1} (\mathbf{b}_m +
+\mathbf{H}_{m \xi} \Delta \mathbf{x_\xi}) &amp;&amp; \quad \in
+\mathbb{R}^{3S} \\
+\Rightarrow \Delta \mathbf{x}_{m_j} &amp;= -\mathbf{H}_{m_j m_j}^{-1}
+(\mathbf{b}_{m_j} + \mathbf{H}_{m_j \xi} \Delta \mathbf{x_\xi})
+&amp;&amp; \quad \in \mathbb{R}^3
+\end{aligned}
+\]</span> <img data-src="res/l4/lm-sparsity.png" style="width:100.0%"
+alt="lmsolution-structure" /></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li><p><span class="math inline">\(\mathbf{H}_{mm}\)</span> is block
+diagonal, with one block per landmark</p></li>
+<li><p>Each block <span class="math inline">\(\mathbf{H}_{m_j
+m_j}\)</span> is small (3x3 for point landmarks)</p></li>
+<li><p>Each block can be inverted independently</p></li>
+<li><p>Landmark-wise solution <span class="math inline">\(\Delta
+\mathbf{x}_{m_j}\)</span> can be computed in parallel</p></li>
+<li><p>Comparably small matrix operations (low memory
+footprint)</p></li>
+<li><p>Only involves poses that observe the landmark</p></li>
+</ul>
+</div>
+</div>
+<!-- Slide number: 20 -->
+</section>
+<section id="exploiting-the-sparse-structure---putting-it-all-together"
+class="slide level1">
+<h1>Exploiting the sparse structure - Putting it all together</h1>
+<p><span class="math display">\[
+\begin{aligned}
+\Delta \mathbf{x_\xi} &amp;= -\mathbf{\tilde{H}}^{-1}
+\mathbf{\tilde{b}}\\
+&amp;= - (\mathbf{H}_{\xi\xi} - \mathbf{H}_{\xi m} \mathbf{H}_{mm}^{-1}
+\mathbf{H}_{m \xi})^{-1} (\mathbf{b}_\xi - \mathbf{H}_{\xi m}
+\mathbf{H}_{mm}^{-1} \mathbf{b}_m)\\
+&amp;= - \left( \mathbf{H}_{\xi\xi} - \sum_{j=1}^S \mathbf{H}_{\xi m_j}
+\mathbf{H}_{m_j m_j}^{-1} \mathbf{H}_{m_j \xi} \right)^{-1} \left(
+\mathbf{b}_\xi - \sum_{j=1}^S \mathbf{H}_{\xi m_j} \mathbf{H}_{m_j
+m_j}^{-1} \mathbf{b}_{m_j} \right)
+\end{aligned}
+\]</span></p>
+<p><img data-src="res/l4/small-matrix-to-invert.png"
+style="width:75.0%" /></p>
+<!-- Slide number: 21 -->
+</section>
+<section id="exploiting-the-sparse-structure---further-considerations"
+class="slide level1">
+<h1>Exploiting the Sparse Structure - Further Considerations</h1>
+<ul>
+<li><p>Reduced pose Hessian can still have a sparse structure</p></li>
+<li><p>For many camera poses with many shared observations, the
+inversion of the reduced pose Hessian is still computationally
+expensive!</p></li>
+<li><p>Exploit further structure, e.g. using variable reordering or
+hierarchical decomposition</p></li>
+</ul>
+<figure>
+<img data-src="res/l4/hessian-examples.png" style="width:75.0%"
+alt="Agarwal et al., ECCV 2010" />
+<figcaption aria-hidden="true">Agarwal et al., ECCV 2010</figcaption>
+</figure>
+<!-- Slide number: 22 -->
+</section>
+<section id="effect-of-loop-closures-on-the-hessian---before"
+class="slide level1">
+<h1>Effect of Loop Closures on the Hessian - Before</h1>
+<p><img data-src="res/l4/hessian-lc-bef.png" style="width:90.0%" /></p>
+<!-- Slide number: 23 -->
+</section>
+<section id="effect-of-loop-closures-on-the-hessian---after"
+class="slide level1">
+<h1>Effect of Loop Closures on the Hessian - After</h1>
+<p><img data-src="res/l4/hessian-lc-aft.png" style="width:90.0%" /></p>
+<!-- Slide number: 24 -->
+</section>
+<section id="further-considerations" class="slide level1">
+<h1>Further Considerations</h1>
+<p>Many methods to improve convergence / robustness / run-time
+efficiency, e.g.</p>
+<ul>
+<li>Use matrix decompositions (e.g. Cholesky) to perform inversions</li>
+<li>Levenberg-Marquardt optimization improves basin of convergence</li>
+<li>Heavier-tail distributions / robust norms (e.g., Huber) on the
+residuals can be implemented using iteratively reweighted least
+squares</li>
+<li>Preconditioning</li>
+<li>Hierarchical optimization</li>
+<li>Variable reordering</li>
+<li>Delayed relinearization</li>
+</ul>
+<!-- Slide number: 25 -->
+</section>
+<section id="triangulation-12" class="slide level1">
+<h1>Triangulation 1/2</h1>
+<p><img data-src="res/l4/triangulation.png" style="width:75.0%" /></p>
+<ul>
+<li>Find landmark position given the camera poses</li>
+<li>Ideally, the rays should intersect</li>
+<li>In practice, many sources of error: pose estimates, feature
+detections and camera model / intrinsic parameters</li>
+</ul>
+<!-- Slide number: 26 -->
+</section>
+<section id="triangulation-22" class="slide level1">
+<h1>Triangulation 2/2</h1>
+<ul>
+<li><p>Goal: Reconstruct 3D point <span class="math inline">\(\tilde{x}
+= (x, y, z, w)^T \in \mathbb{P}^3\)</span> from 2D image observations
+<span class="math inline">\(\{\mathbf{y_1}, \ldots,
+\mathbf{y_n}\}\)</span> for known camera poses <span
+class="math inline">\(\{\mathbf{T}_1, \ldots,
+\mathbf{T}_n\}\)</span></p></li>
+<li><p>Linear solution: Find 3D point such that reprojections equal its
+projection</p>
+<ul>
+<li>For each image <span class="math inline">\(i\)</span>, let <span
+class="math inline">\(\mathbf{T}_i = \begin{pmatrix} &amp; \mathbf{p_1}
+\\ &amp; \mathbf{p_2} \\ &amp; \mathbf{p_3} \\ 0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}\)</span>, where <span class="math inline">\(\mathbf{p_j}
+\in \mathbb{R}^{1 \times 4}\)</span> and <span
+class="math inline">\(\mathbf{y_i} = \begin{pmatrix} u_i \\ v_i
+\end{pmatrix}\)</span></li>
+<li>Projecting <span class="math inline">\(\mathbf{\tilde{x}}\)</span>
+yields <span class="math inline">\(\mathbf{y_i}&#39; = \pi(\mathbf{T}_i
+\tilde{\mathbf{x}}) = \begin{pmatrix} \mathbf{p_1}
+\tilde{\mathbf{x}}/\mathbf{p_3} \tilde{\mathbf{x}} \\ \mathbf{p_2}
+\tilde{\mathbf{x}}/\mathbf{p_3} \tilde{\mathbf{x}}
+\end{pmatrix}\)</span></li>
+<li>Requiring <span class="math inline">\(\mathbf{y_i}&#39; =
+\mathbf{y_i}\)</span> gives two linear equations per image: <span
+class="math display">\[
+\begin{cases}
+\mathbf{p_1} \tilde{\mathbf{x}}/\mathbf{p_3} \tilde{\mathbf{x}} = u_i \\
+\mathbf{p_2} \tilde{\mathbf{x}}/\mathbf{p_3} \tilde{\mathbf{x}} = v_i
+\end{cases} \Leftrightarrow
+\begin{cases}
+u_i \mathbf{p_3} \tilde{\mathbf{x}} - \mathbf{p_1} \tilde{\mathbf{x}} =
+0 \\
+v_i \mathbf{p_3} \tilde{\mathbf{x}} - \mathbf{p_2} \tilde{\mathbf{x}} =
+0
+\end{cases} \Leftrightarrow
+\begin{pmatrix}
+\mathbf{p_1} - u_i \mathbf{p_3} \\
+\mathbf{p_2} - v_i \mathbf{p_3}
+\end{pmatrix} \tilde{\mathbf{x}} = 0
+\quad \dot{\Leftrightarrow} \quad
+\mathbf{A} \tilde{\mathbf{x}} = 0 \in \mathbb{R}^{2}
+\]</span></li>
+<li>Leads to system of linear equations <span
+class="math inline">\(\mathbf{A} \tilde{\mathbf{x}} = 0\)</span> , two
+approaches to solve:
+<ul>
+<li>Set <span class="math inline">\(w = 1\)</span> and solve
+non-homogeneous least squares problem</li>
+<li>Find nullspace of <span class="math inline">\(\mathbf{A}\)</span>
+using SVD, then scale such that <span
+class="math inline">\(w=1\)</span></li>
+</ul></li>
+</ul></li>
+<li><p>Non-linear least squares on reprojection errors (more accurate):
+<span class="math display">\[
+\tilde{\mathbf{x}} = \min_{\mathbf{x}} \sum_{i=1}^n \| \mathbf{y_i} -
+\pi(\mathbf{T}_i \tilde{\mathbf{x}}) \|^2_2
+\]</span></p></li>
+<li><p>Different solutions for different methods in the presence of
+noise</p></li>
+</ul>
+<!-- Slide number: 27 -->
+</section>
+<section id="exercises" class="slide level1">
+<h1>Exercises</h1>
+<h3 id="exercise-sheet-4">Exercise sheet 4</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Implement components of SfM pipeline</li>
+<li>Triangulation: use OpenGV’s triangulate function</li>
+<li>BA: Ceres can do the Schur complement</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ceres<span class="op">::</span>Solver<span class="op">::</span>Options ceres_options<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ceres_options<span class="op">.</span>max_num_iterations <span class="op">=</span> <span class="dv">20</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ceres_options<span class="op">.</span><span class="dt">linear_solver_type</span> <span class="op">=</span> ceres<span class="op">::</span>SPARSE_SCHUR<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ceres_options<span class="op">.</span>num_threads <span class="op">=</span> <span class="dv">8</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ceres<span class="op">::</span>Solver<span class="op">::</span>Summary summary<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Solve<span class="op">(</span>ceres_options<span class="op">,</span> <span class="op">&amp;</span>problem<span class="op">,</span> <span class="op">&amp;</span>summary<span class="op">);</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> summary<span class="op">.</span>FullReport<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Output in next slide</span></span></code></pre></div>
+</div>
+</div>
+<h3 id="exercise-sheet-5">Exercise sheet 5</h3>
+<ul>
+<li>Implement components of odometry</li>
+<li>Similar to sheet 4, but:
+<ul>
+<li>More efficient 2D-3D matching using approximate pose of previous
+frame</li>
+<li>New keyframe if number of matches too small</li>
+<li>New landmarks by triangulation from stereo pair</li>
+<li>Keep runtime bounded by removing old keyframes</li>
+</ul></li>
+</ul>
+<!-- Slide number: 28 -->
+</section>
+<section id="ceres-report" class="slide level1">
+<h1>Ceres report</h1>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>                                    Original                  Reduced</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Parameter blocks                         <span class="dv">4896</span>                     <span class="dv">4892</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Parameters                              <span class="dv">15354</span>                    <span class="dv">15324</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Effective parameters                    <span class="dv">15190</span>                    <span class="dv">15162</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Residual blocks                         <span class="dv">24014</span>                    <span class="dv">24014</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Residuals                               <span class="dv">48028</span>                    <span class="dv">48028</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>Minimizer                        TRUST_REGION</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>Sparse linear algebra library    SUITE_SPARSE</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>Trust region strategy     LEVENBERG_MARQUARDT</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                                        Given                     Used</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Linear solver                    SPARSE_SCHUR             SPARSE_SCHUR</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>Threads                                     <span class="dv">8</span>                        <span class="dv">8</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>Linear solver ordering              AUTOMATIC                 <span class="dv">4730</span><span class="op">,</span><span class="dv">162</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>Schur structure                         <span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">,</span><span class="dv">6</span>                    <span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">,</span><span class="dv">6</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>Cost<span class="op">:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>Initial                          <span class="fl">3.979886e+03</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>Final                            <span class="fl">3.766801e+03</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>Change                           <span class="fl">2.130843e+02</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>Minimizer iterations                       <span class="dv">21</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>Successful steps                           <span class="dv">21</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>Unsuccessful steps                          <span class="dv">0</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>Time <span class="op">(</span>in seconds<span class="op">):</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>Preprocessor                         <span class="fl">0.048047</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  Residual only evaluation           <span class="fl">0.069569</span> <span class="op">(</span><span class="dv">20</span><span class="op">)</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  Jacobian <span class="op">&amp;</span> residual evaluation     <span class="fl">0.388923</span> <span class="op">(</span><span class="dv">21</span><span class="op">)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  Linear solver                      <span class="fl">0.586967</span> <span class="op">(</span><span class="dv">20</span><span class="op">)</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Minimizer                            <span class="fl">1.134797</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>Postprocessor                        <span class="fl">0.001068</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>Total                                <span class="fl">1.183913</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>Termination<span class="op">:</span>                   NO_CONVERGENCE <span class="op">(</span>Maximum number of iterations reached<span class="op">.</span> Number of iterations<span class="op">:</span> <span class="fl">20.</span><span class="op">)</span></span></code></pre></div>
+<!-- Slide number: 29 -->
+</section>
+<section id="summary" class="slide level1">
+<h1>Summary</h1>
+<p>SfM</p>
+<ul>
+<li>Estimate map and camera poses from set of images</li>
+<li>SLAM: Sequential data, real-time</li>
+<li>Odometry: No global mapping</li>
+</ul>
+<p>Bundle Adjustment</p>
+<ul>
+<li>Non-linear least squares problem</li>
+<li>Sparse structure of Hessian can be exploited for efficient
+inversion</li>
+</ul>
+<p>Triangulation</p>
+<ul>
+<li>Linear and non-linear algorithms</li>
+<li>Differences in the presence of noise</li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="node_modules/reveal.js/plugin/notes/notes.js"></script>
+  <script src="node_modules/reveal.js/plugin/search/search.js"></script>
+  <script src="node_modules/reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="node_modules/reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'node_modules/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>
