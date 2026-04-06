@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Epipolar Geometry Embed</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-border: #d4d1ca;
+      --color-text: #28251d;
+      --color-text-muted: #7a7974;
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --color-blue: #2196F3;
+      --color-pink: #E91E63;
+      --color-green: #4CAF50;
+      --color-gray: #7d7d7d;
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-2: #201f1d;
+      --color-border: #393836;
+      --color-text: #cdccca;
+      --color-text-muted: #9b9995;
+      --color-primary: #4f98a3;
+      --color-primary-hover: #227f8b;
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Satoshi', system-ui, sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.5;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-4);
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: var(--text-lg);
+      line-height: 1.1;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      min-height: 44px;
+    }
+
+    label, select, button {
+      font: inherit;
+    }
+
+    select, button {
+      border: none;
+      background: transparent;
+      color: var(--color-text);
+    }
+
+    select:focus, button:focus { outline: none; }
+
+    .btn {
+      cursor: pointer;
+      background: var(--color-primary);
+      color: white;
+      border-radius: var(--radius-md);
+      padding: 0.7rem 0.95rem;
+      min-height: 44px;
+      transition: background 180ms ease;
+    }
+
+    .btn:hover { background: var(--color-primary-hover); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      /* min-height: 520px; */
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .panel-header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .panel-header h2 {
+      margin: 0 0 0.15rem;
+      font-size: var(--text-base);
+    }
+
+    .panel-header p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .plot { width: 100%; height: 100%; min-height: 440px; }
+
+    .note {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { min-height: 460px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+
+    <section class="grid">
+      <article class="panel">
+        <!-- <header class="panel-header">
+          <h2>Base geometry</h2>
+          <p>Cameras, image planes, point X, rays, and baseline.</p>
+        </header> -->
+        <div id="plot-basic" class="plot"></div>
+      </article>
+
+      <article class="panel">
+        <!-- <header class="panel-header">
+          <h2>Essential matrix view</h2>
+          <p>Includes <code>Rlr·Xr</code>, <code>[Tlr]_x Rlr·Xr</code>, and the explanatory note.</p>
+        </header> -->
+        <div id="plot-essential" class="plot"></div>
+      </article>
+    </section>
+
+    <section class="toolbar">
+      <div class="toolbar-left">
+        <div class="title-block">
+          <h1>Epipolar geometry</h1>
+          <!-- <p>Embeddable HTML/WebGL version of your matplotlib scene.</p> -->
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <div class="control">
+          <label for="viewSelect">Camera view</label>
+          <select id="viewSelect" aria-label="Camera view selector">
+            <option value="default">Matplotlib-like</option>
+            <option value="iso">Isometric</option>
+            <option value="top">Top</option>
+          </select>
+        </div>
+        <button class="btn" id="themeToggle" type="button" aria-label="Switch theme">Toggle theme</button>
+      </div>
+    </section>
+
+    <!-- <section class="note">
+      Drop this file into any site with an <code>&lt;iframe src="..."&gt;</code>. Plotly handles orbit, zoom, pan, and responsive resizing out of the box; basically matplotlib but with fewer screenshot rituals and more mouse smugness.
+    </section> -->
+  </main>
+
+  <script>
+    const LIM = 5;
+    const COLORS = {
+      left: '#2196F3',
+      right: '#E91E63',
+      point: '#4CAF50',
+      gray: '#7d7d7d'
+    };
+
+    const Ol = [0, 0, 0];
+    const Tlr = [3, 0, 1.5];
+    const Or = add(Ol, Tlr);
+    const theta = -20 * Math.PI / 180;
+    const Rlr = [
+      [Math.cos(theta), 0, Math.sin(theta)],
+      [0, 1, 0],
+      [-Math.sin(theta), 0, Math.cos(theta)]
+    ];
+    const X = [1, 1, 5];
+    const Xl = normalizeToZ1(sub(X, Ol));
+    let Xr = matVec(transpose(Rlr), sub(X, Or));
+    Xr = normalizeToZ1(Xr);
+    const Xr_w = matVec(Rlr, Xr);
+    const trx = matVec(hat(Tlr), Xr_w);
+
+    function add(a, b) { return a.map((v, i) => v + b[i]); }
+    function sub(a, b) { return a.map((v, i) => v - b[i]); }
+    function scale(v, s) { return v.map(x => x * s); }
+    function norm(v) { return Math.hypot(...v); }
+    function transpose(M) { return M[0].map((_, i) => M.map(row => row[i])); }
+    function matVec(M, v) { return M.map(row => row.reduce((acc, val, i) => acc + val * v[i], 0)); }
+    function normalizeToZ1(v) { return scale(v, 1 / v[2]); }
+    function hat(v) {
+      return [
+        [0, -v[2], v[1]],
+        [v[2], 0, -v[0]],
+        [-v[1], v[0], 0]
+      ];
+    }
+
+    function lineTrace(start, end, color, width = 3, dash = null, name = '', showLegend = false) {
+      return {
+        type: 'scatter3d',
+        mode: 'lines',
+        x: [start[0], end[0]], y: [start[1], end[1]], z: [start[2], end[2]],
+        line: { color, width, dash },
+        name,
+        showlegend: showLegend,
+        hoverinfo: 'skip'
+      };
+    }
+
+    function textTrace(point, text, color, size = 6) {
+      return {
+        type: 'scatter3d',
+        mode: 'markers+text',
+        x: [point[0]], y: [point[1]], z: [point[2]],
+        marker: { color, size },
+        text: [text],
+        textposition: 'top center',
+        textfont: { color, size: 12 },
+        showlegend: false,
+        hoverinfo: 'text'
+      };
+    }
+
+    function vectorTrace(start, vec, color, label, width = 5) {
+      const end = add(start, vec);
+      return [
+        lineTrace(start, end, color, width, null, label, false),
+        textTrace(end, label, color, 3)
+      ];
+    }
+
+    function planeTrace(origin, rotation, color, label) {
+      const w = 2, h = 2, z = 1;
+      const corners = [
+        [-w / 2, -h / 2, z],
+        [ w / 2, -h / 2, z],
+        [ w / 2,  h / 2, z],
+        [-w / 2,  h / 2, z],
+        [-w / 2, -h / 2, z]
+      ];
+      const rotated = corners.map(c => add(matVec(rotation, c), origin));
+      return {
+        type: 'scatter3d',
+        mode: 'lines',
+        x: rotated.map(p => p[0]),
+        y: rotated.map(p => p[1]),
+        z: rotated.map(p => p[2]),
+        line: { color, width: 3, dash: 'dash' },
+        name: label,
+        showlegend: false,
+        hoverinfo: 'text',
+        text: rotated.map(() => label)
+      };
+    }
+
+    function cameraEye(mode) {
+      if (mode === 'iso') return { x: 1.65, y: 1.35, z: 1.1 };
+      if (mode === 'top') return { x: 0.01, y: 0.01, z: 2.4 };
+      return { x: 0, y: -2.35, z: 0.01 };
+    }
+
+    function makeLayout(title, mode, annotationText = null) {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const css = getComputedStyle(document.documentElement);
+      const paper = css.getPropertyValue('--color-surface').trim();
+      const bg = css.getPropertyValue('--color-surface').trim();
+      const text = css.getPropertyValue('--color-text').trim();
+      const border = css.getPropertyValue('--color-border').trim();
+      const grid = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)';
+      return {
+        title: { text: title, font: { family: 'Satoshi, sans-serif', size: 20, color: text } },
+        margin: { l: 0, r: 0, b: 0, t: 40 },
+        paper_bgcolor: paper,
+        plot_bgcolor: bg,
+        showlegend: false,
+        scene: {
+          aspectmode: 'cube',
+          bgcolor: bg,
+          camera: { eye: cameraEye(mode) },
+          xaxis: { title: 'X', range: [-LIM, LIM], gridcolor: grid, zerolinecolor: border, color: text, backgroundcolor: bg },
+          yaxis: { title: 'Y', range: [-LIM, LIM], gridcolor: grid, zerolinecolor: border, color: text, backgroundcolor: bg },
+          zaxis: { title: 'Z', range: [-LIM, LIM], gridcolor: grid, zerolinecolor: border, color: text, backgroundcolor: bg }
+        },
+        annotations: annotationText ? [{
+          x: 0,
+          y: 0,
+          xref: 'paper',
+          yref: 'paper',
+          xanchor: 'left',
+          yanchor: 'bottom',
+          align: 'left',
+          showarrow: false,
+          text: annotationText.replace(/\n/g, '<br>'),
+          font: { family: 'Satoshi, sans-serif', size: 12, color: text },
+          bgcolor: isDark ? 'rgba(28,27,25,0.92)' : 'rgba(255,255,255,0.92)',
+          bordercolor: border,
+          borderpad: 10
+        }] : []
+      };
+    }
+
+    function buildBasicData() {
+      const traces = [];
+      traces.push(textTrace(Ol, 'Ol', COLORS.left));
+      traces.push(textTrace(Or, 'Or', COLORS.right));
+      traces.push(textTrace(X, 'X', COLORS.point));
+      traces.push(planeTrace(Ol, [[1,0,0],[0,1,0],[0,0,1]], COLORS.left, 'Left Image Plane'));
+      traces.push(planeTrace(Or, Rlr, COLORS.right, 'Right Image Plane'));
+      traces.push(...vectorTrace(Ol, Xl, COLORS.left, 'Xl', 6));
+      traces.push(...vectorTrace(Or, Xr_w, COLORS.right, 'Xr', 6));
+      traces.push(lineTrace(Ol, X, COLORS.left, 3));
+      traces.push(lineTrace(Or, X, COLORS.right, 3));
+      traces.push(lineTrace(Ol, Or, COLORS.gray, 3));
+      return traces;
+    }
+
+    function buildEssentialData() {
+      const traces = buildBasicData();
+      traces.push(...vectorTrace(Ol, Xr, COLORS.right, 'Xr', 4));
+      traces.push(...vectorTrace(Ol, Xr_w, COLORS.right, 'Rlr·Xr', 6));
+      traces.push(...vectorTrace(Ol, trx, COLORS.point, 'E·Xr', 6));
+      traces.push(...vectorTrace(Ol, scale(Tlr, 1 / norm(Tlr)), COLORS.gray, 'Tlr', 4));
+      traces.push(planeTrace(Ol, Rlr, COLORS.right, 'Right Plane at Origin'));
+      return traces;
+    }
+
+    function render() {
+      const mode = document.getElementById('viewSelect').value;
+      // const title = 'Epipolar geometry';
+      const title = '';
+      Plotly.react('plot-basic', buildBasicData(), makeLayout(title, mode), {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['toImage'],
+        scrollZoom: true
+      });
+
+      // const explanation = 'The epipolar constraint says that the three vectors Xl, Tlr, Xr_l should lie on the same plane. This is equivalent to saying that the cross product of Tlr and Xr_l should be perpendicular to Xl.';
+      const explanation = '';
+      const title2 = '';
+      Plotly.react('plot-essential', buildEssentialData(), makeLayout(title2, mode, explanation), {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['toImage'],
+        scrollZoom: true
+      });
+    }
+
+    document.getElementById('viewSelect').addEventListener('change', render);
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      render();
+    });
+
+    window.addEventListener('resize', render);
+    render();
+  </script>
+</body>
+</html>
