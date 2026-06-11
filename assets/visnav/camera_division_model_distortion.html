@@ -1,0 +1,173 @@
+
+<h2 class="sr-only">Interactive camera lens distortion visualizer using the division model. Adjust k to control barrel or pincushion distortion, and cell size to control the grid density.</h2>
+
+<style>
+  body {
+    background-color: #1f1f1e;
+    color: #EEE;
+  }
+
+  input[type="range"] {
+    appearance: none;
+    border-radius: 5px;
+    height: 4px;
+    background-color: #09F;
+  }
+</style>
+
+<div style="display: flex; gap: 16px; margin-bottom: 1rem; align-items: flex-end; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 180px;">
+    <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 6px;">distortion k</label>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 12px; color: var(--color-text-tertiary); width: 32px;">−1.5</span>
+      <input type="range" id="kSlider" min="-1.5" max="1.5" step="0.01" value="0"
+             style="flex: 1;" oninput="update()">
+      <span style="font-size: 12px; color: var(--color-text-tertiary); width: 24px; text-align: right;">1.5</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+      <span id="kVal" style="font-size: 15px; font-weight: 500; min-width: 44px;">k = 0.00</span>
+      <span id="kLabel" style="font-size: 12px; color: var(--color-text-secondary);"></span>
+    </div>
+  </div>
+  <div style="flex: 1; min-width: 180px;">
+    <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 6px;">cell size</label>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 12px; color: var(--color-text-tertiary); width: 32px;">2</span>
+      <input type="range" id="cellSlider" min="2" max="12" step="1" value="6"
+             style="flex: 1;" oninput="update()">
+      <span style="font-size: 12px; color: var(--color-text-tertiary); width: 24px; text-align: right;">12</span>
+    </div>
+    <div style="margin-top: 4px;">
+      <span id="cellVal" style="font-size: 15px; font-weight: 500;">6 cells</span>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+  <div>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px; text-align: center;">input (undistorted)</p>
+    <canvas id="srcCanvas" style="width: 100%; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); display: block;"></canvas>
+  </div>
+  <div>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px; text-align: center;">distorted (division model)</p>
+    <canvas id="dstCanvas" style="width: 100%; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); display: block;"></canvas>
+  </div>
+</div>
+
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const BG    = isDark ? '#1a1a18' : '#f8f7f4';
+const LINE  = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)';
+const CROSS = isDark ? '#6ab4f5' : '#185FA5';
+const LINEW = 1;
+
+function setupCanvas(canvas) {
+  const parent = canvas.parentElement;
+  const W = parent.clientWidth - 2;
+  const SIZE = W;
+  canvas.width  = SIZE;
+  canvas.height = SIZE;
+  return SIZE;
+}
+
+function drawGrid(ctx, SIZE, cells) {
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, SIZE, SIZE);
+  ctx.strokeStyle = LINE;
+  ctx.lineWidth = LINEW;
+  const step = SIZE / cells;
+  for (let i = 0; i <= cells; i++) {
+    const p = i * step;
+    ctx.beginPath(); ctx.moveTo(p, 0);    ctx.lineTo(p, SIZE); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, p);    ctx.lineTo(SIZE, 0 + p); ctx.stroke();
+  }
+  ctx.strokeStyle = CROSS;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(SIZE/2, 0); ctx.lineTo(SIZE/2, SIZE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, SIZE/2); ctx.lineTo(SIZE, SIZE/2); ctx.stroke();
+  ctx.fillStyle = CROSS;
+  ctx.beginPath(); ctx.arc(SIZE/2, SIZE/2, 3, 0, Math.PI*2); ctx.fill();
+}
+
+function distortPoint(xd, yd, k) {
+  const r2 = xd * xd + yd * yd;
+  const denom = 1 + k * r2;
+  if (Math.abs(denom) < 1e-9) return null;
+  return { x: xd / denom, y: yd / denom };
+}
+
+function drawDistorted(ctx, SIZE, cells, k) {
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, SIZE, SIZE);
+
+  const scale = SIZE * 0.5;
+  const cx = SIZE / 2, cy = SIZE / 2;
+  const N = 80;
+  const step = 1.0 / cells;
+
+  function toCanvas(nx, ny) {
+    return { x: cx + nx * scale, y: cy + ny * scale };
+  }
+
+  function drawPolyline(pts, color, lw) {
+    if (pts.length < 2) return;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    const p0 = toCanvas(pts[0].x, pts[0].y);
+    ctx.moveTo(p0.x, p0.y);
+    for (let i = 1; i < pts.length; i++) {
+      const p = toCanvas(pts[i].x, pts[i].y);
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+  }
+
+  for (let gi = 0; gi <= cells; gi++) {
+    const nd = gi * step - 0.5;
+
+    const colPts = [];
+    for (let t = 0; t <= N; t++) {
+      const xd = nd;
+      const yd = (t / N) - 0.5;
+      const u = distortPoint(xd, yd, k);
+      if (u) colPts.push(u);
+    }
+    const isCenter = gi === cells / 2;
+    drawPolyline(colPts, isCenter ? CROSS : LINE, isCenter ? 1 : LINEW);
+
+    const rowPts = [];
+    for (let t = 0; t <= N; t++) {
+      const xd = (t / N) - 0.5;
+      const yd = nd;
+      const u = distortPoint(xd, yd, k);
+      if (u) rowPts.push(u);
+    }
+    drawPolyline(rowPts, isCenter ? CROSS : LINE, isCenter ? 1 : LINEW);
+  }
+
+  ctx.fillStyle = CROSS;
+  const c = distortPoint(0, 0, k);
+  if (c) { const cp = toCanvas(c.x, c.y); ctx.beginPath(); ctx.arc(cp.x, cp.y, 3, 0, Math.PI*2); ctx.fill(); }
+}
+
+function update() {
+  const k    = parseFloat(document.getElementById('kSlider').value);
+  const cells = parseInt(document.getElementById('cellSlider').value);
+
+  document.getElementById('kVal').textContent   = 'k = ' + k.toFixed(2);
+  document.getElementById('cellVal').textContent = cells + ' cells';
+  const lbl = k < -0.01 ? '→ barrel' : k > 0.01 ? '→ pincushion' : '';
+  document.getElementById('kLabel').textContent = lbl;
+
+  const src = document.getElementById('srcCanvas');
+  const dst = document.getElementById('dstCanvas');
+  const S1 = setupCanvas(src);
+  const S2 = setupCanvas(dst);
+  drawGrid(src.getContext('2d'), S1, cells);
+  drawDistorted(dst.getContext('2d'), S2, cells, k);
+}
+
+window.addEventListener('load', update);
+window.addEventListener('resize', update);
+</script>
