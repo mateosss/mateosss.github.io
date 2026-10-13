@@ -1,0 +1,547 @@
+<<<<<<< Updated upstream
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gimbal Lock</title>
+  <link rel="stylesheet" href="common.css" />
+  <script src="common.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    :root { --c-yaw: #1e88e5; --c-pitch: #43a047; --c-roll: #e53935; }
+    .angle label { min-width: 4.2em; font-weight: 600; }
+    .angle span { width: 3.4em; text-align: right; font-family: ui-monospace, Menlo, monospace; }
+    .meter { height: 10px; border-radius: 99px; background: #e4e1da; overflow: hidden; flex: 1; }
+    .meter > div { height: 100%; background: var(--color-primary); transition: width 80ms; }
+    .lock { font-weight: 700; color: #c62828; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="view" id="view">
+      <div class="hint">Drag to orbit · scroll to zoom · R = Rz(yaw) · Ry(pitch) · Rx(roll)</div>
+    </section>
+
+    <aside class="side">
+      <h1>Euler angles &amp; gimbal lock</h1>
+
+      <div class="row angle"><label style="color: var(--c-yaw)">yaw ψ</label><input type="range" id="yaw" min="-180" max="180" step="0.5" value="20" /><span id="yawv"></span><button class="btn" data-wiggle="yaw" title="Wiggle yaw">~</button></div>
+      <div class="row angle"><label style="color: var(--c-pitch)">pitch θ</label><input type="range" id="pitch" min="-90" max="90" step="0.5" value="25" /><span id="pitchv"></span><button class="btn" data-wiggle="pitch" title="Wiggle pitch">~</button></div>
+      <div class="row angle"><label style="color: var(--c-roll)">roll φ</label><input type="range" id="roll" min="-180" max="180" step="0.5" value="0" /><span id="rollv"></span><button class="btn" data-wiggle="roll" title="Wiggle roll">~</button></div>
+
+      <div class="row">
+        <button class="btn primary" id="tour">▶ Guided tour</button>
+        <button class="btn" id="slerp">Euler vs SLERP</button>
+      </div>
+
+      <p class="explain" id="explain"></p>
+
+      <h2>Rotation axes of the gimbals (world frame)</h2>
+      <div class="row">|det [a<sub>ψ</sub> a<sub>θ</sub> a<sub>φ</sub>]| = |cos θ|</div>
+      <div class="row"><div class="meter"><div id="meter"></div></div><span id="detv" style="width: 3.4em; text-align: right"></span></div>
+      <div id="dof"></div>
+
+      <details>
+        <summary>Why does this matter?</summary>
+        <p class="explain">
+          The angular velocity is ω = ψ̇ a<sub>ψ</sub> + θ̇ a<sub>θ</sub> + φ̇ a<sub>φ</sub>. When θ = ±90° the yaw and roll axes coincide,
+          so the map from angle rates to ω has rank 2: one direction of rotation (dashed arrow) cannot be produced by any
+          small change of the angles. In optimisation this shows up as a singular Jacobian. Any 3-parameter representation of
+          SO(3) has such singularities somewhere.
+        </p>
+      </details>
+    </aside>
+  </main>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const COL = { yaw: 0x1e88e5, pitch: 0x43a047, roll: 0xe53935 };
+    const css = (c) => '#' + c.toString(16).padStart(6, '0');
+    const D2R = Math.PI / 180;
+
+    const view = document.getElementById('view');
+    const { scene, render } = Viz.setup(THREE, OrbitControls, CSS2DRenderer, view, { eye: [9, -9, 5.5], target: [0, 0, 0.2] });
+
+    // --- Gimbal: nested groups yaw ⊃ pitch ⊃ roll ⊃ airplane ---------------------
+    const yawG = new THREE.Group(), pitchG = new THREE.Group(), rollG = new THREE.Group();
+    scene.add(yawG); yawG.add(pitchG); pitchG.add(rollG);
+
+    const ringMat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.2 });
+    function ring(radius, color) { return new THREE.Mesh(new THREE.TorusGeometry(radius, 0.07, 16, 96), ringMat(color)); }
+    function rod(from, to, color) {
+      const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, a.distanceTo(b), 12), ringMat(color));
+      m.position.copy(a).add(b).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+      return m;
+    }
+    const R_YAW = 3.0, R_PITCH = 2.55, R_ROLL = 2.1;
+    // Yaw ring spins about world z (lies in the xy plane)
+    yawG.add(ring(R_YAW, COL.yaw));
+    scene.add(rod([0, 0, -3.6], [0, 0, -R_YAW], 0x888888));
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.2, 32), ringMat(0x999999));
+    base.rotation.x = Math.PI / 2; base.position.z = -3.7; scene.add(base);
+    // Pitch ring spins about y (lies in the xz plane), pinned to the yaw ring at ±y
+    const pr = ring(R_PITCH, COL.pitch); pr.rotation.x = Math.PI / 2; pitchG.add(pr);
+    pitchG.add(rod([0, R_PITCH, 0], [0, R_YAW, 0], COL.pitch), rod([0, -R_PITCH, 0], [0, -R_YAW, 0], COL.pitch));
+    // Roll ring spins about x (lies in the yz plane), pinned to the pitch ring at ±x
+    const rr = ring(R_ROLL, COL.roll); rr.rotation.y = Math.PI / 2; rollG.add(rr);
+    rollG.add(rod([R_ROLL, 0, 0], [R_PITCH, 0, 0], COL.roll), rod([-R_ROLL, 0, 0], [-R_PITCH, 0, 0], COL.roll));
+
+    function airplane(color, opacity = 1) {
+      const g = new THREE.Group();
+      const m = new THREE.MeshStandardMaterial({ color, transparent: opacity < 1, opacity, roughness: 0.5 });
+      const accent = new THREE.MeshStandardMaterial({ color: 0xe8710a, transparent: opacity < 1, opacity });
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.12, 2.4, 20), m);
+      body.rotation.z = -Math.PI / 2; g.add(body);
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.45, 20), accent);
+      nose.rotation.z = -Math.PI / 2; nose.position.x = 1.42; g.add(nose);
+      const wing = new THREE.Mesh(new THREE.BoxGeometry(0.55, 2.6, 0.05), m);
+      wing.position.x = 0.15; g.add(wing);
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.9, 0.04), m);
+      tail.position.x = -1.05; g.add(tail);
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.5), accent);
+      fin.position.set(-1.05, 0, 0.27); g.add(fin);
+      return g;
+    }
+    const plane = airplane(0xdddddd);
+    rollG.add(plane);
+    const ghost = airplane(0x9c27b0, 0.35);
+    ghost.visible = false;
+    scene.add(ghost);
+
+    // Gimbal rotation axes in world coordinates
+    const axYaw = Viz.arrow(THREE, [0, 0, 0], [0, 0, 1], 4, COL.yaw, 0.3, 0.16);
+    const axPitch = Viz.arrow(THREE, [0, 0, 0], [0, 1, 0], 4, COL.pitch, 0.3, 0.16);
+    const axRoll = Viz.arrow(THREE, [0, 0, 0], [1, 0, 0], 4, COL.roll, 0.3, 0.16);
+    axYaw.add(Viz.label(THREE, CSS2DObject, 'a_ψ', css(COL.yaw), [0, 4.25, 0]));
+    axPitch.add(Viz.label(THREE, CSS2DObject, 'a_θ', css(COL.pitch), [0, 4.25, 0]));
+    axRoll.add(Viz.label(THREE, CSS2DObject, 'a_φ', css(COL.roll), [0, 4.25, 0]));
+    scene.add(axYaw, axPitch, axRoll);
+    // Direction that cannot be reached when locked: normal of the plane spanned by the yaw and pitch axes
+    const blocked = Viz.polyline(THREE, 0x000000, 2, { dashed: true });
+    const blockedLabel = Viz.label(THREE, CSS2DObject, 'blocked', '#c62828');
+    scene.add(blocked, blockedLabel);
+
+    // Trails for the Euler vs SLERP comparison
+    const trailEuler = Viz.polyline(THREE, 0x555555, 200);
+    const trailSlerp = Viz.polyline(THREE, 0x9c27b0, 200);
+    scene.add(trailEuler, trailSlerp);
+
+    // --- State ----------------------------------------------------------------
+    const ang = { yaw: 20, pitch: 25, roll: 0 };
+    const offset = { yaw: 0, pitch: 0, roll: 0 }; // temporary wiggle offsets
+    const inputs = {};
+    for (const k of ['yaw', 'pitch', 'roll']) {
+      inputs[k] = document.getElementById(k);
+      inputs[k].addEventListener('input', () => { stopAnim(); ang[k] = parseFloat(inputs[k].value); });
+    }
+    const explain = document.getElementById('explain');
+    const DEFAULT_TEXT = 'Move the sliders, or press ~ to wiggle one angle. Bring pitch to ±90° and wiggle yaw and roll: they produce the <b>same</b> motion.';
+    explain.innerHTML = DEFAULT_TEXT;
+
+    function eulerQuat(y, p, r) {
+      return new THREE.Quaternion().setFromEuler(new THREE.Euler(r * D2R, p * D2R, y * D2R, 'ZYX'));
+    }
+
+    function apply() {
+      const y = ang.yaw + offset.yaw, p = ang.pitch + offset.pitch, r = ang.roll + offset.roll;
+      yawG.rotation.set(0, 0, y * D2R);
+      pitchG.rotation.set(0, p * D2R, 0);
+      rollG.rotation.set(r * D2R, 0, 0);
+      for (const k of ['yaw', 'pitch', 'roll']) {
+        inputs[k].value = ang[k];
+        document.getElementById(k + 'v').textContent = (ang[k] + offset[k]).toFixed(0) + '°';
+      }
+      scene.updateMatrixWorld();
+      const aY = new THREE.Vector3(0, 0, 1);
+      const aP = new THREE.Vector3(0, 1, 0).applyQuaternion(yawG.quaternion);
+      const aR = new THREE.Vector3(1, 0, 0).applyQuaternion(pitchG.getWorldQuaternion(new THREE.Quaternion()));
+      axYaw.setDirection(aY); axPitch.setDirection(aP); axRoll.setDirection(aR);
+      const det = Math.abs(new THREE.Matrix3().set(aY.x, aP.x, aR.x, aY.y, aP.y, aR.y, aY.z, aP.z, aR.z).determinant());
+      document.getElementById('meter').style.width = (100 * det).toFixed(1) + '%';
+      document.getElementById('detv').textContent = det.toFixed(2);
+      const locked = det < 0.02;
+      document.getElementById('dof').innerHTML = locked
+        ? '<span class="lock">GIMBAL LOCK: yaw and roll axes are aligned, only 2 DoF left!</span>'
+        : det < 0.25 ? 'Close to the singularity: small rotations need huge angle changes.' : 'Three independent axes: 3 DoF.';
+      const n = new THREE.Vector3().crossVectors(aY, aP).normalize().multiplyScalar(4.2);
+      blocked.setPoints([[0, 0, 0], n.toArray()]);
+      blocked.material.opacity = Math.max(0, 1 - det / 0.3);
+      blocked.material.transparent = true;
+      blocked.visible = det < 0.3;
+      blockedLabel.position.copy(n.clone().multiplyScalar(1.07));
+      blockedLabel.visible = det < 0.3;
+    }
+
+    // --- Animations -------------------------------------------------------------
+    let anim = null; // {start, fn(elapsed) -> bool continue}
+    function startAnim(fn) { anim = { start: performance.now(), fn }; }
+    function stopAnim() {
+      anim = null;
+      for (const k in offset) offset[k] = 0;
+      ghost.visible = false;
+      trailEuler.setPoints([]); trailSlerp.setPoints([]);
+      document.getElementById('tour').textContent = '▶ Guided tour';
+    }
+
+    function wiggle(k, dur = 1.6) {
+      return (t) => {
+        offset[k] = t < dur ? 25 * Math.sin((2 * Math.PI * t) / (dur / 2)) * Math.sin((Math.PI * t) / dur) : 0;
+        return t < dur;
+      };
+    }
+    document.querySelectorAll('[data-wiggle]').forEach((b) => b.addEventListener('click', () => { stopAnim(); startAnim(wiggle(b.dataset.wiggle)); }));
+
+    const ease = (x) => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
+    // Guided tour: a list of [duration, text, fn(progress)] steps
+    function tour() {
+      const steps = [
+        [2.0, 'Start in a generic orientation: the three gimbal axes are independent.', (s) => { ang.yaw = 20; ang.pitch = 25 * (1 - s) + 10 * s; ang.roll = 0; }],
+        [1.6, 'Wiggle <b style="color:#1e88e5">yaw</b>: rotates about the vertical axis.', (s, t) => wiggle('yaw')(t)],
+        [1.6, 'Wiggle <b style="color:#e53935">roll</b>: rotates about the nose: a different motion.', (s, t) => wiggle('roll')(t)],
+        [2.5, 'Now pitch the nose up to θ = 90°… watch the red ring fall into the plane of the blue ring.', (s) => { ang.pitch = 10 + 80 * ease(s); }],
+        [1.6, 'Wiggle <b style="color:#1e88e5">yaw</b> at θ = 90°…', (s, t) => wiggle('yaw')(t)],
+        [1.6, '…and <b style="color:#e53935">roll</b>: the <b>same</b> motion! One degree of freedom is lost: gimbal lock.', (s, t) => wiggle('roll')(t)],
+        [3.0, 'Rotating about the dashed axis is impossible with small angle changes. Any 3-parameter representation of SO(3) has such singularities.', () => {}],
+      ];
+      let i = 0, t0 = 0;
+      document.getElementById('tour').textContent = '■ Stop';
+      return (t) => {
+        while (i < steps.length && t - t0 > steps[i][0]) { steps[i][2](1, steps[i][0]); for (const k in offset) offset[k] = 0; t0 += steps[i][0]; i++; }
+        if (i >= steps.length) { document.getElementById('tour').textContent = '▶ Guided tour'; return false; }
+        explain.innerHTML = `<b>${i + 1}/${steps.length}</b> ` + steps[i][1];
+        steps[i][2]((t - t0) / steps[i][0], t - t0);
+        return true;
+      };
+    }
+    document.getElementById('tour').addEventListener('click', () => {
+      if (anim) { stopAnim(); explain.innerHTML = DEFAULT_TEXT; return; }
+      startAnim(tour());
+    });
+
+    // Euler vs SLERP: two orientations only ~9° apart but far apart in Euler angles
+    document.getElementById('slerp').addEventListener('click', () => {
+      stopAnim();
+      const A = { yaw: -60, pitch: 85, roll: -60 }, B = { yaw: 60, pitch: 85, roll: 60 };
+      const qA = eulerQuat(A.yaw, A.pitch, A.roll), qB = eulerQuat(B.yaw, B.pitch, B.roll);
+      const angle = (2 * Math.acos(Math.min(1, Math.abs(qA.dot(qB))))) / D2R;
+      explain.innerHTML = `From (ψ,θ,φ) = (−60°, 85°, −60°) to (60°, 85°, 60°): the two orientations differ by only <b>${angle.toFixed(1)}°</b>. `
+        + 'Linear interpolation of the Euler angles (grey trail) takes a long detour, while SLERP on quaternions (purple ghost) takes the shortest path.';
+      const nose = new THREE.Vector3(1.7, 0, 0);
+      const ptsE = [], ptsS = [];
+      for (let i = 0; i <= 100; i++) {
+        const s = i / 100;
+        ptsE.push(nose.clone().applyQuaternion(eulerQuat(A.yaw + 120 * s, 85, A.roll + 120 * s)).toArray());
+        ptsS.push(nose.clone().applyQuaternion(qA.clone().slerp(qB, s)).toArray());
+      }
+      const dur = 4;
+      startAnim((t) => {
+        const s = ease(((t % (dur + 1)) / dur));
+        ang.yaw = A.yaw + 120 * s; ang.pitch = 85; ang.roll = A.roll + 120 * s;
+        ghost.visible = true;
+        ghost.quaternion.copy(qA.clone().slerp(qB, s));
+        trailEuler.setPoints(ptsE.slice(0, Math.round(s * 100) + 1));
+        trailSlerp.setPoints(ptsS.slice(0, Math.round(s * 100) + 1));
+        return t < 3 * (dur + 1);
+      });
+    });
+
+    function loop(now) {
+      if (anim && !anim.fn((now - anim.start) / 1000)) {
+        anim = null;
+        for (const k in offset) offset[k] = 0;
+      }
+      apply();
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
+||||||| Stash base
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gimbal Lock</title>
+  <link rel="stylesheet" href="common.css" />
+  <script src="common.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    :root { --c-yaw: #1e88e5; --c-pitch: #43a047; --c-roll: #e53935; }
+    .angle label { min-width: 4.2em; font-weight: 600; }
+    .angle span { width: 3.4em; text-align: right; font-family: ui-monospace, Menlo, monospace; }
+    .meter { height: 10px; border-radius: 99px; background: #e4e1da; overflow: hidden; flex: 1; }
+    .meter > div { height: 100%; background: var(--color-primary); transition: width 80ms; }
+    .lock { font-weight: 700; color: #c62828; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="view" id="view">
+      <div class="hint">Drag to orbit · scroll to zoom · R = Rz(yaw) · Ry(pitch) · Rx(roll)</div>
+    </section>
+
+    <aside class="side">
+      <h1>Euler angles &amp; gimbal lock</h1>
+
+      <div class="row angle"><label style="color: var(--c-yaw)">yaw ψ</label><input type="range" id="yaw" min="-180" max="180" step="0.5" value="20" /><span id="yawv"></span><button class="btn" data-wiggle="yaw" title="Wiggle yaw">~</button></div>
+      <div class="row angle"><label style="color: var(--c-pitch)">pitch θ</label><input type="range" id="pitch" min="-90" max="90" step="0.5" value="25" /><span id="pitchv"></span><button class="btn" data-wiggle="pitch" title="Wiggle pitch">~</button></div>
+      <div class="row angle"><label style="color: var(--c-roll)">roll φ</label><input type="range" id="roll" min="-180" max="180" step="0.5" value="0" /><span id="rollv"></span><button class="btn" data-wiggle="roll" title="Wiggle roll">~</button></div>
+
+      <div class="row">
+        <button class="btn primary" id="tour">▶ Guided tour</button>
+        <button class="btn" id="slerp">Euler vs SLERP</button>
+      </div>
+
+      <p class="explain" id="explain"></p>
+
+      <h2>Rotation axes of the gimbals (world frame)</h2>
+      <div class="row">|det [a<sub>ψ</sub> a<sub>θ</sub> a<sub>φ</sub>]| = |cos θ|</div>
+      <div class="row"><div class="meter"><div id="meter"></div></div><span id="detv" style="width: 3.4em; text-align: right"></span></div>
+      <div id="dof"></div>
+
+      <details>
+        <summary>Why does this matter?</summary>
+        <p class="explain">
+          The angular velocity is ω = ψ̇ a<sub>ψ</sub> + θ̇ a<sub>θ</sub> + φ̇ a<sub>φ</sub>. When θ = ±90° the yaw and roll axes coincide,
+          so the map from angle rates to ω has rank 2: one direction of rotation (dashed arrow) cannot be produced by any
+          small change of the angles. In optimisation this shows up as a singular Jacobian.
+        </p>
+      </details>
+    </aside>
+  </main>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const COL = { yaw: 0x1e88e5, pitch: 0x43a047, roll: 0xe53935 };
+    const css = (c) => '#' + c.toString(16).padStart(6, '0');
+    const D2R = Math.PI / 180;
+
+    const view = document.getElementById('view');
+    const { scene, render } = Viz.setup(THREE, OrbitControls, CSS2DRenderer, view, { eye: [9, -9, 5.5], target: [0, 0, 0.2] });
+
+    // --- Gimbal: nested groups yaw ⊃ pitch ⊃ roll ⊃ airplane ---------------------
+    const yawG = new THREE.Group(), pitchG = new THREE.Group(), rollG = new THREE.Group();
+    scene.add(yawG); yawG.add(pitchG); pitchG.add(rollG);
+
+    const ringMat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.4, metalness: 0.2 });
+    function ring(radius, color) { return new THREE.Mesh(new THREE.TorusGeometry(radius, 0.07, 16, 96), ringMat(color)); }
+    function rod(from, to, color) {
+      const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, a.distanceTo(b), 12), ringMat(color));
+      m.position.copy(a).add(b).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+      return m;
+    }
+    const R_YAW = 3.0, R_PITCH = 2.55, R_ROLL = 2.1;
+    // Yaw ring spins about world z (lies in the xy plane)
+    yawG.add(ring(R_YAW, COL.yaw));
+    scene.add(rod([0, 0, -3.6], [0, 0, -R_YAW], 0x888888));
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.2, 32), ringMat(0x999999));
+    base.rotation.x = Math.PI / 2; base.position.z = -3.7; scene.add(base);
+    // Pitch ring spins about y (lies in the xz plane), pinned to the yaw ring at ±y
+    const pr = ring(R_PITCH, COL.pitch); pr.rotation.x = Math.PI / 2; pitchG.add(pr);
+    pitchG.add(rod([0, R_PITCH, 0], [0, R_YAW, 0], COL.pitch), rod([0, -R_PITCH, 0], [0, -R_YAW, 0], COL.pitch));
+    // Roll ring spins about x (lies in the yz plane), pinned to the pitch ring at ±x
+    const rr = ring(R_ROLL, COL.roll); rr.rotation.y = Math.PI / 2; rollG.add(rr);
+    rollG.add(rod([R_ROLL, 0, 0], [R_PITCH, 0, 0], COL.roll), rod([-R_ROLL, 0, 0], [-R_PITCH, 0, 0], COL.roll));
+
+    function airplane(color, opacity = 1) {
+      const g = new THREE.Group();
+      const m = new THREE.MeshStandardMaterial({ color, transparent: opacity < 1, opacity, roughness: 0.5 });
+      const accent = new THREE.MeshStandardMaterial({ color: 0xe8710a, transparent: opacity < 1, opacity });
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.12, 2.4, 20), m);
+      body.rotation.z = -Math.PI / 2; g.add(body);
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.45, 20), accent);
+      nose.rotation.z = -Math.PI / 2; nose.position.x = 1.42; g.add(nose);
+      const wing = new THREE.Mesh(new THREE.BoxGeometry(0.55, 2.6, 0.05), m);
+      wing.position.x = 0.15; g.add(wing);
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.9, 0.04), m);
+      tail.position.x = -1.05; g.add(tail);
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.5), accent);
+      fin.position.set(-1.05, 0, 0.27); g.add(fin);
+      return g;
+    }
+    const plane = airplane(0xdddddd);
+    rollG.add(plane);
+    const ghost = airplane(0x9c27b0, 0.35);
+    ghost.visible = false;
+    scene.add(ghost);
+
+    // Gimbal rotation axes in world coordinates
+    const axYaw = Viz.arrow(THREE, [0, 0, 0], [0, 0, 1], 4, COL.yaw, 0.3, 0.16);
+    const axPitch = Viz.arrow(THREE, [0, 0, 0], [0, 1, 0], 4, COL.pitch, 0.3, 0.16);
+    const axRoll = Viz.arrow(THREE, [0, 0, 0], [1, 0, 0], 4, COL.roll, 0.3, 0.16);
+    axYaw.add(Viz.label(THREE, CSS2DObject, 'a_ψ', css(COL.yaw), [0, 4.25, 0]));
+    axPitch.add(Viz.label(THREE, CSS2DObject, 'a_θ', css(COL.pitch), [0, 4.25, 0]));
+    axRoll.add(Viz.label(THREE, CSS2DObject, 'a_φ', css(COL.roll), [0, 4.25, 0]));
+    scene.add(axYaw, axPitch, axRoll);
+    // Direction that cannot be reached when locked: normal of the plane spanned by the yaw and pitch axes
+    const blocked = Viz.polyline(THREE, 0x000000, 2, { dashed: true });
+    const blockedLabel = Viz.label(THREE, CSS2DObject, 'blocked', '#c62828');
+    scene.add(blocked, blockedLabel);
+
+    // Trails for the Euler vs SLERP comparison
+    const trailEuler = Viz.polyline(THREE, 0x555555, 200);
+    const trailSlerp = Viz.polyline(THREE, 0x9c27b0, 200);
+    scene.add(trailEuler, trailSlerp);
+
+    // --- State ----------------------------------------------------------------
+    const ang = { yaw: 20, pitch: 25, roll: 0 };
+    const offset = { yaw: 0, pitch: 0, roll: 0 }; // temporary wiggle offsets
+    const inputs = {};
+    for (const k of ['yaw', 'pitch', 'roll']) {
+      inputs[k] = document.getElementById(k);
+      inputs[k].addEventListener('input', () => { stopAnim(); ang[k] = parseFloat(inputs[k].value); });
+    }
+    const explain = document.getElementById('explain');
+    const DEFAULT_TEXT = 'Move the sliders, or press ~ to wiggle one angle. Bring pitch to ±90° and wiggle yaw and roll: they produce the <b>same</b> motion.';
+    explain.innerHTML = DEFAULT_TEXT;
+
+    function eulerQuat(y, p, r) {
+      return new THREE.Quaternion().setFromEuler(new THREE.Euler(r * D2R, p * D2R, y * D2R, 'ZYX'));
+    }
+
+    function apply() {
+      const y = ang.yaw + offset.yaw, p = ang.pitch + offset.pitch, r = ang.roll + offset.roll;
+      yawG.rotation.set(0, 0, y * D2R);
+      pitchG.rotation.set(0, p * D2R, 0);
+      rollG.rotation.set(r * D2R, 0, 0);
+      for (const k of ['yaw', 'pitch', 'roll']) {
+        inputs[k].value = ang[k];
+        document.getElementById(k + 'v').textContent = (ang[k] + offset[k]).toFixed(0) + '°';
+      }
+      scene.updateMatrixWorld();
+      const aY = new THREE.Vector3(0, 0, 1);
+      const aP = new THREE.Vector3(0, 1, 0).applyQuaternion(yawG.quaternion);
+      const aR = new THREE.Vector3(1, 0, 0).applyQuaternion(pitchG.getWorldQuaternion(new THREE.Quaternion()));
+      axYaw.setDirection(aY); axPitch.setDirection(aP); axRoll.setDirection(aR);
+      const det = Math.abs(new THREE.Matrix3().set(aY.x, aP.x, aR.x, aY.y, aP.y, aR.y, aY.z, aP.z, aR.z).determinant());
+      document.getElementById('meter').style.width = (100 * det).toFixed(1) + '%';
+      document.getElementById('detv').textContent = det.toFixed(2);
+      const locked = det < 0.02;
+      document.getElementById('dof').innerHTML = locked
+        ? '<span class="lock">GIMBAL LOCK: yaw and roll axes are aligned, only 2 DoF left!</span>'
+        : det < 0.25 ? 'Close to the singularity: small rotations need huge angle changes.' : 'Three independent axes: 3 DoF.';
+      const n = new THREE.Vector3().crossVectors(aY, aP).normalize().multiplyScalar(4.2);
+      blocked.setPoints([[0, 0, 0], n.toArray()]);
+      blocked.material.opacity = Math.max(0, 1 - det / 0.3);
+      blocked.material.transparent = true;
+      blocked.visible = det < 0.3;
+      blockedLabel.position.copy(n.clone().multiplyScalar(1.07));
+      blockedLabel.visible = det < 0.3;
+    }
+
+    // --- Animations -------------------------------------------------------------
+    let anim = null; // {start, fn(elapsed) -> bool continue}
+    function startAnim(fn) { anim = { start: performance.now(), fn }; }
+    function stopAnim() {
+      anim = null;
+      for (const k in offset) offset[k] = 0;
+      ghost.visible = false;
+      trailEuler.setPoints([]); trailSlerp.setPoints([]);
+      document.getElementById('tour').textContent = '▶ Guided tour';
+    }
+
+    function wiggle(k, dur = 1.6) {
+      return (t) => {
+        offset[k] = t < dur ? 25 * Math.sin((2 * Math.PI * t) / (dur / 2)) * Math.sin((Math.PI * t) / dur) : 0;
+        return t < dur;
+      };
+    }
+    document.querySelectorAll('[data-wiggle]').forEach((b) => b.addEventListener('click', () => { stopAnim(); startAnim(wiggle(b.dataset.wiggle)); }));
+
+    const ease = (x) => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
+    // Guided tour: a list of [duration, text, fn(progress)] steps
+    function tour() {
+      const steps = [
+        [3.0, 'Start in a generic orientation: the three gimbal axes are independent.', (s) => { ang.yaw = 20; ang.pitch = 25 * (1 - s) + 10 * s; ang.roll = 0; }],
+        [1.6, 'Wiggle <b style="color:#1e88e5">yaw</b>: rotates about the vertical axis.', (s, t) => wiggle('yaw')(t)],
+        [1.6, 'Wiggle <b style="color:#e53935">roll</b>: rotates about the nose: a different motion.', (s, t) => wiggle('roll')(t)],
+        [5.0, 'Now pitch the nose up to θ = 90°… watch the red ring fall into the plane of the blue ring.', (s) => { ang.pitch = 10 + 80 * ease(s); }],
+        [1.6, 'Wiggle <b style="color:#1e88e5">yaw</b> at θ = 90°…', (s, t) => wiggle('yaw')(t)],
+        [1.6, '…and <b style="color:#e53935">roll</b>: the <b>same</b> motion! One degree of freedom is lost: gimbal lock.', (s, t) => wiggle('roll')(t)],
+        [5.0, 'Rotating about the dashed axis is impossible with small angle changes.', () => {}],
+      ];
+      let i = 0, t0 = 0;
+      document.getElementById('tour').textContent = '■ Stop';
+      return (t) => {
+        while (i < steps.length && t - t0 > steps[i][0]) { steps[i][2](1, steps[i][0]); for (const k in offset) offset[k] = 0; t0 += steps[i][0]; i++; }
+        if (i >= steps.length) { document.getElementById('tour').textContent = '▶ Guided tour'; return false; }
+        explain.innerHTML = `<b>${i + 1}/${steps.length}</b> ` + steps[i][1];
+        steps[i][2]((t - t0) / steps[i][0], t - t0);
+        return true;
+      };
+    }
+    document.getElementById('tour').addEventListener('click', () => {
+      if (anim) { stopAnim(); explain.innerHTML = DEFAULT_TEXT; return; }
+      startAnim(tour());
+    });
+
+    // Euler vs SLERP: two orientations only ~9° apart but far apart in Euler angles
+    document.getElementById('slerp').addEventListener('click', () => {
+      stopAnim();
+      const A = { yaw: -60, pitch: 85, roll: -60 }, B = { yaw: 60, pitch: 85, roll: 60 };
+      const qA = eulerQuat(A.yaw, A.pitch, A.roll), qB = eulerQuat(B.yaw, B.pitch, B.roll);
+      const angle = (2 * Math.acos(Math.min(1, Math.abs(qA.dot(qB))))) / D2R;
+      explain.innerHTML = `From (ψ,θ,φ) = (−60°, 85°, −60°) to (60°, 85°, 60°): the two orientations differ by only <b>${angle.toFixed(1)}°</b>. `
+        + 'Linear interpolation of the Euler angles (grey trail) takes a long detour, while SLERP on quaternions (purple ghost) takes the shortest path.';
+      const nose = new THREE.Vector3(1.7, 0, 0);
+      const ptsE = [], ptsS = [];
+      for (let i = 0; i <= 100; i++) {
+        const s = i / 100;
+        ptsE.push(nose.clone().applyQuaternion(eulerQuat(A.yaw + 120 * s, 85, A.roll + 120 * s)).toArray());
+        ptsS.push(nose.clone().applyQuaternion(qA.clone().slerp(qB, s)).toArray());
+      }
+      const dur = 4;
+      startAnim((t) => {
+        const s = ease(((t % (dur + 1)) / dur));
+        ang.yaw = A.yaw + 120 * s; ang.pitch = 85; ang.roll = A.roll + 120 * s;
+        ghost.visible = true;
+        ghost.quaternion.copy(qA.clone().slerp(qB, s));
+        trailEuler.setPoints(ptsE.slice(0, Math.round(s * 100) + 1));
+        trailSlerp.setPoints(ptsS.slice(0, Math.round(s * 100) + 1));
+        return t < 3 * (dur + 1);
+      });
+    });
+
+    function loop(now) {
+      if (anim && !anim.fn((now - anim.start) / 1000)) {
+        anim = null;
+        for (const k in offset) offset[k] = 0;
+      }
+      apply();
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
+>>>>>>> Stashed changes

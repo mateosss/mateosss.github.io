@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exponential Map of SO(3)</title>
+  <link rel="stylesheet" href="common.css" />
+  <script src="common.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    .legend { display: grid; grid-template-columns: 14px 1fr; gap: 2px 6px; align-items: center; font-size: 13px; }
+    .sw { width: 14px; height: 4px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="view" id="view">
+      <div class="hint">Drag to orbit · scroll to zoom</div>
+      <div class="timeline">
+        <button class="btn primary" id="play">❚❚ Pause</button>
+        <input type="range" id="time" />
+        <span class="tval" id="tval"></span>
+      </div>
+    </section>
+
+    <aside class="side">
+      <h1>X(t) = R(t) X₀ = exp(ω̂ t) X₀</h1>
+
+      <div class="row"><label>axis az</label><input type="range" id="az" min="-180" max="180" step="1" value="30" /></div>
+      <div class="row"><label>axis el</label><input type="range" id="el" min="-90" max="90" step="1" value="60" /></div>
+      <div class="row"><label>|ω|</label><input type="range" id="speed" min="0.2" max="2" step="0.01" value="0.8" /><span id="speedv" style="width: 4.5em"></span></div>
+      <div class="row"><label>Taylor N</label><input type="range" id="order" min="1" max="12" step="1" value="2" /><span id="orderv" style="width: 4.5em"></span></div>
+
+      <div class="legend">
+        <div class="sw" style="background: #7b1fa2"></div><div>ω: rotation axis, |ω| = angular speed</div>
+        <div class="sw" style="background: #222"></div><div>X(t) = exp(ω̂t) X₀ (exact)</div>
+        <div class="sw" style="background: #e8710a"></div><div>Ẋ(t) = ω̂ X(t) = ω × X(t)</div>
+        <div class="sw" style="background: #1e88e5"></div><div>(I + ω̂ t) X₀: 1st order</div>
+        <div class="sw" style="background: #e53935"></div><div>Σ<sub>n≤N</sub> (ω̂t)ⁿ/n! X₀: Taylor series</div>
+      </div>
+
+      <h2>R(t)</h2>
+      <pre class="mat" id="R"></pre>
+      <h2>Ṙ(t) R(t)ᵀ (numerical) = ω̂</h2>
+      <pre class="mat" id="W"></pre>
+      <div id="err"></div>
+    </aside>
+  </main>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const view = document.getElementById('view');
+    const { scene, render } = Viz.setup(THREE, OrbitControls, CSS2DRenderer, view, { eye: [6, -6.5, 4.5], target: [0, 0, 0.5] });
+    scene.add(Viz.triad(THREE, 1.0, 0.6));
+
+    const X0_LOCAL = [1.6, -0.4, 0.9]; // the point, in the frame of the object at t = 0
+    const omegaArrow = Viz.arrow(THREE, [0, 0, 0], [0, 0, 1], 3, 0x7b1fa2, 0.28, 0.14);
+    const omegaNeg = Viz.polyline(THREE, 0x7b1fa2, 2, { dashed: true });
+    const omegaLabel = Viz.label(THREE, CSS2DObject, 'ω', '#7b1fa2');
+    scene.add(omegaArrow, omegaNeg, omegaLabel);
+
+    const body = Viz.cameraModel(THREE, 0x9e9e9e, 0.55);
+    scene.add(body);
+    const radius = Viz.polyline(THREE, 0x999999, 2, { dashed: true });
+    scene.add(radius);
+
+    const circle = Viz.polyline(THREE, 0x222222, 400, { opacity: 0.2 });
+    const arc = Viz.polyline(THREE, 0x222222, 400);
+    const tangentLine = Viz.polyline(THREE, 0x1e88e5, 400);
+    const taylorLine = Viz.polyline(THREE, 0xe53935, 400);
+    scene.add(circle, arc, tangentLine, taylorLine);
+
+    const pX0 = Viz.dot(THREE, 0x555555, 0.06);
+    pX0.add(Viz.label(THREE, CSS2DObject, 'X₀', '#555', [0, 0, 0.22]));
+    const pX = Viz.dot(THREE, 0x222222, 0.08);
+    pX.add(Viz.label(THREE, CSS2DObject, 'X(t)', '#222', [0, 0, 0.25]));
+    const pLin = Viz.dot(THREE, 0x1e88e5, 0.065);
+    const pTay = Viz.dot(THREE, 0xe53935, 0.065);
+    scene.add(pX0, pX, pLin, pTay);
+    const vel = Viz.arrow(THREE, [0, 0, 0], [1, 0, 0], 1, 0xe8710a, 0.2, 0.1);
+    vel.add(Viz.label(THREE, CSS2DObject, 'Ẋ', '#e8710a', [0, 1.1, 0]));
+    scene.add(vel);
+
+    // --- Parameters -------------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+    let omega = [0, 0, 1], N = 2;
+    let X0 = X0_LOCAL;
+
+    function readParams() {
+      const az = $('az').value * Math.PI / 180, el = $('el').value * Math.PI / 180, s = parseFloat($('speed').value);
+      omega = [s * Math.cos(el) * Math.cos(az), s * Math.cos(el) * Math.sin(az), s * Math.sin(el)];
+      N = parseInt($('order').value);
+      $('speedv').textContent = s.toFixed(2) + ' rad/s';
+      $('orderv').textContent = 'N = ' + N;
+      const dir = Lie.scale(omega, 1 / s);
+      Viz.setArrow(THREE, omegaArrow, [0, 0, 0], Lie.scale(dir, 1.2 + 1.2 * s));
+      omegaNeg.setPoints([[0, 0, 0], Lie.scale(dir, -2.5)]);
+      omegaLabel.position.set(...Lie.scale(dir, 1.45 + 1.2 * s));
+      player.duration = (2 * Math.PI) / s; // one full turn
+      circle.setPoints(sampleCurve((t) => X(t), 0, player.duration, 200));
+      pX0.position.set(...X0);
+    }
+
+    const R = (t) => Lie.expSO3(Lie.scale(omega, t));
+    const X = (t) => Lie.mulv(R(t), X0);
+    // Truncated series sum_{n<=N} (W t)^n / n! applied to X0
+    function taylor(t, n) {
+      const W = Lie.hat(Lie.scale(omega, t));
+      let term = [...X0], sum = [...X0];
+      for (let k = 1; k <= n; k++) { term = Lie.scale(Lie.mulv(W, term), 1 / k); sum = Lie.add(sum, term); }
+      return sum;
+    }
+    function sampleCurve(f, a, b, n) {
+      const pts = [];
+      for (let i = 0; i <= n; i++) pts.push(f(a + ((b - a) * i) / n));
+      return pts;
+    }
+
+    function update(t) {
+      const Rt = R(t);
+      Viz.setPose(THREE, body, { R: Rt, t: [0, 0, 0] });
+      const x = X(t);
+      pX.position.set(...x);
+      // Projection of X onto the axis: centre of the circle
+      const dir = Lie.scale(omega, 1 / Lie.norm(omega));
+      radius.setPoints([Lie.scale(dir, Lie.dot(dir, x)), x]);
+      arc.setPoints(sampleCurve(X, 0, t, Math.max(2, Math.ceil(120 * t / player.duration))));
+      Viz.setArrow(THREE, vel, x, Lie.scale(Lie.cross(omega, x), 0.8));
+      const lin = taylor(t, 1);
+      pLin.position.set(...lin);
+      tangentLine.setPoints([X0, lin]);
+      const tay = taylor(t, N);
+      pTay.position.set(...tay);
+      taylorLine.setPoints(sampleCurve((s) => taylor(s, N), 0, t, Math.max(2, Math.ceil(120 * t / player.duration))));
+      pTay.visible = taylorLine.visible = N > 1;
+
+      $('R').textContent = Fmt.mat(Rt, 3);
+      const h = 1e-4;
+      const Rdot = Lie.mscale(Lie.msub(R(t + h), R(t - h)), 1 / (2 * h));
+      $('W').textContent = Fmt.mat(Lie.mul(Rdot, Lie.T(Rt)), 3);
+      const e1 = Lie.norm(Lie.sub(lin, x)), eN = Lie.norm(Lie.sub(tay, x));
+      $('err').innerHTML = `angle |ω|t = ${(Lie.norm(omega) * t / Math.PI * 180).toFixed(0)}°<br>`
+        + `error 1st order: ${e1.toFixed(3)} &nbsp;·&nbsp; order ${N}: ${eN.toExponential(1)}`;
+    }
+
+    const player = makePlayer({
+      playBtn: $('play'), slider: $('time'), readout: $('tval'), duration: 1, speed: 1,
+      fmt: (t) => 't = ' + Math.min(t, player.duration).toFixed(2) + ' s',
+      onChange: (t) => update(Math.min(t, player.duration)),
+    });
+    for (const id of ['az', 'el', 'speed', 'order']) $(id).addEventListener('input', () => { readParams(); update(Math.min(player.t, player.duration)); });
+    readParams();
+    player.seek(0);
+
+    function loop(now) {
+      player.tick(now);
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

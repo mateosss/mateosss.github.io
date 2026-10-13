@@ -1,0 +1,50 @@
+%!TEX TS-program = pdflatex
+%!TEX encoding = UTF-8 Unicode
+
+\usepackage{etoolbox}
+\AtBeginEnvironment{Shaded}{\scriptsize}
+
+\makeatletter
+% Save the original include graphics command
+\let\old@includegraphics\includegraphics
+
+% Redefine it to check if a width was provided
+\renewcommand{\includegraphics}[2][]{%
+  \centering
+  \ifstrempty{#1}{%
+    % No optional arguments (like width) provided: set default to 0.5\textwidth
+    \old@includegraphics[width=0.5\textwidth]{#2}%
+  }{%
+    % Optional arguments provided: use them (this preserves your {width=100%})
+    \old@includegraphics[#1]{#2}%
+  }%
+}
+\makeatother
+
+% TUM Styleguide: https://portal.mytum.de/corporatedesign/regeln/index_styleguide
+\definecolor{normalblue}{RGB}{0, 101, 189}
+\definecolor{darkblue}{RGB}{0, 51, 89}
+\definecolor{lighterblue}{RGB}{34, 111, 167}
+\definecolor{darkerblue}{RGB}{0, 37, 73}
+\definecolor{ivory}{RGB}{218, 215, 203}
+\definecolor{matbluegreylight}{RGB}{236, 239, 241}
+
+\setbeamercolor{structure}{fg=normalblue} % Subtitles and bulletpoints
+\setbeamercolor{frametitle}{fg=normalblue} % Slide title
+\setbeamercolor{title}{fg=normalblue} % Presentation title
+\setbeamercolor{palette tertiary}{bg=normalblue, fg=white} % Left decoration color
+\setbeamercolor{palette secondary}{bg=darkblue, fg=white} % Mid bottom decoration color
+\setbeamercolor{palette primary}{bg=darkerblue, fg=white} % Right decoration color
+
+\setbeamercolor{author in head/foot}{fg=white, bg=normalblue} % Left deco
+\setbeamercolor{title in head/foot}{fg=white, bg=darkblue} % Mid deco
+\setbeamercolor{date in head/foot}{fg=white, bg=darkerblue} % Right deco
+
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercolor{block title}{fg=black,bg=matbluegreylight}
+\setbeamercolor{block body}{fg=black,bg=matbluegreylight}
+\setbeamercolor{block title}{use=structure,fg=structure.fg,bg=matbluegreylight}
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=matbluegreylight}
+
+\usepackage{mathrsfs}
+\usepackage{amsmath}

@@ -1,0 +1,11 @@
+title: "Vision Based Navigation"
+author: "Computer Vision Group - TUM"
+colorlinks: true
+linkcolor: cyan
+urlcolor: cyan
+header-includes:
+  # - \usepackage{amsmath}
+  # - \DeclareMathOperator*{\argmax}{arg\,max}
+  # - \usepackage{mathscr}
+  # - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,fontsize=\scriptsize,numbers=left,commandchars=\\\{\}}
+  # - \setkeys{Gin}{width=\textwidth,height=\textheight,keepaspectratio}

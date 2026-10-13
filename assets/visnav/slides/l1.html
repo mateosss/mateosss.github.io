@@ -37,8 +37,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -49,7 +50,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -119,6 +120,7 @@
 <section id="title-slide">
   <h1 class="title">Vision Based Navigation</h1>
   <p class="author">Computer Vision Group - TUM</p>
+  <p class="date">19.10.2026</p>
 </section>
 
 <section class="slide level1">
@@ -130,10 +132,26 @@ class="slide level1">
 <h1>Practical Course: Vision Based Navigation</h1>
 <h2 id="lecture-1-introduction-3d-geometry-and-lie-groups">Lecture 1:
 Introduction, 3D Geometry and Lie Groups</h2>
-<p>Mateo de Mayo, Jason Chui, Jonathan Eichhorn</p>
+<p>Mateo de Mayo, Jonathan Eichhorn</p>
 <p>Prof. Dr. Daniel Cremers</p>
 <p><img data-src="res/l1/tumbuilding.png" style="width:40.0%" /></p>
-<p>Version: 01.04.2026</p>
+<p>Date: 19.10.2026</p>
+</section>
+<section id="preliminaries" class="slide level1">
+<h1>Preliminaries</h1>
+<ol type="1">
+<li>Background of participants</li>
+<li><a href="https://cvg.cit.tum.de/teaching/visnav">History</a> of the
+course: from drones to perception</li>
+<li>Course offer:
+<ul>
+<li>How did you find it?</li>
+<li>Opinions on fixed timeslot?</li>
+<li>Compared to other courses?</li>
+</ul></li>
+<li>What do you expect to learn?</li>
+<li>In the context of learning</li>
+</ol>
 <!-- Slide number: 2 -->
 </section>
 <section id="introduction" class="slide level1">
@@ -152,6 +170,79 @@ data-src="res/l1/image_373637.jpeg" /></p>
 data-src="res/l1/image_362938.jpeg" style="width:80.0%" /></p>
 </div>
 </div>
+</section>
+<section id="applications-today-drones-and-3d-capture"
+class="slide level1">
+<h1>Applications Today: Drones and 3D Capture</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/iqHN56MwdKM?mute=1&loop=1&playlist=iqHN56MwdKM&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Antigravity A1: 8K 360° drone (2026)</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/H4PsfCmxbo8?mute=1&loop=1&playlist=H4PsfCmxbo8&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Stipple: Realtime 3D Gaussian Splatting on AR glasses (2026)</p></div></p>
+</div>
+</div>
+<ul>
+<li>Drones: visual-inertial odometry for stabilization, obstacle
+avoidance, follow-me and return-to-home.</li>
+<li>Gaussian splatting needs accurate camera poses first: they usually
+come from SfM (e.g., COLMAP) or SLAM, exactly what you will
+implement.</li>
+</ul>
+</section>
+<section id="applications-today-ar-and-vr-glasses" class="slide level1">
+<h1>Applications Today: AR and VR Glasses</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/qIQ7Qga61QI?mute=1&loop=1&playlist=qIQ7Qga61QI&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">XREAL Project Aura (Android XR)</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/xyD_bmMy5nQ?mute=1&loop=1&playlist=xyD_bmMy5nQ&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Meta VR Glasses (2027)</p></div></p>
+</div>
+</div>
+<ul>
+<li>Every XR device runs inside-out visual-inertial SLAM to keep virtual
+content anchored to the world.</li>
+<li>Requirements: low latency, high frequency, low power, and robustness
+to fast head motions.</li>
+</ul>
+</section>
+<section id="applications-today-robots-and-cars" class="slide level1">
+<h1>Applications Today: Robots and Cars</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/uq8uEp7UXsc?mute=1&loop=1&playlist=uq8uEp7UXsc&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">SLAM mapping and localization in an apple orchard</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/TUDiG7PcLBs?mute=1&loop=1&playlist=TUDiG7PcLBs&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Tesla Full Self-Driving (Supervised)</p></div></p>
+</div>
+</div>
+<ul>
+<li>Agriculture: GNSS is unreliable under the canopy, so robots rely on
+SLAM to navigate rows of trees and crops.</li>
+<li>Autonomous driving: camera-only (Tesla) vs. cameras + LiDAR + radar
+(e.g., Waymo).</li>
+</ul>
+</section>
+<section id="cameras-vs.-lidar-an-open-debate" class="slide level1">
+<h1>Cameras vs. LiDAR: An Open Debate</h1>
+<blockquote>
+<p>“Lidar and radar reduce safety due to sensor contention. If
+lidars/radars disagree with cameras, which one wins? This sensor
+ambiguity causes increased, not decreased, risk. That’s why Waymos can’t
+drive on highways. We turned off the radars in Teslas to increase
+safety. Cameras ftw.”</p>
+<p>— Elon Musk on X, 25 Aug 2025, <a
+href="https://x.com/elonmusk/status/1959831831668228450"
+class="uri">https://x.com/elonmusk/status/1959831831668228450</a></p>
+</blockquote>
+<ul>
+<li>Argument for vision only: humans drive with two eyes, cameras are
+cheap, and the world is designed for vision.</li>
+<li>Argument against: cameras struggle with low light, glare and
+textureless scenes, and LiDAR measures depth directly.</li>
+<li>Note: some of the claims in the post were disputed (e.g., Waymo was
+already testing on highways).</li>
+<li><em>Who’s right? it depends on your problem constraints, but
+vision/vision-inertial has lots of advantages</em></li>
+</ul>
 <!-- Slide number: 4 -->
 </section>
 <section id="sensors-for-navigation" class="slide level1">
@@ -198,7 +289,10 @@ Wikipedia</figcaption>
 <li>Monocular</li>
 <li>Stereo</li>
 <li>RGB-D</li>
-<li>Event camera,</li>
+<li>Multi-camera rigs and 360° cameras</li>
+<li>Wearable and egocentric cameras (glasses)</li>
+<li>Event cameras</li>
+<li>Pixel processor arrays</li>
 <li>…</li>
 </ul></li>
 </ul>
@@ -223,6 +317,56 @@ or large + far away?</figcaption>
 </figure>
 </div>
 </div>
+</section>
+<section id="modern-cameras-360-and-wearable" class="slide level1">
+<h1>Modern Cameras: 360° and Wearable</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/8SoY7hiXc4M?mute=1&loop=1&playlist=8SoY7hiXc4M&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Insta360 X5: dual fisheye 360° camera</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/HSPiKMLVPI0?mute=1&loop=1&playlist=HSPiKMLVPI0&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">DJI Osmo Nano: wearable POV camera (chest, head, cap)</p></div></p>
+</div>
+</div>
+<ul>
+<li>360° cameras: two fisheye lenses cover the full sphere, so features
+never leave the field of view.</li>
+<li>Body-worn cameras: strong motion blur and fast rotations, a hard
+case for visual odometry.</li>
+</ul>
+</section>
+<section id="modern-cameras-glasses" class="slide level1">
+<h1>Modern Cameras: Glasses</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/GjZo2On_oOI?mute=1&loop=1&playlist=GjZo2On_oOI&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Meta Project Aria Gen 2: research glasses with SLAM cameras, IMUs, eye tracking</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/hrj4NQuE93M?mute=1&loop=1&playlist=hrj4NQuE93M&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Meta Ray-Ban Display: AI glasses with a camera and a display</p></div></p>
+</div>
+</div>
+<ul>
+<li>Egocentric (first-person) data: the camera moves with the head of
+the wearer.</li>
+<li>Tight budgets for power, weight and heat: navigation must be
+extremely efficient.</li>
+</ul>
+</section>
+<section id="modern-cameras-neuromorphic-sensors" class="slide level1">
+<h1>Modern Cameras: Neuromorphic Sensors</h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/MjX3z-6n3iA?mute=1&loop=1&playlist=MjX3z-6n3iA&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Event cameras: each pixel independently reports brightness changes</p></div></p>
+</div><div class="column" style="width:50%;">
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100%;aspect-ratio:16/9" src="https://www.youtube.com/embed/QDucNhl8ir8?mute=1&loop=1&playlist=QDucNhl8ir8&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Pixel processor arrays (SCAMP): a small processor in every pixel</p></div></p>
+</div>
+</div>
+<ul>
+<li>Event cameras (e.g., Prophesee): asynchronous, microsecond latency,
+high dynamic range, no motion blur.</li>
+<li>Pixel processor arrays: compute features on the sensor itself, then
+only send the result.</li>
+<li>Both need new algorithms: there are no “images” in the classical
+sense.</li>
+</ul>
 <!-- Slide number: 7 -->
 </section>
 <section id="stereo-cameras" class="slide level1">
@@ -246,6 +390,65 @@ class="no-margin-left" /></p>
 <div class="center">
 <p>Moving stereo: disparity can be estimated in the motion</p>
 </div>
+</section>
+<section id="tracking-cameras" class="slide level1">
+<h1>Tracking Cameras</h1>
+<div class="columns">
+<div class="column" style="width:45%;">
+<p>Cameras built for tracking (e.g., in XR headsets) are different from
+cameras for photos:</p>
+<ul>
+<li>Two or more cameras, often with little or no overlap, to maximize
+coverage</li>
+<li>Wide field of view (fisheye lenses)</li>
+<li>Global shutter: the whole image is exposed at once, no rolling
+shutter distortion</li>
+<li>Monochrome: more light per pixel, often with IR illumination</li>
+<li>Low resolution (around VGA, 640×480): cheap to process at high frame
+rates</li>
+<li>Hardware synchronized with an IMU</li>
+</ul>
+</div><div class="column" style="width:55%;">
+<figure>
+<img data-src="res/l1/monado-reverb-g2.jpg" style="width:90.0%"
+alt="HP Reverb G2: four tracking cameras. De Mayo, M., Cremers, D., Pire, T. “The Monado SLAM Dataset for Egocentric Visual-Inertial Tracking”, IROS 2025" />
+<figcaption aria-hidden="true">HP Reverb G2: four tracking cameras. De
+Mayo, M., Cremers, D., Pire, T. “The Monado SLAM Dataset for Egocentric
+Visual-Inertial Tracking”, IROS 2025</figcaption>
+</figure>
+<p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:70%;aspect-ratio:16/9" src="https://www.youtube.com/embed/yD-QHvRv-q4?mute=1&loop=1&playlist=yD-QHvRv-q4&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">Steam Frame (2026): four monochrome tracking cameras with IR illumination</p></div></p>
+</div>
+</div>
+</section>
+<section id="cameras-for-slam-hilti-2026" class="slide level1">
+<h1>360° Cameras for SLAM: Hilti 2026</h1>
+<div class="columns">
+<div class="column" style="width:40%;">
+<figure>
+<img data-src="res/l1/hilti-2026-rig.jpg" style="width:100.0%"
+alt="Insta360 ONE RS 1-Inch 360 Edition on the data collection rig" />
+<figcaption aria-hidden="true">Insta360 ONE RS 1-Inch 360 Edition on the
+data collection rig</figcaption>
+</figure>
+</div><div class="column" style="width:60%;">
+<ul>
+<li>Hilti-Trimble-Oxford Dataset (2026): 30 visual-inertial sequences on
+a construction site.</li>
+<li>A single consumer 360° camera with two fisheye cameras (~220° FOV
+each) and an IMU.</li>
+<li>Challenges: SLAM and localization against floor plans.</li>
+</ul>
+<figure>
+<img data-src="res/l1/hilti-2026-360.jpg" style="width:90.0%"
+alt="Equirectangular 360° image from the dataset" />
+<figcaption aria-hidden="true">Equirectangular 360° image from the
+dataset</figcaption>
+</figure>
+<p>Centanni, S. et al. “Hilti-Trimble-Oxford Dataset: 360
+Visual-Inertial Benchmark with Floor Plan Priors for SLAM and
+Localization”, arXiv:2607.06464, 2026.</p>
+</div>
+</div>
 <!-- Slide number: 8 -->
 </section>
 <section id="content-of-the-practical-course" class="slide level1">
@@ -267,7 +470,7 @@ exercises:</p>
 <li>Ceres for optimisation</li>
 <li>Pangolin for visualisation</li>
 <li>Git</li>
-<li>Supported OS: Ubuntu 22.04, 24.04, 26.04</li>
+<li>Supported OS: Ubuntu 24.04 and 26.04</li>
 <li>Unsupported but likely to work with some effort: MacOS (easier) and
 Windows</li>
 </ul>
@@ -329,38 +532,72 @@ Heidelberg.</figcaption>
 <section id="what-you-will-implement-vo" class="slide level1">
 <h1>What You Will Implement (VO)</h1>
 <p><div class="youtube-container" style="text-align:center;align-content:center;height:90%"><iframe style="width:100vw;aspect-ratio:16/9" src="https://www.youtube.com/embed/9MB1951M_Zs?mute=1&loop=1&playlist=9MB1951M_Zs&controls=1&showinfo=0&rel=0&modestbranding=1&autoplay=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><p class="caption">VO Homework Demo</p></div></p>
+</section>
+<section id="classical-geometry-in-the-age-of-learning"
+class="slide level1">
+<h1>Classical Geometry in the Age of Learning</h1>
+<p>Recent learning-based methods that build on the same foundations:</p>
+<ul>
+<li><strong>DROID-SLAM</strong> (2021): learned optical flow +
+differentiable bundle adjustment</li>
+<li><strong>3D Gaussian Splatting</strong> (2023) and Gaussian Splatting
+SLAM (2024): new map representations</li>
+<li><strong>DUSt3R / MASt3R</strong> (2024) and
+<strong>MASt3R-SLAM</strong> (2025): dense 3D reconstruction from image
+pairs with a transformer</li>
+<li><strong>VGGT</strong> (2025): a single network predicts cameras,
+depth and point tracks for many views</li>
+</ul>
+<p>They still rely on what you learn in this course: camera models, Lie
+groups for poses, epipolar geometry, bundle adjustment, and careful
+evaluation. Classical pipelines remain the standard where efficiency,
+accuracy guarantees or interpretability matter (e.g., XR headsets,
+drones).</p>
 <!-- Slide number: 14 -->
 </section>
 <section id="recommended-literature" class="slide level1">
 <h1>Recommended Literature</h1>
 <div class="columns">
-<div class="column" style="width:50%;">
+<div class="column" style="width:33%;">
 <figure>
-<img data-src="res/l1/image_968011.png"
-alt="Hartley and Zisserman, Multiple view geometry in computer vision" />
-<figcaption aria-hidden="true">Hartley and Zisserman, Multiple view
-geometry in computer vision</figcaption>
+<img data-src="res/l1/image_968011.png" style="width:55.0%"
+alt="Timothy Barfoot, State Estimation for Robotics" />
+<figcaption aria-hidden="true">Timothy Barfoot, State Estimation for
+Robotics</figcaption>
 </figure>
-</div><div class="column" style="width:50%;">
+</div><div class="column" style="width:33%;">
 <figure>
-<img data-src="res/l1/image_200347.png"
-alt="Timothy Barfoot, State estimation for robotics" />
-<figcaption aria-hidden="true">Timothy Barfoot, State estimation for
-robotics</figcaption>
+<img data-src="res/l1/image_200347.png" style="width:55.0%"
+alt="Hartley and Zisserman, Multiple View Geometry in Computer Vision" />
+<figcaption aria-hidden="true">Hartley and Zisserman, Multiple View
+Geometry in Computer Vision</figcaption>
+</figure>
+</div><div class="column" style="width:33%;">
+<figure>
+<img data-src="res/l1/slam-handbook.jpg" style="width:55.0%"
+alt="Carlone, Kim, Barfoot, Cremers, Dellaert (eds.), SLAM Handbook (2026)" />
+<figcaption aria-hidden="true">Carlone, Kim, Barfoot, Cremers, Dellaert
+(eds.), SLAM Handbook (2026)</figcaption>
 </figure>
 </div>
 </div>
+<p>The SLAM Handbook covers the current state of SLAM, free draft: <a
+href="https://github.com/SLAM-Handbook-contributors/slam-handbook-public-release"
+class="uri">https://github.com/SLAM-Handbook-contributors/slam-handbook-public-release</a></p>
 <!-- Slide number: 15 -->
 </section>
-<section id="multiple-view-geometry" class="slide level1">
-<h1>Multiple View Geometry</h1>
+<section id="d-computer-vision-3dcv" class="slide level1">
+<h1>3D Computer Vision (3DCV)</h1>
+<p>Prof. Cremers’ lecture <strong>3D Computer Vision (3DCV)</strong>,
+previously called <strong>Computer Vision II: Multiple View Geometry
+(CV2)</strong>, covers the theory behind this practical course.</p>
 <figure>
 <img data-src="res/l1/image_268126.jpeg"
 alt="Multiple View Geometry Lecture by Prof. Dr. Daniel Cremers - TU München" />
 <figcaption aria-hidden="true">Multiple View Geometry Lecture by
 Prof. Dr. Daniel Cremers - TU München</figcaption>
 </figure>
-<p>Video: <a
+<p>Video (recorded as CV2): <a
 href="https://www.youtube.com/watch?v=RDkwklFGMfo&amp;list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4"
 class="uri">https://www.youtube.com/watch?v=RDkwklFGMfo&amp;list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4</a></p>
 <p>Due to the issues with camera exposure we encourage you to download
@@ -623,6 +860,18 @@ called special linear group <span class="math inline">\(SL(n)\)</span>.
 The inverse of <span class="math inline">\(A\)</span> is also in this
 group as <span class="math inline">\(\det(A^{-1}) = \det(A)^{-1} =
 1\)</span>.</p>
+</section>
+<section id="interactive-groups-acting-on-objects" class="slide level1">
+<h1>Interactive: Groups Acting on Objects</h1>
+<p>Elements of a group are both “things” (a translation, a rotation, a
+pose) and actions that smoothly move other things, including other
+elements of the group. Try composition, inverses, and the order of
+operations for <span class="math inline">\((\mathbb{R}^3, +)\)</span>,
+<span class="math inline">\(SO(3)\)</span> and <span
+class="math inline">\(SE(3)\)</span>. Go to the visualization page: <a
+href="https://mateosss.github.io/assets/visnav/slides/res/l1/groups.html"
+class="uri">https://mateosss.github.io/assets/visnav/slides/res/l1/groups.html</a></p>
+<iframe style="width: 100%; height: 40vh;" src="res/l1/groups.html" title="Interactive: Groups Acting on Objects" frameborder="0" allowfullscreen></iframe>
 <!-- Slide number: 24 -->
 </section>
 <section id="matrix-representation-of-groups" class="slide level1">
@@ -733,6 +982,15 @@ alt="Gimbal lock" />
 </figure>
 </div>
 </div>
+</section>
+<section id="interactive-gimbal-lock" class="slide level1">
+<h1>Interactive: Gimbal Lock</h1>
+<p>Take the guided tour, then set pitch to 90° and wiggle yaw and roll.
+Also compare interpolating Euler angles with SLERP on quaternions. Go to
+the visualization page: <a
+href="https://mateosss.github.io/assets/visnav/slides/res/l1/gimbal-lock.html"
+class="uri">https://mateosss.github.io/assets/visnav/slides/res/l1/gimbal-lock.html</a></p>
+<iframe style="width: 100%; height: 40vh;" src="res/l1/gimbal-lock.html" title="Interactive: Gimbal Lock" frameborder="0" allowfullscreen></iframe>
 <!-- Slide number: 27 -->
 </section>
 <section id="representations-of-rotation-1" class="slide level1">
@@ -903,7 +1161,8 @@ the group <span class="math inline">\(SO(3) = \{R \in \mathbb{R}^{3
 \times 3} \mid R^T R = I, \det(R) = +1\}\)</span>. Thus the rigid-body
 motion <span class="math inline">\(g_t\)</span> can be written as:</p>
 <p><span class="math display">\[g_t(x) = R x + T\]</span></p>
-<p><img data-src="res/l1/image_556772.png" style="width:40.0%" /></p>
+<!-- TODO@mateosss: This plot is reused here but not sure if that's the right thing to do? maybe this got wrongly placed by markitdown, review -->
+<p><img data-src="res/l1/image_517862.png" style="width:40.0%" /></p>
 <!-- Slide number: 33 -->
 </section>
 <section id="the-euclidean-group" class="slide level1">
@@ -1023,6 +1282,20 @@ gives the <strong>first order approximation</strong> of a rotation:</p>
 then</p>
 <p><span class="math display">\[R(\Delta t) = I + \hat{\omega}(0) \Delta
 t\]</span></p>
+</section>
+<section id="interactive-infinitesimal-rotations" class="slide level1">
+<h1>Interactive: Infinitesimal Rotations</h1>
+<p>A point <span class="math inline">\(X(t) = R(t) X_0\)</span> rotating
+with constant <span class="math inline">\(\omega\)</span>: its velocity
+is <span class="math inline">\(\dot{X} = \hat{\omega} X\)</span>, the
+first order approximation <span class="math inline">\((I + \hat{\omega}
+t) X_0\)</span> leaves the circle, and the Taylor series of <span
+class="math inline">\(\exp(\hat{\omega} t)\)</span> (next slides)
+converges to it as <span class="math inline">\(N\)</span> grows. Go to
+the visualization page: <a
+href="https://mateosss.github.io/assets/visnav/slides/res/l1/so3-exp.html"
+class="uri">https://mateosss.github.io/assets/visnav/slides/res/l1/so3-exp.html</a></p>
+<iframe style="width: 100%; height: 40vh;" src="res/l1/so3-exp.html" title="Interactive: Infinitesimal Rotations" frameborder="0" allowfullscreen></iframe>
 <!-- Slide number: 36 -->
 </section>
 <section id="lie-group-and-lie-algebra" class="slide level1">
